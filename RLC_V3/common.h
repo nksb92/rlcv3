@@ -185,8 +185,16 @@ enum {
   HSV_PAGE,
   RGB_PAGE,
   DMX_PAGE,
-  PDC_PAGE,
+  ARTNET_NODE,
+  ARTNET_REC,
+  SEGMENT_CNTRL,
   MAIN_LAST
+};
+
+enum {
+  MAIN_MENU,
+  SUB_MENU,
+  MAX_DEEP
 };
 
 /**
@@ -194,6 +202,7 @@ enum {
 */
 class main {
   uint8_t current = HSV_PAGE;
+  uint8_t deepness = MAIN_MENU;
 
 public:
   /**
@@ -201,6 +210,10 @@ public:
   */
   uint8_t get_current() {
     return current;
+  }
+
+  uint8_t get_deepness() {
+    return deepness;
   }
 
   /**
@@ -213,6 +226,14 @@ public:
       current = MAIN_LAST - 1;
     } else {
       current = _current;
+    }
+  }
+
+  void set_deepness(uint8_t _deepness) {
+    if (_deepness >= MAX_DEEP) {
+      deepness = MAX_DEEP - 1;
+    } else {
+      deepness = _deepness;
     }
   }
 
@@ -230,6 +251,13 @@ public:
     current++;
     if (current >= MAIN_LAST) {
       set_hsv();
+    }
+  }
+
+  void deeper() {
+    deepness++;
+    if (deepness >= MAX_DEEP) {
+      deepness = 0;
     }
   }
 };

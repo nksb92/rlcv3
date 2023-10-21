@@ -46,7 +46,7 @@ void init_eeprom() {
   crcInit();
 }
 
-void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, pdc_page& pdc, main& main_sw) {
+void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES];
   uint8_t crc_index = 0;
@@ -102,19 +102,6 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, pdc_page& pdc
   crc_values[crc_index] = start_address;
   crc_index++;
 
-  // get all variables from the pre defined color page
-  uint8_t current_pdc = STD_CURRENT;
-  EEPROM.get(eeprom_address, current_pdc);
-  eeprom_address += sizeof(current_pdc);
-  crc_values[crc_index] = current_pdc;
-  crc_index++;
-
-  uint8_t brightness_p = STD_BRIGHTNESS_PDC;
-  EEPROM.get(eeprom_address, brightness_p);
-  eeprom_address += sizeof(brightness_p);
-  crc_values[crc_index] = brightness_p;
-  crc_index++;
-
   // get the current main state
   uint8_t current_main = STD_CURRENT;
   EEPROM.get(eeprom_address, current_main);
@@ -139,14 +126,11 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, pdc_page& pdc
     dmx_val.set_current(current_dmx);
     dmx_val.set_start_address(start_address);
 
-    pdc.set_current(current_pdc);
-    pdc.set_bright(brightness_p);
-
     main_sw.set_current(current_main);
   }
 }
 
-void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, pdc_page& pdc, main& main_sw) {
+void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES];
   uint8_t crc_index = 0;
@@ -200,19 +184,6 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, pdc_page& pd
   EEPROM.put(eeprom_address, start_address);
   eeprom_address += sizeof(start_address);
   crc_values[crc_index] = start_address;
-  crc_index++;
-
-  // set all variables from the pre defined color page
-  uint8_t current_pdc = pdc.get_current();
-  EEPROM.put(eeprom_address, current_pdc);
-  eeprom_address += sizeof(current_pdc);
-  crc_values[crc_index] = current_pdc;
-  crc_index++;
-
-  uint8_t brightness_p = pdc.get_bright();
-  EEPROM.put(eeprom_address, brightness_p);
-  eeprom_address += sizeof(brightness_p);
-  crc_values[crc_index] = brightness_p;
   crc_index++;
 
   // set the current main state
