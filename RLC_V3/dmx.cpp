@@ -12,7 +12,7 @@ Pins for the communication with the RS-485 IC
 
 rgb_dmx::rgb_dmx(CRGB init_rgb)
   : modes({ "Wire", "Sender", "Receiver" }) {
-  
+
   dmx_message = init_rgb;
 }
 
@@ -48,7 +48,7 @@ uint16_t rgb_dmx::get_start() {
   return start_address;
 }
 
-uint8_t rgb_dmx::get_used_nbr() {
+uint16_t rgb_dmx::get_used_nbr() {
   return used_addresses;
 }
 
@@ -100,4 +100,11 @@ void rgb_dmx::set_data(uint8_t information, uint16_t index) {
 
 uint8_t rgb_dmx::get_data(uint16_t index) {
   return data[index];
+}
+
+void rgb_dmx::set_number_segments(uint16_t num_segs) {
+  number_segments = num_segs;
+  leds_per_segment = NUM_PIXEL / number_segments;
+  used_addresses = number_segments * 3 + 1;  // RGB for each segment + one channel for dimmer
+  last_address = 512 - used_addresses + 1;
 }

@@ -15,15 +15,17 @@ enum {
 // class to handle dmx messages
 class rgb_dmx {
 
-  volatile uint8_t current = STD_CURRENT;                               // The current menu index
-  volatile uint16_t start_address = STD_START_ADDRESS;                        // The current start address
-  const uint8_t used_addresses = 4;                           // The amount of used addresses -> Red, Green, Blue, Dimming
+  volatile uint8_t current = STD_CURRENT;               // The current menu index
+  volatile uint16_t start_address = STD_START_ADDRESS;  // The current start address
+  uint16_t used_addresses = 4;
+  uint16_t leds_per_segment = 0;
+  uint16_t number_segments = 0;
   volatile uint16_t last_address = 512 - used_addresses + 1;  // The last possible address
 
   CRGB dmx_message;  // Variable to store the color
   uint8_t dim = 0;   // Dimming factor given with the fouth address
 
-  dmx_port_t dmxPort = 0;         // Dmx port for the esp_dmx libarary
+  dmx_port_t dmxPort = 0;  // Dmx port for the esp_dmx libarary
   dmx_config_t config = DMX_CONFIG_DEFAULT;
   uint8_t data[DMX_PACKET_SIZE];  // Array to receive the dmx data in
   char* modes[DMX_LAST];          // Array to store the names of the pages
@@ -79,7 +81,7 @@ public:
   *
   * @return The number of DMX addresses used.
   */
-  uint8_t get_used_nbr();
+  uint16_t get_used_nbr();
 
   /**
   * Adds an offset value to the start address.
@@ -128,5 +130,7 @@ public:
   * @return The value at the given index.
   */
   uint8_t get_data(uint16_t index);
+
+  void set_number_segments(uint16_t num_segs);
 };
 #endif

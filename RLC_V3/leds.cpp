@@ -27,9 +27,11 @@ void drive_pixel(CRGB rgb_val, uint8_t factor) {
   pixels.show();
 }
 
-void show_segments(uint16_t segs, uint16_t pixel_per_seg) {
+void show_segments(uint16_t segs) {
   uint16_t count = 0;
   uint16_t col_sel = 0;
+  uint16_t pixel_per_seg = NUM_PIXEL / segs;
+
   CRGB color(0, 0, 0);
   for (int i = 0; i < segs; i++) {
     if (col_sel % 2 == 0) {

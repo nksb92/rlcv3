@@ -42,7 +42,7 @@ void setup() {
   dmx_val.install_dmx();
   seg.init_segments();
   // read_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
-
+  dmx_val.set_number_segments(seg.get_num_seg());
   Serial.println("Startup complete.");
 
   last_millis = millis();
@@ -139,6 +139,7 @@ void loop() {
             rgb_display_update(display, rgb_val);
             break;
           case DMX_PAGE:
+            dmx_val.add_to_adress(encoder_val);
             dmx_display_update(display, dmx_val);
             break;
           case ARTNET_NODE:
@@ -147,7 +148,8 @@ void loop() {
             break;
           case SEGMENT_CNTRL:
             seg.add_seg(encoder_val);
-            show_segments(seg.get_num_seg(), seg.get_leds_per_seg());
+            show_segments(seg.get_num_seg());
+            dmx_val.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);
             break;
         }
