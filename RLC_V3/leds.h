@@ -2,6 +2,8 @@
 #define LEDS_H
 
 #include "common.h"
+#include <Adafruit_NeoPixel.h>
+#include "segments.h"
 
 #define RED_PIN 10
 #define GREEN_PIN 9
@@ -12,7 +14,6 @@
 #define PWM_FREQ 2000
 #define RESOLUTION 8
 #define DATA_OUT 8
-#define NUM_PIXEL 144
 #define CHIPSET WS2812B
 #define COLOR_ORDER RGB
 
@@ -29,5 +30,7 @@ void init_led();
 void hsv_out(C_HSV hsv_val);
 
 void drive_pixel(CRGB rgb_val, uint8_t factor);
+
+void show_segments(uint16_t segs, uint16_t pixel_per_seg);
 
 #endif

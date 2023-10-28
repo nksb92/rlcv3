@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include "dmx.h"
 #include "common.h"
+#include "segments.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
@@ -45,6 +46,8 @@ void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val);
  * @param dmx_val: the rgb_dmx object containing the current DMX values
  */
 void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val);
+
+void seg_display_update(Adafruit_SSD1306& dp, segments seg);
 
 /**
  * Displays that the EEPROM data has been saved.
