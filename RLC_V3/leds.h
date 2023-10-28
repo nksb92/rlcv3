@@ -31,6 +31,6 @@ void hsv_out(C_HSV hsv_val);
 
 void drive_pixel(CRGB rgb_val, uint8_t factor);
 
-void show_segments(uint16_t segs, uint16_t pixel_per_seg);
+void show_segments(uint16_t segs);
 
 #endif

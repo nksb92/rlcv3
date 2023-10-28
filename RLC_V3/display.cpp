@@ -77,7 +77,7 @@ void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val) {
 
 void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   uint16_t start = dmx_val.get_start();
-  uint8_t used = dmx_val.get_used_nbr();
+  uint16_t used = dmx_val.get_used_nbr();
   char* current_mode = dmx_val.get_current_txt();
   // first row
   dp.setTextColor(WHITE);
