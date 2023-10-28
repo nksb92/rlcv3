@@ -93,6 +93,21 @@ void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   dp.display();
 }
 
+void seg_display_update(Adafruit_SSD1306& dp, segments seg){
+  uint16_t number_seg = seg.get_num_seg();
+  dp.clearDisplay();
+  dp.setTextColor(WHITE);
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_SEGMENTS_PAGE],
+                W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][HEIGHT],
+                1);
+  dp.setCursor(62,29);
+  dp.print(number_seg);
+  dp.display();
+}
+
 void display_saved_status(Adafruit_SSD1306& dp) {
   dp.setTextColor(WHITE);
   dp.clearDisplay();

@@ -13,6 +13,7 @@
 #define STD_CURRENT 0
 #define STD_START_ADDRESS 1
 #define STD_BRIGHTNESS_PDC 75
+#define NUM_PIXEL 144
 
 /**
 * An enum to define the possible hsv modes.

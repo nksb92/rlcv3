@@ -3,6 +3,7 @@
 #include "rotary_encoder.h"
 #include "display.h"
 #include "nvm.h"
+#include "segments.h"
 #include "common.h"
 
 int16_t encoder_val = 0;
@@ -24,11 +25,13 @@ C_HSV hsv_val(STD_HUE, STD_SAT_P, STD_VAL_P);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
 rgb_dmx dmx_val(CRGB(0, 0, 0));
 main main_sw;
+segments seg;
 
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void setup() {
+  delay(2000);
   Serial.begin(115200);
   Serial.println("Startup");
 
@@ -37,7 +40,7 @@ void setup() {
   init_display(display);
   init_encoder(enc_button);
   dmx_val.install_dmx();
-
+  seg.init_segments();
   // read_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
 
   Serial.println("Startup complete.");
@@ -54,8 +57,8 @@ void loop() {
   button_pressed = get_press_state();
   button_long_pressed = get_long_press();
   button_double_pressed = get_double_press();
-
   encoder_val = get_encoder_val();
+
   if (button_pressed) {
     switch (main_sw.get_deepness()) {
       case MAIN_MENU:
@@ -81,6 +84,7 @@ void loop() {
           case ARTNET_REC:
             break;
           case SEGMENT_CNTRL:
+            seg_display_update(display, seg);
             break;
         }
         break;
@@ -134,10 +138,23 @@ void loop() {
             drive_pixel(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
             break;
+          case DMX_PAGE:
+            dmx_display_update(display, dmx_val);
+            break;
+          case ARTNET_NODE:
+            break;
+          case ARTNET_REC:
+            break;
+          case SEGMENT_CNTRL:
+            seg.add_seg(encoder_val);
+            show_segments(seg.get_num_seg(), seg.get_leds_per_seg());
+            seg_display_update(display, seg);
+            break;
         }
         break;
     }
     change_vals = false;
+    encoder_val = 0;
     set_dspl_standby(false);
     last_millis = millis();
     set_event_status(change_vals);
@@ -150,25 +167,18 @@ void loop() {
     display.display();
   }
   // hanlde everthing periodically
-  // switch (main_state) {
-  //   case DMX_PAGE:
-  //     dmx_val.hanlde_dmx();
-  //     switch (dmx_val.get_current()) {
-  //       case WIRE:
-  //         break;
-  //       case SENDER:
-  //         if (millis() - pause_time >= last_send) {
-  //           send(dmx_val);
-  //           last_send = millis();
-  //         }
-  //         break;
-  //       case RECEIVER:
-  //         get_received_data(dmx_val);
+  // switch (main_sw.get_deepness()) {
+  //   case MAIN_MENU:
+  //     break;
+  //   case SUB_MENU:
+  //     switch (main_state) {
+  //       case HSV_PAGE:
+  //         hsv_out(hsv_val);
   //         break;
   //     }
-  //     rgb_out(dmx_val.get_dmx_message(), 255);
   //     break;
   // }
+
 
   // // cycle through display options
   // if (button_pressed) {
