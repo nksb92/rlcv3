@@ -3,6 +3,7 @@
 #include "rotary_encoder.h"
 #include "display.h"
 #include "nvm.h"
+#include "rlc_artnet.h"
 #include "segments.h"
 #include "common.h"
 
@@ -105,49 +106,66 @@ void loop() {
         display_menu(display, main_state);
         drive_pixel(rgb_val.get_rgb(), 0);
         break;
+
       case SUB_MENU:
         switch (main_state) {
           case HSV_PAGE:
-            switch (hsv_val.get_current()) {
-              case HUE:
-                hsv_val.add_hue(encoder_val);
-                break;
-              case SAT:
-                hsv_val.add_sat(encoder_val);
-                break;
-              case VAL:
-                hsv_val.add_val(encoder_val);
-                break;
+            // if encoder val is zero, don't jump into functions
+            if (encoder_val != 0) {
+              switch (hsv_val.get_current()) {
+                case HUE:
+                  hsv_val.add_hue(encoder_val);
+                  break;
+                case SAT:
+                  hsv_val.add_sat(encoder_val);
+                  break;
+                case VAL:
+                  hsv_val.add_val(encoder_val);
+                  break;
+              }
             }
             hsv_out(hsv_val);
             hsv_display_update(display, hsv_val);
             break;
 
           case RGB_PAGE:
-            switch (rgb_val.get_current()) {
-              case RED:
-                rgb_val.add_red(encoder_val);
-                break;
-              case GREEN:
-                rgb_val.add_green(encoder_val);
-                break;
-              case BLUE:
-                rgb_val.add_blue(encoder_val);
-                break;
+            // if encoder val is zero, don't jump into functions
+            if (encoder_val != 0) {
+              switch (rgb_val.get_current()) {
+                case RED:
+                  rgb_val.add_red(encoder_val);
+                  break;
+                case GREEN:
+                  rgb_val.add_green(encoder_val);
+                  break;
+                case BLUE:
+                  rgb_val.add_blue(encoder_val);
+                  break;
+              }
             }
             drive_pixel(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
             break;
+
           case DMX_PAGE:
-            dmx_val.add_to_adress(encoder_val);
+            // if encoder val is zero, don't jump into functions
+            if (encoder_val != 0) {
+              dmx_val.add_to_adress(encoder_val);
+            }
             dmx_display_update(display, dmx_val);
             break;
+
           case ARTNET_NODE:
             break;
+
           case ARTNET_REC:
             break;
+
           case SEGMENT_CNTRL:
-            seg.add_seg(encoder_val);
+            // if encoder val is zero, don't jump into functions
+            if (encoder_val != 0) {
+              seg.add_seg(encoder_val);
+            }
             show_segments(seg.get_num_seg());
             dmx_val.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);

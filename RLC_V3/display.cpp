@@ -1,3 +1,4 @@
+#include "WString.h"
 #include "display.h"
 #include "bitmaps.h"
 
@@ -78,22 +79,29 @@ void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val) {
 void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   uint16_t start = dmx_val.get_start();
   uint16_t used = dmx_val.get_used_nbr();
-  char* current_mode = dmx_val.get_current_txt();
-  // first row
-  dp.setTextColor(WHITE);
+  int16_t x1, y1;
+  uint16_t w, h;
+  String buf = String(start);
+  buf = String(buf + "-");
+  buf = String(buf + (start + used - 1)); 
+
   dp.clearDisplay();
-  dp.setCursor(offset, 11);
-  dp.print("DMX|");
-  dp.print(start);
-  dp.print("-");
-  dp.print(start + used - 1);
-  // seccond row
-  dp.setCursor(offset, offset_y);
-  dp.print(current_mode);
+  dp.setTextColor(WHITE);
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_DMX_PAGE][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_DMX_PAGE][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_DMX_PAGE],
+                W_H_MATRIX_SUB_MENU[NMBR_DMX_PAGE][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_DMX_PAGE][HEIGHT],
+                1);
+
+  // display the start and end address centered  
+  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h); //calc width of new string
+  dp.setCursor((x - w / 2) + (128 / 2), 28);
+  dp.print(buf);
   dp.display();
 }
 
-void seg_display_update(Adafruit_SSD1306& dp, segments seg){
+void seg_display_update(Adafruit_SSD1306& dp, segments seg) {
   uint16_t number_seg = seg.get_num_seg();
   dp.clearDisplay();
   dp.setTextColor(WHITE);
@@ -103,7 +111,7 @@ void seg_display_update(Adafruit_SSD1306& dp, segments seg){
                 W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][WIDTH],
                 W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][HEIGHT],
                 1);
-  dp.setCursor(62,29);
+  dp.setCursor(62, 28);
   dp.print(number_seg);
   dp.display();
 }
@@ -111,8 +119,12 @@ void seg_display_update(Adafruit_SSD1306& dp, segments seg){
 void display_saved_status(Adafruit_SSD1306& dp) {
   dp.setTextColor(WHITE);
   dp.clearDisplay();
-  dp.setCursor(offset + 10, offset_y - 10);
-  dp.print("|>SAVED<|");
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SAVED_SCREEN][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_SAVED_SCREEN][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_SAVED_SCREEN],
+                W_H_MATRIX_SUB_MENU[NMBR_SAVED_SCREEN][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_SAVED_SCREEN][HEIGHT],
+                1);
   dp.display();
 }
 
