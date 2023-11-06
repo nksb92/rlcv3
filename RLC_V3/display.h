@@ -5,6 +5,7 @@
 #include "dmx.h"
 #include "common.h"
 #include "segments.h"
+#include "rlc_artnet.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
@@ -64,5 +65,9 @@ void display_saved_status(Adafruit_SSD1306& dp);
 void display_startup(Adafruit_SSD1306& dp);
 
 void display_menu(Adafruit_SSD1306& dp, uint8_t index);
+
+void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var);
+
+void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var);
 
 #endif

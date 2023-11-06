@@ -11,7 +11,6 @@ void segments::init_segments() {
 
 void segments::set_segments(uint8_t pos) {
   number_segments = possible_segments[pos];
-
 }
 
 void segments::calc_segments() {

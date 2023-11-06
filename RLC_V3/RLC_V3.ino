@@ -12,9 +12,12 @@ uint8_t main_state = 1;
 unsigned long last_millis;
 unsigned long saved_timer_start;
 unsigned long last_send;
+unsigned long last_added_dot = 0;
 uint16_t standby_time = 30000;
 uint16_t display_saved_time = 2000;
 uint8_t pause_time = 10;
+uint16_t add_dot_time = 500;
+
 
 bool display_saved = false;
 bool change_vals = true;
@@ -27,9 +30,19 @@ C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
 rgb_dmx dmx_val(CRGB(0, 0, 0));
 main main_sw;
 segments seg;
+rlc_artnet artnet_val;
 
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
+  uint16_t current_universe = artnet_val.get_start_universe();
+  if (universe == current_universe) {
+    artnet_val.set_current_universe(data);
+  } else if (universe == (current_universe + 1)) {
+    artnet_val.set_next_universe(data);
+  }
+}
 
 void setup() {
   delay(2000);
@@ -42,6 +55,8 @@ void setup() {
   init_encoder(enc_button);
   dmx_val.install_dmx();
   seg.init_segments();
+
+  artnet_val.init(on_artnet_frame);
   // read_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
   dmx_val.set_number_segments(seg.get_num_seg());
   Serial.println("Startup complete.");
@@ -67,23 +82,31 @@ void loop() {
         main_state = main_sw.get_current();
         display_menu(display, main_state);
         break;
+
       case SUB_MENU:
         switch (main_sw.get_current()) {
           case HSV_PAGE:
             hsv_val.next();
             hsv_display_update(display, hsv_val);
             break;
+
           case RGB_PAGE:
             rgb_val.next();
             rgb_display_update(display, rgb_val);
             break;
+
           case DMX_PAGE:
             dmx_display_update(display, dmx_val);
             break;
+
           case ARTNET_NODE:
             break;
+
           case ARTNET_REC:
+            artnet_val.next_selection();
+            display_artnet_rec(display, artnet_val);
             break;
+
           case SEGMENT_CNTRL:
             seg_display_update(display, seg);
             break;
@@ -95,6 +118,35 @@ void loop() {
 
   if (button_long_pressed) {
     main_sw.deeper();
+    switch (main_sw.get_deepness()) {
+      case MAIN_MENU:
+        switch (artnet_val.get_current_fsm()) {
+          case CONNECTING:
+            artnet_val.set_current_fsm(MENU);
+          case ARTNET_REC_PAGE:
+            artnet_val.disconnect_wifi();
+            artnet_val.set_current_fsm(MENU);
+            break;
+        }
+        break;
+      case SUB_MENU:
+        switch (main_state) {
+          case ARTNET_NODE:
+            break;
+          case ARTNET_REC:
+            switch (artnet_val.get_current_fsm()) {
+              case MENU:
+                artnet_val.connect_wifi();
+                artnet_val.set_current_fsm(CONNECTING);
+                display_connecting_artnet(display, artnet_val);
+                last_added_dot = millis();
+                break;
+            }
+            break;
+        }
+        break;
+    }
+    Serial.println(artnet_val.get_wifi_status());
     set_event_status(true);
     set_long_press(false);
   }
@@ -159,6 +211,19 @@ void loop() {
             break;
 
           case ARTNET_REC:
+            switch (artnet_val.get_current_fsm()) {
+              case ARTNET_REC_PAGE:
+                switch (artnet_val.get_current_sel()) {
+                  case UNIVERSE:
+                    artnet_val.add_universe(encoder_val);
+                    break;
+                  case CHANNEL:
+                    artnet_val.add_channel(encoder_val);
+                    break;
+                }
+                display_artnet_rec(display, artnet_val);
+                break;
+            }
             break;
 
           case SEGMENT_CNTRL:
@@ -168,6 +233,7 @@ void loop() {
             }
             show_segments(seg.get_num_seg());
             dmx_val.set_number_segments(seg.get_num_seg());
+            artnet_val.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);
             break;
         }
@@ -186,66 +252,50 @@ void loop() {
     display.clearDisplay();
     display.display();
   }
+
   // hanlde everthing periodically
-  // switch (main_sw.get_deepness()) {
-  //   case MAIN_MENU:
-  //     break;
-  //   case SUB_MENU:
-  //     switch (main_state) {
-  //       case HSV_PAGE:
-  //         hsv_out(hsv_val);
-  //         break;
-  //     }
-  //     break;
-  // }
+  switch (main_sw.get_deepness()) {
+    case MAIN_MENU:
+      break;
+    case SUB_MENU:
+      switch (main_state) {
+        case DMX_PAGE:
+          break;
 
+        case ARTNET_NODE:
+          break;
 
-  // // cycle through display options
-  // if (button_pressed) {
-  //   switch (main_state) {
-  //     case HSV_PAGE:
-  //       hsv_val.next();
-  //       break;
-  //     case RGB_PAGE:
-  //       rgb_val.next();
-  //       break;
-  //     case DMX_PAGE:
-  //       dmx_val.next();
-  //       switch (dmx_val.get_current()) {
-  //         case WIRE:
-  //           receiver_deinit();
-  //           break;
-  //         case SENDER:
-  //           sender_init();
-  //           last_send = millis();
-  //           break;
-  //         case RECEIVER:
-  //           sender_deinit();
-  //           receiver_init();
-  //           break;
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  //   set_press_state(false);
-  // }
+        case ARTNET_REC:
+          // on connection loss, jump to connecting state
+          switch (artnet_val.get_current_fsm()) {
+            case CONNECTING:
+              if (!get_standby_status()) {
+                if (millis() - last_added_dot >= add_dot_time) {
+                  display_connecting_artnet(display, artnet_val);
+                  artnet_val.add_dot();
+                  last_added_dot = millis();
+                }
+              }
+              if (artnet_val.get_wifi_status()) {
+                WiFi.localIP();
+                artnet_val.set_current_fsm(ARTNET_REC_PAGE);
+                display_artnet_rec(display, artnet_val);
+                artnet_val.begin_artnet();
+              }
+              break;
 
-  // // cycle through the main menu
-  // if (button_long_pressed) {
-  //   main_sw.next();
-  //   if (main_sw.get_current() == DMX_PAGE) {
-  //     switch (dmx_val.get_current()) {
-  //       case SENDER:
-  //         sender_init();
-  //         break;
-  //       case RECEIVER:
-  //         receiver_init();
-  //         break;
-  //     }
-  //   }
-  //   set_long_press(false);
-  // }
+            case ARTNET_REC_PAGE:
+              if (!artnet_val.get_wifi_status()) {
+                artnet_val.set_current_fsm(CONNECTING);
+              }
+              artnet_val.artnet_parse();
+              break;
+          }
+          break;
+      }
+      break;
+  }
+
 
   // // save variables to EEPROM and display for two secconds
   // // that the values has been saved
