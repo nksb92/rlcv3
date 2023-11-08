@@ -33,4 +33,5 @@ void drive_pixel(CRGB rgb_val, uint8_t factor);
 
 void show_segments(uint16_t segs);
 
+void output_artnet(rlc_artnet artnet_var);
 #endif

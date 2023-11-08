@@ -93,3 +93,8 @@ void set_event_status(bool state) {
 void set_dspl_standby(bool state) {
   standby = state;
 }
+
+bool get_standby_status()
+{
+  return standby;
+}

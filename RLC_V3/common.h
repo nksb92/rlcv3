@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include "rlc_artnet.h"
 
 #define STD_HUE 0
 #define STD_SAT_P 100
@@ -12,7 +13,6 @@
 #define STD_BLUE 128
 #define STD_CURRENT 0
 #define STD_START_ADDRESS 1
-#define STD_BRIGHTNESS_PDC 75
 #define NUM_PIXEL 144
 
 /**
@@ -238,20 +238,14 @@ public:
     }
   }
 
-  /**
-  * Sets the current mode to HSV.
-  */
-  void set_hsv() {
-    current = HSV_PAGE;
-  }
-
-  /**
-  * Sets the current mode to the next mode in the enum. If the current mode is the last one, sets it to HSV.
-  */
-  void next() {
-    current++;
-    if (current >= MAIN_LAST) {
-      set_hsv();
+  void add_current(int val) {
+    int temp = current + val;
+    if (temp >= MAIN_LAST) {
+      current = HSV_PAGE;
+    } else if (temp < 0) {
+      current = MAIN_LAST - 1;
+    } else {
+      current = temp;
     }
   }
 

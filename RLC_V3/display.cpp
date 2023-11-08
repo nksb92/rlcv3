@@ -83,7 +83,7 @@ void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   uint16_t w, h;
   String buf = String(start);
   buf = String(buf + "-");
-  buf = String(buf + (start + used - 1)); 
+  buf = String(buf + (start + used - 1));
 
   dp.clearDisplay();
   dp.setTextColor(WHITE);
@@ -94,8 +94,8 @@ void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
                 W_H_MATRIX_SUB_MENU[NMBR_DMX_PAGE][HEIGHT],
                 1);
 
-  // display the start and end address centered  
-  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h); //calc width of new string
+  // display the start and end address centered
+  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  //calc width of new string
   dp.setCursor((x - w / 2) + (128 / 2), 28);
   dp.print(buf);
   dp.display();
@@ -160,6 +160,71 @@ void display_menu(Adafruit_SSD1306& dp, uint8_t index) {
                 W_H_MATRIX_MAIN_MENU[MENU_ORDER[next]][WIDTH],
                 W_H_MATRIX_MAIN_MENU[MENU_ORDER[next]][HEIGHT],
                 1);
+
+  dp.display();
+}
+
+void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
+  uint16_t start_channel = artnet_var.get_start_channel();
+  uint16_t end_channel = artnet_var.get_end_channel();
+  uint16_t start_universe = artnet_var.get_start_universe();
+  uint16_t end_universe = artnet_var.get_end_universe();
+  int16_t x1, y1;
+  uint16_t w, h;
+
+  String buf_start = String("STRT ");
+  buf_start = String(buf_start + start_universe);
+  buf_start = String(buf_start + ":");
+  buf_start = String(buf_start + start_channel);
+
+  String buf_end = String("END ");
+  buf_end = String(buf_end + end_universe);
+  buf_end = String(buf_end + ":");
+  buf_end = String(buf_end + end_channel);
+
+  dp.clearDisplay();
+  dp.setTextColor(WHITE);
+
+  // dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][x],
+  //               X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][y],
+  //               BITMAP_SUB_MENU_ARRAY[NMBR_ARTNET_REC_PAGE],
+  //               W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][WIDTH],
+  //               W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][HEIGHT],
+  //               1);
+
+  dp.getTextBounds(buf_start, x, y, &x1, &y1, &w, &h);  //calc width of new string
+  dp.setCursor((x - w / 2) + (128 / 2), 12);
+  dp.print(buf_start);
+
+  dp.getTextBounds(buf_end, x, y, &x1, &y1, &w, &h);  //calc width of new string
+  dp.setCursor((x - w / 2) + (128 / 2), 28);
+  dp.print(buf_end);
+
+  dp.display();
+}
+
+void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
+  uint8_t dots = artnet_var.get_number_dots();
+  int16_t x1, y1;
+  uint16_t w, h;
+  dp.clearDisplay();
+  dp.setTextColor(WHITE);
+
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_ARTNET_REC_PAGE],
+                W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][HEIGHT],
+                1);
+
+  String buf = String("");
+  for (int i = 1; i <= dots; i++) {
+    buf = String(buf + ".");
+  }
+
+  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  //calc width of new string
+  dp.setCursor((x - w / 2) + (128 / 2), 28);
+  dp.print(buf);
 
   dp.display();
 }

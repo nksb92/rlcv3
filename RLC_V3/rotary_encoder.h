@@ -122,4 +122,6 @@ void set_event_status(bool state);
  */
 void set_dspl_standby(bool state);
 
+bool get_standby_status();
+
 #endif 
