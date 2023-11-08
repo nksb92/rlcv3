@@ -79,8 +79,6 @@ void loop() {
   if (button_pressed) {
     switch (main_sw.get_deepness()) {
       case MAIN_MENU:
-        main_sw.next();
-        main_state = main_sw.get_current();
         display_menu(display, main_state);
         break;
 
@@ -156,6 +154,10 @@ void loop() {
   if (change_vals) {
     switch (main_sw.get_deepness()) {
       case MAIN_MENU:
+        if (encoder_val != 0) {
+          main_sw.add_current(encoder_val);
+          main_state = main_sw.get_current();
+        }
         display_menu(display, main_state);
         drive_pixel(rgb_val.get_rgb(), 0);
         break;
