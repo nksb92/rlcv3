@@ -18,7 +18,7 @@ uint16_t display_saved_time = 2000;
 uint8_t pause_time = 10;
 uint16_t add_dot_time = 500;
 
-
+bool artnet_data = false;
 bool display_saved = false;
 bool change_vals = true;
 bool button_pressed = false;
@@ -42,6 +42,7 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
   } else if (universe == (current_universe + 1)) {
     artnet_val.set_next_universe(data);
   }
+  artnet_data = true;
 }
 
 void setup() {
@@ -124,7 +125,7 @@ void loop() {
           case CONNECTING:
             artnet_val.set_current_fsm(MENU);
           case ARTNET_REC_PAGE:
-            artnet_val.disconnect_wifi();
+            artnet_val.stop_artnet();
             artnet_val.set_current_fsm(MENU);
             break;
         }
@@ -247,7 +248,7 @@ void loop() {
   }
 
   // no action for 30 secs will set the display in standby mode
-  if (millis() - last_millis >= standby_time) {
+  if (millis() - last_millis >= standby_time && !get_standby_status()) {
     set_dspl_standby(true);
     display.clearDisplay();
     display.display();
@@ -277,7 +278,6 @@ void loop() {
                 }
               }
               if (artnet_val.get_wifi_status()) {
-                WiFi.localIP();
                 artnet_val.set_current_fsm(ARTNET_REC_PAGE);
                 display_artnet_rec(display, artnet_val);
                 artnet_val.begin_artnet();
@@ -289,6 +289,10 @@ void loop() {
                 artnet_val.set_current_fsm(CONNECTING);
               }
               artnet_val.artnet_parse();
+              if (artnet_data) {
+                output_artnet(artnet_val);
+                artnet_data = false;
+              }
               break;
           }
           break;

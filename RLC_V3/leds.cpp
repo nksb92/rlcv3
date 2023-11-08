@@ -1,3 +1,4 @@
+#include "HWCDC.h"
 #include "leds.h"
 
 CRGB leds[NUM_PIXEL];
@@ -44,6 +45,89 @@ void show_segments(uint16_t segs) {
       count++;
     }
     col_sel++;
+  }
+  pixels.show();
+}
+
+uint16_t set_pixel(uint16_t start, uint16_t end, uint16_t pixel_per_section, uint16_t led_index, uint8_t* data) {
+  Serial.println(start);
+  Serial.println(end);
+  for (uint16_t i = start; i <= end; i += 3) {
+    for (uint16_t j = 0; j < pixel_per_section; j++) {
+      if (led_index < NUM_PIXEL) {
+        // Serial.print(i);
+        // Serial.print(",");
+        pixels.setPixelColor(led_index, pixels.Color(data[i], data[i + 1], data[i + 2]));
+        led_index++;
+      }
+    }
+  }
+  return led_index;
+}
+
+void output_artnet(rlc_artnet artnet_var) {
+  uint16_t sections = artnet_var.get_section_number();
+  uint16_t pixel_per_section = NUM_PIXEL / sections;
+  uint16_t start = artnet_var.get_start_channel() - 1;
+  uint16_t start_next = 0;
+  uint16_t end = artnet_var.get_end_channel();
+  uint16_t end_next = 0;
+  uint8_t* current_universe = artnet_var.get_current_data();
+  uint8_t* next_universe = artnet_var.get_next_data();
+  uint16_t data_index = 1;
+  uint16_t led_index = 0;
+
+  if (end < start) {
+    end_next = end;
+    end = UNIVERSE_SIZE;
+    start_next = 0;
+  }
+
+  uint8_t last_red = 0;
+  uint8_t last_blue = 0;
+  uint8_t last_green = 0;
+
+  for (int i = start; i < end; i++) {
+    int remainder = data_index % 3;
+    switch (remainder) {
+      case 1:
+        last_red = current_universe[i];
+        break;
+      case 2:
+        last_green = current_universe[i];
+        break;
+      case 0:
+        last_blue = current_universe[i];
+        for (int j = 0; j < pixel_per_section; j++) {
+          pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+          led_index++;
+        }
+        break;
+    }
+    data_index++;
+  }
+
+  if (end_next != start_next) {
+    data_index--;
+    for (int i = start_next; i < end_next; i++) {
+      int remainder = data_index % 3;
+      switch (remainder) {
+        case 1:
+          last_red = next_universe[i];
+          break;
+        case 2:
+          last_green = next_universe[i];
+          break;
+        case 0:
+          last_blue = next_universe[i];
+          for (int j = 0; j < pixel_per_section; j++) {
+            pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+            led_index++;
+          }
+          break;
+      }
+      data_index++;
+    }
   }
   pixels.show();
 }

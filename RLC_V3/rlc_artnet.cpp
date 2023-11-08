@@ -133,6 +133,11 @@ uint16_t rlc_artnet::get_used_channel() {
   return used_channel;
 }
 
+uint16_t rlc_artnet::get_section_number()
+{
+  return number_segments;
+}
+
 uint8_t rlc_artnet::get_current_sel() {
   return current;
 }
@@ -143,6 +148,16 @@ uint8_t rlc_artnet::get_current_fsm() {
 
 uint8_t rlc_artnet::get_number_dots() {
   return number_dots;
+}
+
+uint8_t *rlc_artnet::get_current_data()
+{
+  return data_current_universe;
+}
+
+uint8_t *rlc_artnet::get_next_data()
+{
+  return data_next_universe;
 }
 
 /* SETTER FUNCTIONS */
@@ -157,12 +172,10 @@ void rlc_artnet::set_number_segments(uint16_t _segments) {
 }
 
 void rlc_artnet::set_current_universe(uint8_t* data) {
-  Serial.println("Current");
   memcpy(data_current_universe, data, UNIVERSE_SIZE);
 }
 
 void rlc_artnet::set_next_universe(uint8_t* data) {
-  Serial.println("Next");
   memcpy(data_next_universe, data, UNIVERSE_SIZE);
 }
 

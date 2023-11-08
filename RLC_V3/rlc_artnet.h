@@ -33,8 +33,8 @@ private:
   uint8_t current = UNIVERSE;
   uint8_t current_fsm = MENU;
   volatile uint8_t number_dots = 1;
-  uint8_t data_current_universe[UNIVERSE_SIZE];
-  uint8_t data_next_universe[UNIVERSE_SIZE];
+  uint8_t data_current_universe[UNIVERSE_SIZE] = {};
+  uint8_t data_next_universe[UNIVERSE_SIZE] = {};
   bool send_current_universe = false;
 
 public:
@@ -60,9 +60,12 @@ public:
   uint16_t get_start_channel();
   uint16_t get_end_channel();
   uint16_t get_used_channel();
+  uint16_t get_section_number();
   uint8_t get_current_sel();
   uint8_t get_current_fsm();
   uint8_t get_number_dots();
+  uint8_t* get_current_data();
+  uint8_t* get_next_data();
 
   /* SETTER FUNCTIONS */
   void set_number_segments(uint16_t _segments);

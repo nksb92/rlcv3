@@ -5,7 +5,6 @@
 #include "dmx.h"
 #include "common.h"
 #include "segments.h"
-#include "rlc_artnet.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Fonts/FreeMonoBold9pt7b.h>

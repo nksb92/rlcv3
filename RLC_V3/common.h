@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include "rlc_artnet.h"
 
 #define STD_HUE 0
 #define STD_SAT_P 100
