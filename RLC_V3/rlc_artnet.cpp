@@ -65,39 +65,39 @@ void rlc_artnet::add_universe(int value) {
 
 void rlc_artnet::add_channel(int value) {
   int temp = channel_start + value;
-  if (send_current_universe) {
-    if (temp > last_address) {
-      channel_start = 1;
-    } else if (temp < 1) {
-      channel_start = last_address;
-    } else {
-      channel_start = temp;
-    }
-    last_channel = channel_start + used_channel - 1;
 
+  if (temp < FIRST_DMX_ADDRESS) {
+    channel_start = LAST_DMX_ADDRESS;
+  } else if (temp > LAST_DMX_ADDRESS) {
+    channel_start = FIRST_DMX_ADDRESS;
   } else {
-    if (temp < FIRST_DMX_ADDRESS) {
-      channel_start = LAST_DMX_ADDRESS;
-    } else if (temp > LAST_DMX_ADDRESS) {
-      channel_start = FIRST_DMX_ADDRESS;
-    } else {
-      channel_start = temp;
-    }
+    channel_start = temp;
+  }
 
-    if (channel_start + used_channel > UNIVERSE_SIZE) {
-      last_used_universe = current_universe + 1;
-      last_channel = ((channel_start + used_channel) % LAST_DMX_ADDRESS) - 1;  // - 1 -> because 0 is not a valid address
-    } else {
-      last_used_universe = current_universe;
-      last_channel = channel_start + used_channel - 1;
-    }
+  if (channel_start + used_channel > UNIVERSE_SIZE) {
+    last_used_universe = current_universe + 1;
+    last_channel = ((channel_start + used_channel) % LAST_DMX_ADDRESS) - 1;  // - 1 -> because 0 is not a valid address
+  } else {
+    last_used_universe = current_universe;
+    last_channel = channel_start + used_channel - 1;
   }
 }
 
-void rlc_artnet::add_dot()
-{
-  number_dots ++;
-  if(number_dots > 5) number_dots = 1;
+void rlc_artnet::add_dot() {
+  number_dots++;
+  if (number_dots > 5) number_dots = 1;
+}
+
+void rlc_artnet::add_channel_node(int value) {
+  int temp = channel_start + value;
+  if (temp > last_address) {
+    channel_start = 1;
+  } else if (temp < 1) {
+    channel_start = last_address;
+  } else {
+    channel_start = temp;
+  }
+  last_channel = channel_start + used_channel - 1;
 }
 
 void rlc_artnet::artnet_parse() {
@@ -113,8 +113,7 @@ bool rlc_artnet::get_wifi_status() {
   return state;
 }
 
-String rlc_artnet::get_wifi_local_ip()
-{
+String rlc_artnet::get_wifi_local_ip() {
   return WiFi.localIP().toString();
 }
 
@@ -138,8 +137,7 @@ uint16_t rlc_artnet::get_used_channel() {
   return used_channel;
 }
 
-uint16_t rlc_artnet::get_section_number()
-{
+uint16_t rlc_artnet::get_section_number() {
   return number_segments;
 }
 
@@ -155,13 +153,11 @@ uint8_t rlc_artnet::get_number_dots() {
   return number_dots;
 }
 
-uint8_t *rlc_artnet::get_current_data()
-{
+uint8_t* rlc_artnet::get_current_data() {
   return data_current_universe;
 }
 
-uint8_t *rlc_artnet::get_next_data()
-{
+uint8_t* rlc_artnet::get_next_data() {
   return data_next_universe;
 }
 
@@ -170,7 +166,7 @@ uint8_t *rlc_artnet::get_next_data()
 void rlc_artnet::set_number_segments(uint16_t _segments) {
   number_segments = _segments;
   used_channel = number_segments * 3 + 1;  // RGB for each segment + one channel for dimmer
-  last_address = 512 - used_channel + 1;
+  last_address = UNIVERSE_SIZE - used_channel;
   // update values
   add_channel(0);
   add_universe(0);

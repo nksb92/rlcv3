@@ -30,13 +30,12 @@ private:
   uint16_t last_channel = 0;
   uint16_t used_channel = 4;
   uint16_t number_segments = 1;
-  uint16_t last_address = LAST_DMX_ADDRESS - used_channel + 1;
+  uint16_t last_address = UNIVERSE_SIZE - used_channel;
   uint8_t current = UNIVERSE;
   uint8_t current_fsm = MENU;
   volatile uint8_t number_dots = 1;
   uint8_t data_current_universe[UNIVERSE_SIZE] = {};
   uint8_t data_next_universe[UNIVERSE_SIZE] = {};
-  bool send_current_universe = false;
 
 public:
   rlc_artnet();
@@ -47,11 +46,14 @@ public:
   void connect_wifi();
   void disconnect_wifi();
 
+  // channel and universe manipulation
   void next_selection();
   void add_universe(int value);
   void add_channel(int value);
   void add_dot();
+  void add_channel_node(int value);
 
+  // artnet and dmx functions
   void artnet_parse();
 
   /* GETTER FUNCTIONS */

@@ -28,6 +28,35 @@ void drive_pixel(CRGB rgb_val, uint8_t factor) {
   pixels.show();
 }
 
+void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
+  uint16_t data_index = 1;
+  uint8_t led_index = 0;
+  int remainder = 0;
+  int dim_factor = data[dimmer_channel];
+  CRGB color(0,0,0);
+
+  for (int i = start; i < dimmer_channel; i++) {
+    remainder = data_index % 3;
+    switch (remainder) {
+      case 1:
+        color.r = data[i];
+        break;
+      case 2:
+        color.g = data[i];
+        break;
+      case 0:
+        color.b = data[i];
+        for (int j = 0; j < pixel_per_section; j++) {
+          color.nscale8_video(dim_factor);
+          pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
+          led_index++;
+        }
+        break;
+    }
+    data_index++;
+  }
+}
+
 void show_segments(uint16_t segs) {
   uint16_t count = 0;
   uint16_t col_sel = 0;
@@ -47,22 +76,6 @@ void show_segments(uint16_t segs) {
     col_sel++;
   }
   pixels.show();
-}
-
-uint16_t set_pixel(uint16_t start, uint16_t end, uint16_t pixel_per_section, uint16_t led_index, uint8_t* data) {
-  Serial.println(start);
-  Serial.println(end);
-  for (uint16_t i = start; i <= end; i += 3) {
-    for (uint16_t j = 0; j < pixel_per_section; j++) {
-      if (led_index < NUM_PIXEL) {
-        // Serial.print(i);
-        // Serial.print(",");
-        pixels.setPixelColor(led_index, pixels.Color(data[i], data[i + 1], data[i + 2]));
-        led_index++;
-      }
-    }
-  }
-  return led_index;
 }
 
 void output_artnet(rlc_artnet artnet_var) {
