@@ -18,6 +18,7 @@ enum {
 enum {
   UNIVERSE,
   CHANNEL,
+  IP_ADDRESS,
   ARTNET_LAST
 };
 
@@ -55,6 +56,7 @@ public:
 
   /* GETTER FUNCTIONS */
   bool get_wifi_status();
+  String get_wifi_local_ip();
   uint16_t get_start_universe();
   uint16_t get_end_universe();
   uint16_t get_start_channel();
