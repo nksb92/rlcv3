@@ -28,20 +28,20 @@ bool button_double_pressed = false;
 
 C_HSV hsv_val(STD_HUE, STD_SAT_P, STD_VAL_P);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
-rgb_dmx dmx_val(CRGB(0, 0, 0));
+rgb_dmx dmx_val;
 main main_sw;
 segments seg;
-rlc_artnet artnet_val;
+rlc_artnet artnet_var;
 
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
-  uint16_t current_universe = artnet_val.get_start_universe();
+  uint16_t current_universe = artnet_var.get_start_universe();
   if (universe == current_universe) {
-    artnet_val.set_current_universe(data);
+    artnet_var.set_current_universe(data);
   } else if (universe == (current_universe + 1)) {
-    artnet_val.set_next_universe(data);
+    artnet_var.set_next_universe(data);
   }
   artnet_data = true;
 }
@@ -58,7 +58,7 @@ void setup() {
   dmx_val.install_dmx();
   seg.init_segments();
 
-  artnet_val.init(on_artnet_frame);
+  artnet_var.init(on_artnet_frame);
   // read_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
   dmx_val.set_number_segments(seg.get_num_seg());
   Serial.println("Startup complete.");
@@ -100,11 +100,9 @@ void loop() {
             break;
 
           case ARTNET_NODE:
-            break;
-
           case ARTNET_REC:
-            artnet_val.next_selection();
-            display_artnet_rec(display, artnet_val);
+            artnet_var.next_selection();
+            display_artnet_rec(display, artnet_var);
             break;
 
           case SEGMENT_CNTRL:
@@ -120,25 +118,25 @@ void loop() {
     main_sw.deeper();
     switch (main_sw.get_deepness()) {
       case MAIN_MENU:
-        switch (artnet_val.get_current_fsm()) {
+        switch (artnet_var.get_current_fsm()) {
           case CONNECTING:
-            artnet_val.set_current_fsm(MENU);
+            artnet_var.set_current_fsm(MENU);
           case ARTNET_REC_PAGE:
-            artnet_val.stop_artnet();
-            artnet_val.set_current_fsm(MENU);
+            artnet_var.stop_artnet();
+            artnet_var.set_current_fsm(MENU);
             break;
         }
         break;
       case SUB_MENU:
         switch (main_state) {
           case ARTNET_NODE:
-            break;
+            artnet_var.add_channel_node(0);
           case ARTNET_REC:
-            switch (artnet_val.get_current_fsm()) {
+            switch (artnet_var.get_current_fsm()) {
               case MENU:
-                artnet_val.connect_wifi();
-                artnet_val.set_current_fsm(CONNECTING);
-                display_connecting_artnet(display, artnet_val);
+                artnet_var.connect_wifi();
+                artnet_var.set_current_fsm(CONNECTING);
+                display_connecting_artnet(display, artnet_var);
                 last_added_dot = millis();
                 break;
             }
@@ -146,7 +144,6 @@ void loop() {
         }
         break;
     }
-    Serial.println(artnet_val.get_wifi_status());
     set_event_status(true);
     set_long_press(false);
   }
@@ -212,21 +209,26 @@ void loop() {
             break;
 
           case ARTNET_NODE:
-            break;
 
           case ARTNET_REC:
-            switch (artnet_val.get_current_fsm()) {
-              case ARTNET_REC_PAGE:
-                switch (artnet_val.get_current_sel()) {
-                  case UNIVERSE:
-                    artnet_val.add_universe(encoder_val);
-                    break;
-                  case CHANNEL:
-                    artnet_val.add_channel(encoder_val);
-                    break;
-                }
-                display_artnet_rec(display, artnet_val);
-                break;
+            if (encoder_val != 0) {
+              switch (artnet_var.get_current_fsm()) {
+                case ARTNET_REC_PAGE:
+                  switch (artnet_var.get_current_sel()) {
+                    case UNIVERSE:
+                      artnet_var.add_universe(encoder_val);
+                      break;
+                    case CHANNEL:
+                      if (main_state == ARTNET_NODE) {
+                        artnet_var.add_channel_node(encoder_val);
+                      } else {
+                        artnet_var.add_channel(encoder_val);
+                      }
+                      break;
+                  }
+                  display_artnet_rec(display, artnet_var);
+                  break;
+              }
             }
             break;
 
@@ -237,7 +239,7 @@ void loop() {
             }
             show_segments(seg.get_num_seg());
             dmx_val.set_number_segments(seg.get_num_seg());
-            artnet_val.set_number_segments(seg.get_num_seg());
+            artnet_var.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);
             break;
         }
@@ -264,45 +266,50 @@ void loop() {
     case SUB_MENU:
       switch (main_state) {
         case DMX_PAGE:
+          dmx_val.hanlde_dmx();
+          if (dmx_val.get_rec_status()) {
+            set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
+            dmx_val.set_rec_status(false);
+          }
           break;
 
         case ARTNET_NODE:
-          break;
-
+          set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
+          dmx_val.send_universe();
         case ARTNET_REC:
           // on connection loss, jump to connecting state
-          switch (artnet_val.get_current_fsm()) {
+          switch (artnet_var.get_current_fsm()) {
             case CONNECTING:
               if (!get_standby_status()) {
                 if (millis() - last_added_dot >= add_dot_time) {
-                  display_connecting_artnet(display, artnet_val);
-                  artnet_val.add_dot();
+                  display_connecting_artnet(display, artnet_var);
+                  artnet_var.add_dot();
                   last_added_dot = millis();
                 }
               }
-              if (artnet_val.get_wifi_status()) {
-                artnet_val.set_current_fsm(ARTNET_REC_PAGE);
-                display_artnet_rec(display, artnet_val);
-                artnet_val.begin_artnet();
+              if (artnet_var.get_wifi_status()) {
+                artnet_var.set_current_fsm(ARTNET_REC_PAGE);
+                display_artnet_rec(display, artnet_var);
+                artnet_var.begin_artnet();
               }
               break;
 
             case ARTNET_REC_PAGE:
-              // check connection 
-              if (!artnet_val.get_wifi_status()) {
-                artnet_val.set_current_fsm(CONNECTING);
+              // check connection is still available
+              if (!artnet_var.get_wifi_status()) {
+                artnet_var.set_current_fsm(CONNECTING);
               }
 
-              artnet_val.artnet_parse();
+              artnet_var.artnet_parse();
               if (artnet_data) {
-                output_artnet(artnet_val);
+                output_artnet(artnet_var);
                 artnet_data = false;
               }
 
-              if (artnet_val.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
+              if (artnet_var.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
                 if (millis() - last_scroll_time >= scroll_time) {
                   scroll();
-                  display_artnet_rec(display, artnet_val);
+                  display_artnet_rec(display, artnet_var);
                   last_scroll_time = millis();
                 }
               }
@@ -313,7 +320,6 @@ void loop() {
       break;
   }
 
-
   // // save variables to EEPROM and display for two secconds
   // // that the values has been saved
   // if (button_double_pressed) {
@@ -323,14 +329,4 @@ void loop() {
   //   display_saved_status(display);
   //   saved_timer_start = millis();
   // }
-
-  // // display for two secconds that the data has been written to the eeprom
-  // if (millis() - saved_timer_start >= display_saved_time) {
-  //   if (display_saved) {
-  //     change_vals = true;
-  //     display_saved = false;
-  //   }
-  // }
-
-  // main_state = main_sw.get_current();
 }

@@ -31,6 +31,8 @@ void hsv_out(C_HSV hsv_val);
 
 void drive_pixel(CRGB rgb_val, uint8_t factor);
 
+void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t*data);
+
 void show_segments(uint16_t segs);
 
 void output_artnet(rlc_artnet artnet_var);

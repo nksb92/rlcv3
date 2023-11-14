@@ -90,12 +90,6 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw
   crc_index++;
 
   // get all variables from the dmx page
-  uint8_t current_dmx = STD_CURRENT;
-  EEPROM.get(eeprom_address, current_dmx);
-  eeprom_address += sizeof(current_dmx);
-  crc_values[crc_index] = current_dmx;
-  crc_index++;
-
   uint16_t start_address = STD_START_ADDRESS;
   EEPROM.get(eeprom_address, start_address);
   eeprom_address += sizeof(start_address);
@@ -123,9 +117,8 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw
     rgb_val.set_green(green);
     rgb_val.set_blue(blue);
 
-    dmx_val.set_current(current_dmx);
     dmx_val.set_start_address(start_address);
-
+    
     main_sw.set_current(current_main);
   }
 }
@@ -174,12 +167,6 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_s
   crc_index++;
 
   // set all variables from the dmx page
-  uint8_t current_dmx = dmx_val.get_current();
-  EEPROM.put(eeprom_address, current_dmx);
-  eeprom_address += sizeof(current_dmx);
-  crc_values[crc_index] = current_dmx;
-  crc_index++;
-
   uint16_t start_address = dmx_val.get_start();
   EEPROM.put(eeprom_address, start_address);
   eeprom_address += sizeof(start_address);
