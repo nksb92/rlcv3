@@ -113,6 +113,11 @@ bool rlc_artnet::get_wifi_status() {
   return state;
 }
 
+String rlc_artnet::get_wifi_local_ip()
+{
+  return WiFi.localIP().toString();
+}
+
 uint16_t rlc_artnet::get_start_universe() {
   return current_universe;
 }

@@ -67,6 +67,8 @@ void display_menu(Adafruit_SSD1306& dp, uint8_t index);
 
 void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var);
 
+void scroll();
+
 void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var);
 
 #endif

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "WString.h"
 #include "display.h"
 #include "bitmaps.h"
@@ -5,6 +6,8 @@
 uint8_t offset = 5;
 uint8_t offset_y = 26;
 uint8_t last_index = 0;
+int x_scroll = 0;
+int min_x = 0;
 
 void init_display(Adafruit_SSD1306& dp) {
   dp.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
@@ -12,8 +15,9 @@ void init_display(Adafruit_SSD1306& dp) {
   dp.setTextSize(1);
   dp.setTextColor(WHITE);
   dp.setFont(&FreeMonoBold9pt7b);
-  // dp.setRotation(2);
   dp.display();
+  dp.setTextWrap(false);
+  x_scroll = SCREEN_WIDTH;
 }
 
 void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {
@@ -169,38 +173,86 @@ void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
   uint16_t end_channel = artnet_var.get_end_channel();
   uint16_t start_universe = artnet_var.get_start_universe();
   uint16_t end_universe = artnet_var.get_end_universe();
+  uint8_t mode = artnet_var.get_current_sel();
+  uint8_t w_start = 48;
   int16_t x1, y1;
   uint16_t w, h;
-
-  String buf_start = String("STRT ");
-  buf_start = String(buf_start + start_universe);
-  buf_start = String(buf_start + ":");
-  buf_start = String(buf_start + start_channel);
-
-  String buf_end = String("END ");
-  buf_end = String(buf_end + end_universe);
-  buf_end = String(buf_end + ":");
-  buf_end = String(buf_end + end_channel);
+  uint8_t offset_uni = 8;
+  uint8_t offset_chan = 8;
 
   dp.clearDisplay();
   dp.setTextColor(WHITE);
+  dp.stopscroll();
 
-  // dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][x],
-  //               X_Y_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][y],
-  //               BITMAP_SUB_MENU_ARRAY[NMBR_ARTNET_REC_PAGE],
-  //               W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][WIDTH],
-  //               W_H_MATRIX_SUB_MENU[NMBR_ARTNET_REC_PAGE][HEIGHT],
-  //               1);
+  if (mode != IP_ADDRESS) {
+    if (start_universe > 9 || end_universe > 9) {
+      offset_uni = 20;
+    }
 
-  dp.getTextBounds(buf_start, x, y, &x1, &y1, &w, &h);  //calc width of new string
-  dp.setCursor((x - w / 2) + (128 / 2), 12);
-  dp.print(buf_start);
+    if (start_channel > 9 || end_channel > 9) {
+      offset_chan = 20;
+    }
+    if (start_channel > 99 || end_channel > 99) {
+      offset_chan = 32;
+    }
 
-  dp.getTextBounds(buf_end, x, y, &x1, &y1, &w, &h);  //calc width of new string
-  dp.setCursor((x - w / 2) + (128 / 2), 28);
-  dp.print(buf_end);
+    String buf_end = String("END");
+    String start = String("STRT ");
 
+    switch (mode) {
+      case UNIVERSE:
+        dp.setCursor(3, 12);
+        dp.print(start);
+        dp.fillRoundRect(w_start + 3, 0, 25, 14, 3, WHITE);
+        dp.setTextColor(BLACK);
+        dp.getTextBounds(String(start_universe), x, y, &x1, &y1, &w, &h);
+        dp.setCursor(w_start + (14 - offset_uni / 2), 12);
+        dp.print(String(start_universe));
+        dp.setTextColor(WHITE);
+        dp.setCursor(w_start + 3 + 25, 12);
+        dp.print(":");
+        dp.setCursor(w_start + 5 + 25 + 2 + 3 + 2 + (18 - offset_chan / 2), 12);
+        dp.print(start_channel);
+        break;
+      case CHANNEL:
+        dp.setCursor(3, 12);
+        dp.print(start);
+        dp.getTextBounds(String(start_universe), x, y, &x1, &y1, &w, &h);
+        dp.setCursor(w_start + (14 - offset_uni / 2), 12);
+        dp.print(String(start_universe));
+        dp.setCursor(w_start + 3 + 25, 12);
+        dp.print(":");
+        dp.fillRoundRect(w_start + 5 + 25 + 3 + 2 + 3, 0, 35, 14, 3, WHITE);
+        dp.setTextColor(BLACK);
+        dp.setCursor(w_start + 5 + 25 + 2 + 3 + 2 + (18 - offset_chan / 2), 12);
+        dp.print(start_channel);
+        dp.setTextColor(WHITE);
+        break;
+    }
+    dp.setCursor(3, 28);
+    dp.print(buf_end);
+    dp.getTextBounds(String(end_universe), x, y, &x1, &y1, &w, &h);
+    dp.setCursor(w_start + (14 - offset_uni / 2), 28);
+    dp.print(String(end_universe));
+    dp.setCursor(w_start + 3 + 25, 28);
+    dp.print(":");
+    dp.setCursor(w_start + 5 + 25 + 2 + 3 + 2 + (18 - offset_chan / 2), 28);
+    dp.print(end_channel);
+  } else {
+    String ip = String("IP:");
+    ip = String(ip + artnet_var.get_wifi_local_ip());
+    min_x = -12 * ip.length();
+    dp.setCursor(x_scroll, 20);
+    dp.print(ip);
+  }
   dp.display();
+}
+
+void scroll() {
+  x_scroll-=4;
+  if (x_scroll < min_x) {
+    x_scroll = SCREEN_WIDTH;
+  }
 }
 
 void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {

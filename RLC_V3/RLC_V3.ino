@@ -9,13 +9,14 @@
 
 int16_t encoder_val = 0;
 uint8_t main_state = 1;
-unsigned long last_millis;
-unsigned long saved_timer_start;
-unsigned long last_send;
+unsigned long last_millis = 0;
+unsigned long saved_timer_start = 0;
+unsigned long last_send = 0;
 unsigned long last_added_dot = 0;
+unsigned long last_scroll_time = 0;
 uint16_t standby_time = 30000;
 uint16_t display_saved_time = 2000;
-uint8_t pause_time = 10;
+uint8_t scroll_time = 100;
 uint16_t add_dot_time = 500;
 
 bool artnet_data = false;
@@ -287,13 +288,23 @@ void loop() {
               break;
 
             case ARTNET_REC_PAGE:
+              // check connection 
               if (!artnet_val.get_wifi_status()) {
                 artnet_val.set_current_fsm(CONNECTING);
               }
+
               artnet_val.artnet_parse();
               if (artnet_data) {
                 output_artnet(artnet_val);
                 artnet_data = false;
+              }
+
+              if (artnet_val.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
+                if (millis() - last_scroll_time >= scroll_time) {
+                  scroll();
+                  display_artnet_rec(display, artnet_val);
+                  last_scroll_time = millis();
+                }
               }
               break;
           }
