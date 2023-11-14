@@ -23,7 +23,7 @@ def get_num_pixels(filepath):
     width, height = Image.open(filepath).size
     return "{" + str(width) + ", " + str(height) + "}"
 
-for img in walk(Path("F:/Programme/rlcv3/images/sub_menu")): 
+for img in walk(Path("F:/Programme/rlcv3/images/main_menu")): 
     temp_data = DATA.copy()
     w_h = get_num_pixels(img)
     temp_data["name"] = img.stem
