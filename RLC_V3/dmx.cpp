@@ -10,33 +10,7 @@ Pins for the communication with the RS-485 IC
 #define RECEIVE_PIN 20
 #define ENABLE_PIN 5
 
-rgb_dmx::rgb_dmx(CRGB init_rgb)
-  : modes({ "Wire", "Sender", "Receiver" }) {
-
-  dmx_message = init_rgb;
-}
-
-uint8_t rgb_dmx::get_current() {
-  return current;
-}
-
-void rgb_dmx::set_current(uint8_t _current) {
-  if (_current >= DMX_LAST) {
-    current = DMX_LAST - 1;
-  } else {
-    current = _current;
-  }
-}
-
-void rgb_dmx::next() {
-  current++;
-  if (current >= DMX_LAST) {
-    current = 0;
-  }
-}
-
-char* rgb_dmx::get_current_txt() {
-  return modes[current];
+rgb_dmx::rgb_dmx() {
 }
 
 void rgb_dmx::install_dmx() {
@@ -68,43 +42,46 @@ void rgb_dmx::set_start_address(int start) {
   add_to_adress(start - 1);
 }
 
-void rgb_dmx::set_rgb() {
-  dmx_message.r = data[start_address + 0];
-  dmx_message.g = data[start_address + 1];
-  dmx_message.b = data[start_address + 2];
-  dim = data[start_address + 3];  // dimming factor
-  dmx_message.nscale8(dim);
-}
-
 void rgb_dmx::hanlde_dmx() {
-  if (current == WIRE || current == SENDER) {
-    dmx_packet_t packet;
-    if (dmx_receive(dmxPort, &packet, 5)) {
-      if (!packet.err) {
-        dmx_read(dmxPort, data, packet.size);
-        set_rgb();
-      }
+  dmx_packet_t packet;
+  if (dmx_receive(dmxPort, &packet, 5)) {
+    if (!packet.err) {
+      dmx_read(dmxPort, data, packet.size);
+      set_universe(data);
     }
-  } else if (current == RECEIVER) {
-    set_rgb();
   }
 }
 
-CRGB rgb_dmx::get_dmx_message() {
-  return dmx_message;
+bool rgb_dmx::get_rec_status() {
+  return data_received;
 }
 
-void rgb_dmx::set_data(uint8_t information, uint16_t index) {
-  data[index] = information;
+uint16_t rgb_dmx::get_dimmer_address()
+{
+  return last_address;
 }
 
-uint8_t rgb_dmx::get_data(uint16_t index) {
-  return data[index];
+uint8_t *rgb_dmx::get_universe()
+{
+  return data;
+}
+
+void rgb_dmx::set_rec_status(bool status) {
+  data_received = status;
 }
 
 void rgb_dmx::set_number_segments(uint16_t num_segs) {
   number_segments = num_segs;
   leds_per_segment = NUM_PIXEL / number_segments;
   used_addresses = number_segments * 3 + 1;  // RGB for each segment + one channel for dimmer
-  last_address = 512 - used_addresses + 1;
+  last_address = UNIVERSE_SIZE - used_addresses;
+}
+
+void rgb_dmx::set_universe(uint8_t *_data) {
+  memcpy(data, _data, UNIVERSE_SIZE);
+}
+
+void rgb_dmx::send_universe() {
+  dmx_write(dmxPort, data, UNIVERSE_SIZE);
+  dmx_send(dmxPort, UNIVERSE_SIZE);
 }
