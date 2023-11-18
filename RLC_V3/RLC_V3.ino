@@ -24,6 +24,7 @@ bool display_saved = false;
 bool change_vals = true;
 bool button_pressed = false;
 bool button_long_pressed = false;
+bool long_press_triggered = false;
 bool button_double_pressed = false;
 
 C_HSV hsv_val(STD_HUE, STD_SAT_P, STD_VAL_P);
@@ -73,9 +74,20 @@ void loop() {
   enc_button.update();
   change_vals = get_event_status();
   button_pressed = get_press_state();
-  button_long_pressed = get_long_press();
   button_double_pressed = get_double_press();
   encoder_val = get_encoder_val();
+
+  if (get_long_press()) {
+    long_press_triggered = false;
+    set_long_press(false);
+  }
+
+  if (enc_button.isPressed()) {
+    if (enc_button.currentDuration() > LONG_PRESS_TIME && !long_press_triggered) {
+      button_long_pressed = true;
+      long_press_triggered = true;
+    }
+  }
 
   if (button_pressed) {
     switch (main_sw.get_deepness()) {
@@ -101,8 +113,10 @@ void loop() {
 
           case ARTNET_NODE:
           case ARTNET_REC:
-            artnet_var.next_selection();
-            display_artnet_rec(display, artnet_var);
+            if (artnet_var.get_current_fsm() == ARTNET_PAGE) {
+              artnet_var.next_selection();
+              display_artnet_rec(display, artnet_var);
+            }
             break;
 
           case SEGMENT_CNTRL:
@@ -121,7 +135,7 @@ void loop() {
         switch (artnet_var.get_current_fsm()) {
           case CONNECTING:
             artnet_var.set_current_fsm(MENU);
-          case ARTNET_REC_PAGE:
+          case ARTNET_PAGE:
             artnet_var.stop_artnet();
             artnet_var.set_current_fsm(MENU);
             break;
@@ -145,7 +159,7 @@ void loop() {
         break;
     }
     set_event_status(true);
-    set_long_press(false);
+    button_long_pressed = false;
   }
 
   // handle everything on event
@@ -213,7 +227,7 @@ void loop() {
           case ARTNET_REC:
             if (encoder_val != 0) {
               switch (artnet_var.get_current_fsm()) {
-                case ARTNET_REC_PAGE:
+                case ARTNET_PAGE:
                   switch (artnet_var.get_current_sel()) {
                     case UNIVERSE:
                       artnet_var.add_universe(encoder_val);
@@ -288,13 +302,13 @@ void loop() {
                 }
               }
               if (artnet_var.get_wifi_status()) {
-                artnet_var.set_current_fsm(ARTNET_REC_PAGE);
+                artnet_var.set_current_fsm(ARTNET_PAGE);
                 display_artnet_rec(display, artnet_var);
                 artnet_var.begin_artnet();
               }
               break;
 
-            case ARTNET_REC_PAGE:
+            case ARTNET_PAGE:
               // check connection is still available
               if (!artnet_var.get_wifi_status()) {
                 artnet_var.set_current_fsm(CONNECTING);
