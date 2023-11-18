@@ -17,6 +17,8 @@
 // The pin number for the DT (data) pin of the rotary encoder
 #define DT_PIN 4
 
+#define LONG_PRESS_TIME 750
+
 /**
  * Initialize the rotary encoder module with the specified EncoderButton object.
  *
@@ -124,4 +126,4 @@ void set_dspl_standby(bool state);
 
 bool get_standby_status();
 
-#endif 
+#endif

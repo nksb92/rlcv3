@@ -12,7 +12,7 @@
 enum {
   MENU,
   CONNECTING,
-  ARTNET_REC_PAGE
+  ARTNET_PAGE
 };
 
 enum {
