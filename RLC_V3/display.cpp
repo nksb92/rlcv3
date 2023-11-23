@@ -17,7 +17,7 @@ void init_display(Adafruit_SSD1306& dp) {
   dp.setFont(&FreeMonoBold9pt7b);
   dp.display();
   dp.setTextWrap(false);
-  x_scroll = SCREEN_WIDTH;
+  x_scroll = SCREEN_WIDTH / 3;
 }
 
 void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {
@@ -241,7 +241,7 @@ void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
   } else {
     String ip = String("IP:");
     ip = String(ip + artnet_var.get_wifi_local_ip());
-    min_x = -12 * ip.length();
+    min_x = -12 * ip.length() + SCREEN_WIDTH / 2;
     dp.setCursor(x_scroll, 20);
     dp.print(ip);
   }
@@ -249,9 +249,9 @@ void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
 }
 
 void scroll() {
-  x_scroll-=4;
+  x_scroll -= 5;
   if (x_scroll < min_x) {
-    x_scroll = SCREEN_WIDTH;
+    x_scroll = SCREEN_WIDTH / 3;
   }
 }
 

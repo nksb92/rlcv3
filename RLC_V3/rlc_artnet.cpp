@@ -183,3 +183,13 @@ void rlc_artnet::set_next_universe(uint8_t* data) {
 void rlc_artnet::set_current_fsm(uint8_t val) {
   current_fsm = val;
 }
+
+void rlc_artnet::set_current_universe_nmbr(uint16_t val) {
+  current_universe = 0;
+  add_universe(val);
+}
+
+void rlc_artnet::set_current_channel(uint16_t channel) {
+  channel_start = 0;
+  add_channel(channel);
+}

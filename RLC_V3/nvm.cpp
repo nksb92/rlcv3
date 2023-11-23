@@ -1,6 +1,6 @@
 #include "nvm.h"
 
-#define COUNT_STORED_VALUES 12
+#define COUNT_STORED_VALUES 14
 #define POLYNOMIAL 0xD8
 #define WIDTH (8 * sizeof(uint8_t))
 #define TOPBIT (1 << (WIDTH - 1))
@@ -10,7 +10,7 @@ uint8_t crcTable[256];
 
 // crc code from website: https://barrgroup.com/embedded-systems/how-to/crc-calculation-c-code
 // explaination can be found there
-void crcInit(void) {
+void crcInit() {
   uint8_t remainder;
 
   for (int dividend = 0; dividend < 256; ++dividend) {
@@ -46,9 +46,9 @@ void init_eeprom() {
   crcInit();
 }
 
-void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw) {
+void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
-  int crc_values[COUNT_STORED_VALUES];
+  int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
 
   // get all variables from the hsv page
@@ -89,6 +89,13 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw
   crc_values[crc_index] = blue;
   crc_index++;
 
+  // get all variables from the segment page
+  uint8_t segment_pos = STD_SEGMENTS;
+  EEPROM.get(eeprom_address, segment_pos);
+  eeprom_address += sizeof(segment_pos);
+  crc_values[crc_index] = segment_pos;
+  crc_index++;
+
   // get all variables from the dmx page
   uint16_t start_address = STD_START_ADDRESS;
   EEPROM.get(eeprom_address, start_address);
@@ -102,6 +109,30 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw
   eeprom_address += sizeof(current_main);
   crc_values[crc_index] = current_main;
   crc_index++;
+
+  uint8_t deepness_main = STD_DEEPNESS;
+  EEPROM.get(eeprom_address, deepness_main);
+  eeprom_address += sizeof(deepness_main);
+  crc_values[crc_index] = deepness_main;
+  crc_index++;
+
+  // get all variables from the artnet page
+  uint16_t artnet_universe = STD_UNIVERSE;
+  EEPROM.get(eeprom_address, artnet_universe);
+  eeprom_address += sizeof(artnet_universe);
+  crc_values[crc_index] = artnet_universe;
+  crc_index++;
+
+  uint16_t artnet_start = STD_START_ADDRESS;
+  EEPROM.get(eeprom_address, artnet_start);
+  eeprom_address += sizeof(artnet_start);
+  crc_values[crc_index] = artnet_start;
+  crc_index++;
+
+  uint8_t artnet_fsm = MENU;
+  EEPROM.get(eeprom_address, artnet_fsm);
+  eeprom_address += sizeof(artnet_fsm);
+  crc_values[crc_index] = artnet_fsm;
 
   uint8_t crc = 0;
   EEPROM.get(eeprom_address, crc);
@@ -117,15 +148,25 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw
     rgb_val.set_green(green);
     rgb_val.set_blue(blue);
 
-    dmx_val.set_start_address(start_address);
+    segment_var.set_current_segment(segment_pos);
     
+    dmx_val.set_number_segments(segment_var.get_num_seg());
+    artnet_var.set_number_segments(segment_var.get_num_seg());
+    
+    dmx_val.set_start_address(start_address);
+
     main_sw.set_current(current_main);
+    main_sw.set_deepness(deepness_main);
+
+    artnet_var.set_current_universe_nmbr(artnet_universe);
+    artnet_var.set_current_channel(artnet_start);
+    artnet_var.set_current_fsm(artnet_fsm);
   }
 }
 
-void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw) {
+void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
-  int crc_values[COUNT_STORED_VALUES];
+  int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
 
   // set all variables from the hsv page
@@ -166,6 +207,13 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_s
   crc_values[crc_index] = blue;
   crc_index++;
 
+  // set all variables from the segment page
+  uint8_t segment_pos = segment_var.get_current_seg();
+  EEPROM.put(eeprom_address, segment_pos);
+  eeprom_address += sizeof(segment_pos);
+  crc_values[crc_index] = segment_pos;
+  crc_index++;
+
   // set all variables from the dmx page
   uint16_t start_address = dmx_val.get_start();
   EEPROM.put(eeprom_address, start_address);
@@ -173,11 +221,36 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, main& main_s
   crc_values[crc_index] = start_address;
   crc_index++;
 
-  // set the current main state
+  // set the all variables from main state
   uint8_t current_main = main_sw.get_current();
   EEPROM.put(eeprom_address, current_main);
   eeprom_address += sizeof(current_main);
   crc_values[crc_index] = current_main;
+  crc_index++;
+
+  uint8_t deepness_main = main_sw.get_deepness();
+  EEPROM.put(eeprom_address, deepness_main);
+  eeprom_address += sizeof(deepness_main);
+  crc_values[crc_index] = deepness_main;
+  crc_index++;
+
+  // set all variables from the artnet page
+  uint16_t artnet_universe = artnet_var.get_start_universe();
+  EEPROM.put(eeprom_address, artnet_universe);
+  eeprom_address += sizeof(artnet_universe);
+  crc_values[crc_index] = artnet_universe;
+  crc_index++;
+
+  uint16_t artnet_start = artnet_var.get_start_channel();
+  EEPROM.put(eeprom_address, artnet_start);
+  eeprom_address += sizeof(artnet_start);
+  crc_values[crc_index] = artnet_start;
+  crc_index++;
+
+  uint8_t artnet_fsm = artnet_var.get_current_fsm();
+  EEPROM.put(eeprom_address, artnet_fsm);
+  eeprom_address += sizeof(artnet_fsm);
+  crc_values[crc_index] = artnet_fsm;
 
   // calculate the crc and saving it in the eeprom
   EEPROM.put(eeprom_address, crcFast(crc_values));
