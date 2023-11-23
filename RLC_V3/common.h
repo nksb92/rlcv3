@@ -12,7 +12,10 @@
 #define STD_GREEN 0
 #define STD_BLUE 128
 #define STD_CURRENT 0
+#define STD_DEEPNESS 0
+#define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
+#define STD_UNIVERSE 0
 #define NUM_PIXEL 144
 
 /**

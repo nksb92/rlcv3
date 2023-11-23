@@ -9,18 +9,15 @@
 
 int16_t encoder_val = 0;
 uint8_t main_state = 1;
+uint8_t current_deepness = 0;
 unsigned long last_millis = 0;
-unsigned long saved_timer_start = 0;
-unsigned long last_send = 0;
 unsigned long last_added_dot = 0;
 unsigned long last_scroll_time = 0;
 uint16_t standby_time = 30000;
-uint16_t display_saved_time = 2000;
-uint8_t scroll_time = 100;
+uint8_t scroll_time = 110;
 uint16_t add_dot_time = 500;
 
 bool artnet_data = false;
-bool display_saved = false;
 bool change_vals = true;
 bool button_pressed = false;
 bool button_long_pressed = false;
@@ -33,7 +30,6 @@ rgb_dmx dmx_val;
 main main_sw;
 segments seg;
 rlc_artnet artnet_var;
-
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -52,22 +48,29 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Startup");
 
+  // init all classes and functions
   init_eeprom();
   init_led();
   init_display(display);
   init_encoder(enc_button);
   dmx_val.install_dmx();
   seg.init_segments();
-
   artnet_var.init(on_artnet_frame);
-  // read_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
-  dmx_val.set_number_segments(seg.get_num_seg());
-  Serial.println("Startup complete.");
 
-  last_millis = millis();
-  saved_timer_start = millis();
-  set_event_status(true);
+  // read non volatile memory and set variables accordingly
+  read_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
+  switch (artnet_var.get_current_fsm()) {
+    case CONNECTING:
+    case ARTNET_PAGE:
+      artnet_var.connect_wifi();
+      artnet_var.set_current_fsm(CONNECTING);
+      break;
+  }
+  current_deepness = main_sw.get_deepness();
   main_state = main_sw.get_current();
+  Serial.println("Startup complete.");
+  last_millis = millis();
+  set_event_status(true);
 }
 
 void loop() {
@@ -90,7 +93,7 @@ void loop() {
   }
 
   if (button_pressed) {
-    switch (main_sw.get_deepness()) {
+    switch (current_deepness) {
       case MAIN_MENU:
         display_menu(display, main_state);
         break;
@@ -130,7 +133,8 @@ void loop() {
 
   if (button_long_pressed) {
     main_sw.deeper();
-    switch (main_sw.get_deepness()) {
+    current_deepness = main_sw.get_deepness();
+    switch (current_deepness) {
       case MAIN_MENU:
         switch (artnet_var.get_current_fsm()) {
           case CONNECTING:
@@ -145,6 +149,7 @@ void loop() {
         switch (main_state) {
           case ARTNET_NODE:
             artnet_var.add_channel_node(0);
+            artnet_var.add_universe(0);
           case ARTNET_REC:
             switch (artnet_var.get_current_fsm()) {
               case MENU:
@@ -164,7 +169,7 @@ void loop() {
 
   // handle everything on event
   if (change_vals) {
-    switch (main_sw.get_deepness()) {
+    switch (current_deepness) {
       case MAIN_MENU:
         if (encoder_val != 0) {
           main_sw.add_current(encoder_val);
@@ -274,10 +279,17 @@ void loop() {
   }
 
   // hanlde everthing periodically
-  switch (main_sw.get_deepness()) {
+  switch (current_deepness) {
     case MAIN_MENU:
       break;
     case SUB_MENU:
+      // save variables to EEPROM
+      if (button_double_pressed) {
+        write_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
+        set_double_press(false);
+        display_saved_status(display);
+      }
+
       switch (main_state) {
         case DMX_PAGE:
           dmx_val.hanlde_dmx();
@@ -333,14 +345,4 @@ void loop() {
       }
       break;
   }
-
-  // // save variables to EEPROM and display for two secconds
-  // // that the values has been saved
-  // if (button_double_pressed) {
-  //   write_eeprom(hsv_val, rgb_val, dmx_val, main_sw);
-  //   set_double_press(false);
-  //   display_saved = true;
-  //   display_saved_status(display);
-  //   saved_timer_start = millis();
-  // }
 }

@@ -9,10 +9,6 @@ void segments::init_segments() {
   set_segments(0);
 }
 
-void segments::set_segments(uint8_t pos) {
-  number_segments = possible_segments[pos];
-}
-
 void segments::calc_segments() {
   uint16_t inc = 0;
   for (int i = 1; i < NUM_PIXEL + 1; i++) {
@@ -32,6 +28,16 @@ uint16_t segments::get_num_seg() {
 
 uint8_t segments::get_current_seg() {
   return current_segment;
+}
+
+void segments::set_current_segment(uint8_t _current)
+{
+  current_segment =_current;
+  add_seg(0);
+}
+
+void segments::set_segments(uint8_t pos) {
+  number_segments = possible_segments[pos];
 }
 
 void segments::add_seg(int value) {
