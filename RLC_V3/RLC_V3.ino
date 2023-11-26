@@ -59,15 +59,35 @@ void setup() {
 
   // read non volatile memory and set variables accordingly
   read_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
-  switch (artnet_var.get_current_fsm()) {
-    case CONNECTING:
-    case ARTNET_PAGE:
-      artnet_var.connect_wifi();
-      artnet_var.set_current_fsm(CONNECTING);
-      break;
-  }
+
   current_deepness = main_sw.get_deepness();
   main_state = main_sw.get_current();
+
+  switch (current_deepness) {
+    case SUB_MENU:
+      switch (main_state) {
+        case HSV_PAGE:
+          ramp_up_hsv(hsv_val);
+          break;
+          
+        case RGB_PAGE:
+          ramp_up_rgb(rgb_val.get_rgb());
+          break;
+
+        case ARTNET_REC:
+        case ARTNET_NODE:
+          switch (artnet_var.get_current_fsm()) {
+            case CONNECTING:
+            case ARTNET_PAGE:
+              artnet_var.connect_wifi();
+              artnet_var.set_current_fsm(CONNECTING);
+              break;
+          }
+          break;
+      }
+      break;
+  }
+
   Serial.println("Startup complete.");
   last_millis = millis();
   set_event_status(true);

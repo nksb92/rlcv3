@@ -29,7 +29,11 @@ void init_led();
  */
 void hsv_out(C_HSV hsv_val);
 
+void ramp_up_hsv(C_HSV hsv_val);
+
 void drive_pixel(CRGB rgb_val, uint8_t factor);
+
+void ramp_up_rgb(CRGB rgb_val);
 
 void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t*data);
 

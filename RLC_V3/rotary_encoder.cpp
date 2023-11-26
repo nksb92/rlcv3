@@ -42,7 +42,6 @@ void long_press_handler(EncoderButton& eb) {
   if (!standby) {
     long_press = true;
   }
-  change = true;
 }
 
 bool get_long_press(){
