@@ -1,13 +1,13 @@
 #include "HWCDC.h"
 #include "leds.h"
 
-CRGB leds[NUM_PIXEL];
 CRGB red_segment(128, 0, 0);
 CRGB blue_segment(0, 0, 128);
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, NEO_RGB + NEO_KHZ800);
 
 void init_led() {
   pixels.begin();
+  drive_pixel(red_segment, 0);
 }
 
 void hsv_out(C_HSV hsv_val) {
@@ -20,6 +20,18 @@ void hsv_out(C_HSV hsv_val) {
   drive_pixel(temp_rgb, 255);
 }
 
+void ramp_up_hsv(C_HSV hsv_val) {
+  uint16_t startup_time = 1500;
+  uint16_t temp_brightness = hsv_val.get_val_p();
+  uint16_t t_delay = startup_time / temp_brightness;
+
+  for (int i = 0; i <= temp_brightness; i++) {
+    hsv_val.set_val_p(i);
+    hsv_out(hsv_val);
+    delay(t_delay);
+  }
+}
+
 void drive_pixel(CRGB rgb_val, uint8_t factor) {
   rgb_val.nscale8_video(factor);
   for (int i = 0; i < NUM_PIXEL; i++) {
@@ -28,12 +40,23 @@ void drive_pixel(CRGB rgb_val, uint8_t factor) {
   pixels.show();
 }
 
+void ramp_up_rgb(CRGB rgb_val) {
+  uint16_t startup_time = 1500;
+  uint8_t temp_brightness = 255;
+  uint16_t t_delay = startup_time / temp_brightness;
+
+  for (int i = 0; i <= temp_brightness; i++) {
+    drive_pixel(rgb_val, i);
+    delay(t_delay);
+  }
+}
+
 void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
   uint16_t data_index = 1;
   uint8_t led_index = 0;
   int remainder = 0;
   int dim_factor = data[dimmer_channel];
-  CRGB color(0,0,0);
+  CRGB color(0, 0, 0);
 
   for (int i = start; i < dimmer_channel; i++) {
     remainder = data_index % 3;
