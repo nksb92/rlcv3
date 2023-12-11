@@ -112,11 +112,13 @@ void output_artnet(rlc_artnet artnet_var) {
   uint8_t* next_universe = artnet_var.get_next_data();
   uint16_t data_index = 1;
   uint16_t led_index = 0;
+  float dimmer_per = current_universe[end] / 255;
 
   if (end < start) {
     end_next = end;
     end = UNIVERSE_SIZE;
     start_next = 0;
+    dimmer_per = next_universe[end_next] / 255;
   }
 
   uint8_t last_red = 0;
@@ -127,13 +129,13 @@ void output_artnet(rlc_artnet artnet_var) {
     int remainder = data_index % 3;
     switch (remainder) {
       case 1:
-        last_red = current_universe[i];
+        last_red = current_universe[i] * dimmer_per;
         break;
       case 2:
-        last_green = current_universe[i];
+        last_green = current_universe[i] * dimmer_per;
         break;
       case 0:
-        last_blue = current_universe[i];
+        last_blue = current_universe[i] * dimmer_per;
         for (int j = 0; j < pixel_per_section; j++) {
           pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
           led_index++;
@@ -149,13 +151,13 @@ void output_artnet(rlc_artnet artnet_var) {
       int remainder = data_index % 3;
       switch (remainder) {
         case 1:
-          last_red = next_universe[i];
+          last_red = next_universe[i] * dimmer_per;
           break;
         case 2:
-          last_green = next_universe[i];
+          last_green = next_universe[i] * dimmer_per;
           break;
         case 0:
-          last_blue = next_universe[i];
+          last_blue = next_universe[i] * dimmer_per;
           for (int j = 0; j < pixel_per_section; j++) {
             pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
             led_index++;
