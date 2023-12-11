@@ -1,3 +1,4 @@
+#include "HWCDC.h"
 #include "dmx.h"
 
 /*
@@ -46,8 +47,10 @@ void rgb_dmx::hanlde_dmx() {
   dmx_packet_t packet;
   if (dmx_receive(dmxPort, &packet, 5)) {
     if (!packet.err) {
-      dmx_read(dmxPort, data, packet.size);
-      set_universe(data);
+      uint8_t _data[UNIVERSE_SIZE] = {};
+      dmx_read(dmxPort, _data, packet.size);
+      set_universe(_data);
+      data_received = true;
     }
   }
 }
@@ -56,13 +59,11 @@ bool rgb_dmx::get_rec_status() {
   return data_received;
 }
 
-uint16_t rgb_dmx::get_dimmer_address()
-{
-  return last_address;
+uint16_t rgb_dmx::get_dimmer_address() {
+  return start_address + used_addresses - 1;
 }
 
-uint8_t *rgb_dmx::get_universe()
-{
+uint8_t *rgb_dmx::get_universe() {
   return data;
 }
 

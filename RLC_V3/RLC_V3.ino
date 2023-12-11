@@ -9,6 +9,7 @@
 
 int16_t encoder_val = 0;
 uint8_t main_state = 1;
+uint8_t artnet_state = 0;
 uint8_t current_deepness = 0;
 unsigned long last_millis = 0;
 unsigned long last_added_dot = 0;
@@ -49,6 +50,7 @@ void setup() {
   Serial.println("Startup");
 
   // init all classes and functions
+  main_sw.init();
   init_eeprom();
   init_led();
   init_display(display);
@@ -62,6 +64,7 @@ void setup() {
 
   current_deepness = main_sw.get_deepness();
   main_state = main_sw.get_current();
+  artnet_state = artnet_var.get_current_fsm();
 
   switch (current_deepness) {
     case SUB_MENU:
@@ -69,14 +72,14 @@ void setup() {
         case HSV_PAGE:
           ramp_up_hsv(hsv_val);
           break;
-          
+
         case RGB_PAGE:
           ramp_up_rgb(rgb_val.get_rgb());
           break;
 
         case ARTNET_REC:
         case ARTNET_NODE:
-          switch (artnet_var.get_current_fsm()) {
+          switch (artnet_state) {
             case CONNECTING:
             case ARTNET_PAGE:
               artnet_var.connect_wifi();
@@ -99,6 +102,7 @@ void loop() {
   button_pressed = get_press_state();
   button_double_pressed = get_double_press();
   encoder_val = get_encoder_val();
+  artnet_state = artnet_var.get_current_fsm();
 
   if (get_long_press()) {
     long_press_triggered = false;
@@ -136,7 +140,7 @@ void loop() {
 
           case ARTNET_NODE:
           case ARTNET_REC:
-            if (artnet_var.get_current_fsm() == ARTNET_PAGE) {
+            if (artnet_state == ARTNET_PAGE) {
               artnet_var.next_selection();
               display_artnet_rec(display, artnet_var);
             }
@@ -156,26 +160,29 @@ void loop() {
     current_deepness = main_sw.get_deepness();
     switch (current_deepness) {
       case MAIN_MENU:
-        switch (artnet_var.get_current_fsm()) {
+        switch (artnet_state) {
           case CONNECTING:
             artnet_var.set_current_fsm(MENU);
           case ARTNET_PAGE:
             artnet_var.stop_artnet();
             artnet_var.set_current_fsm(MENU);
+            artnet_state = artnet_var.get_current_fsm();
             break;
         }
         break;
+
       case SUB_MENU:
         switch (main_state) {
           case ARTNET_NODE:
             artnet_var.add_channel_node(0);
             artnet_var.add_universe(0);
           case ARTNET_REC:
-            switch (artnet_var.get_current_fsm()) {
+            switch (artnet_state) {
               case MENU:
                 artnet_var.connect_wifi();
                 artnet_var.set_current_fsm(CONNECTING);
                 display_connecting_artnet(display, artnet_var);
+                artnet_state = artnet_var.get_current_fsm();
                 last_added_dot = millis();
                 break;
             }
@@ -196,7 +203,7 @@ void loop() {
           main_state = main_sw.get_current();
         }
         display_menu(display, main_state);
-        drive_pixel(rgb_val.get_rgb(), 0);
+        rgb_out(rgb_val.get_rgb(), 0);
         break;
 
       case SUB_MENU:
@@ -235,7 +242,7 @@ void loop() {
                   break;
               }
             }
-            drive_pixel(rgb_val.get_rgb(), 255);
+            rgb_out(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
             break;
 
@@ -248,10 +255,9 @@ void loop() {
             break;
 
           case ARTNET_NODE:
-
           case ARTNET_REC:
             if (encoder_val != 0) {
-              switch (artnet_var.get_current_fsm()) {
+              switch (artnet_state) {
                 case ARTNET_PAGE:
                   switch (artnet_var.get_current_sel()) {
                     case UNIVERSE:
@@ -320,11 +326,13 @@ void loop() {
           break;
 
         case ARTNET_NODE:
-          set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
-          dmx_val.send_universe();
+          if (artnet_state == ARTNET_PAGE) {
+            set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
+            dmx_val.send_universe();
+          }
         case ARTNET_REC:
           // on connection loss, jump to connecting state
-          switch (artnet_var.get_current_fsm()) {
+          switch (artnet_state) {
             case CONNECTING:
               if (!get_standby_status()) {
                 if (millis() - last_added_dot >= add_dot_time) {

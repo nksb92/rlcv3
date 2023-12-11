@@ -29,6 +29,8 @@ void init_led();
  */
 void hsv_out(C_HSV hsv_val);
 
+void rgb_out(CRGB led_val, uint8_t factor);
+
 void ramp_up_hsv(C_HSV hsv_val);
 
 void drive_pixel(CRGB rgb_val, uint8_t factor);
