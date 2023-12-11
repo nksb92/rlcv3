@@ -16,7 +16,13 @@
 #define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
 #define STD_UNIVERSE 0
-#define NUM_PIXEL 144
+// #define NUM_PIXEL 144
+#define NUM_PIXEL 1  // for usage with RGB
+#define RGB_IC 0
+#define RGB 1
+
+// #define CURRENT_MODE RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
+#define CURRENT_MODE RGB  // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
 
 /**
 * An enum to define the possible hsv modes.
@@ -207,8 +213,13 @@ enum {
 class main {
   uint8_t current = HSV_PAGE;
   uint8_t deepness = MAIN_MENU;
+  uint8_t last_menu = MAIN_LAST;
 
 public:
+  void init() {
+    if (CURRENT_MODE == RGB) last_menu = MAIN_LAST - 1;
+  }
+
   /**
   * Returns the current mode.
   */
@@ -243,10 +254,10 @@ public:
 
   void add_current(int val) {
     int temp = current + val;
-    if (temp >= MAIN_LAST) {
+    if (temp >= last_menu) {
       current = HSV_PAGE;
     } else if (temp < 0) {
-      current = MAIN_LAST - 1;
+      current = last_menu - 1;
     } else {
       current = temp;
     }
