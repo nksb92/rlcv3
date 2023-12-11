@@ -3,7 +3,7 @@ import json
 number = 144
 possible = []
 
-for i in range(1, number):
+for i in range(1, number+1):
     if number % i == 0:
         possible.append({
             "pixel/section" : i,

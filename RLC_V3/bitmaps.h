@@ -94,8 +94,6 @@ const unsigned char* BITMAP_MAIN_MENU_ARRAY[BITMAP_MAIN_MENU_LEN] = {
   BITMAP_SEGMENTS_MENU
 };
 
-const uint8_t MENU_ORDER[] = { HSV_MENU, RGB_MENU, DMX_MENU, ARTNET_NODE_MENU, ARTNET_REC_MENU, SEGMENTS_MENU };
-
 // 'scrollbar_handle', 7x3px
 const unsigned char BITMAP_SCROLLBAR_HANDLE[] PROGMEM = {
   0xff, 0xf0, 0xff, 0xf0, 0xff, 0xf0

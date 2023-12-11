@@ -5,7 +5,8 @@
 
 uint8_t offset = 5;
 uint8_t offset_y = 26;
-uint8_t last_index = 0;
+uint8_t last_menu_index = BITMAP_MAIN_MENU_LEN;
+uint8_t MENU_ORDER[] = { HSV_MENU, RGB_MENU, DMX_MENU, ARTNET_NODE_MENU, ARTNET_REC_MENU, SEGMENTS_MENU };
 int x_scroll = 0;
 int min_x = 0;
 
@@ -18,6 +19,11 @@ void init_display(Adafruit_SSD1306& dp) {
   dp.display();
   dp.setTextWrap(false);
   x_scroll = SCREEN_WIDTH / 3;
+
+  if (CURRENT_MODE == RGB) {
+    last_menu_index = BITMAP_MAIN_MENU_LEN - 1;
+    uint8_t* MENU_ORDER = new uint8_t(last_menu_index);
+  }
 }
 
 void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {
@@ -136,9 +142,9 @@ void display_menu(Adafruit_SSD1306& dp, uint8_t index) {
   int previos = 0;
   int next = 0;
   previos = index - 1;
-  if (previos < 0) previos = BITMAP_MAIN_MENU_LEN - 1;
+  if (previos < 0) previos = last_menu_index - 1;
   next = index + 1;
-  if (next >= BITMAP_MAIN_MENU_LEN) next = 0;
+  if (next >= last_menu_index) next = 0;
 
   dp.clearDisplay();
 

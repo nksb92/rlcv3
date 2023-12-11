@@ -6,8 +6,21 @@ CRGB blue_segment(0, 0, 128);
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, NEO_RGB + NEO_KHZ800);
 
 void init_led() {
-  pixels.begin();
-  drive_pixel(red_segment, 0);
+  switch (CURRENT_MODE) {
+    case RGB_IC:
+      pixels.begin();
+      rgb_out(red_segment, 0);
+      break;
+
+    case RGB:
+      ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
+      ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
+      ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
+      ledcAttachPin(RED_PIN, RED_CHANNEL);
+      ledcAttachPin(GREEN_PIN, GREEN_CHANNEL);
+      ledcAttachPin(BLUE_PIN, BLUE_CHANNEL);
+      break;
+  }
 }
 
 void hsv_out(C_HSV hsv_val) {
@@ -17,7 +30,26 @@ void hsv_out(C_HSV hsv_val) {
   CHSV temp_hsv(hue, sat, val);
   CRGB temp_rgb;
   hsv2rgb_rainbow(temp_hsv, temp_rgb);
-  drive_pixel(temp_rgb, 255);
+  rgb_out(temp_rgb, 255);
+}
+
+void rgb_out(CRGB led_val, uint8_t factor) {
+  led_val.nscale8_video(factor);
+
+  switch (CURRENT_MODE) {
+    case RGB_IC:
+      for (int i = 0; i < NUM_PIXEL; i++) {
+        pixels.setPixelColor(i, pixels.Color(led_val.r, led_val.g, led_val.b));
+      }
+      pixels.show();
+      break;
+
+    case RGB:
+      ledcWrite(RED_CHANNEL, led_val.r);
+      ledcWrite(GREEN_CHANNEL, led_val.g);
+      ledcWrite(BLUE_CHANNEL, led_val.b);
+      break;
+  }
 }
 
 void ramp_up_hsv(C_HSV hsv_val) {
@@ -32,21 +64,13 @@ void ramp_up_hsv(C_HSV hsv_val) {
   }
 }
 
-void drive_pixel(CRGB rgb_val, uint8_t factor) {
-  rgb_val.nscale8_video(factor);
-  for (int i = 0; i < NUM_PIXEL; i++) {
-    pixels.setPixelColor(i, pixels.Color(rgb_val.r, rgb_val.g, rgb_val.b));
-  }
-  pixels.show();
-}
-
 void ramp_up_rgb(CRGB rgb_val) {
   uint16_t startup_time = 1500;
   uint8_t temp_brightness = 255;
   uint16_t t_delay = startup_time / temp_brightness;
 
   for (int i = 0; i <= temp_brightness; i++) {
-    drive_pixel(rgb_val, i);
+    rgb_out(rgb_val, i);
     delay(t_delay);
   }
 }
@@ -71,13 +95,21 @@ void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_secti
         color.b = data[i];
         for (int j = 0; j < pixel_per_section; j++) {
           color.nscale8_video(dim_factor);
-          pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
+          switch (CURRENT_MODE) {
+            case RGB_IC:
+              pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
+              break;
+            case RGB:
+              rgb_out(color, 255);
+              break;
+          }
           led_index++;
         }
         break;
     }
     data_index++;
   }
+  if (CURRENT_MODE == RGB_IC) pixels.show();
 }
 
 void show_segments(uint16_t segs) {
@@ -137,7 +169,14 @@ void output_artnet(rlc_artnet artnet_var) {
       case 0:
         last_blue = current_universe[i] * dimmer_per;
         for (int j = 0; j < pixel_per_section; j++) {
-          pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+          switch (CURRENT_MODE) {
+            case RGB_IC:
+              pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+              break;
+            case RGB:
+              rgb_out(CRGB(last_red, last_green, last_blue), 255);
+              break;
+          }
           led_index++;
         }
         break;
@@ -159,7 +198,14 @@ void output_artnet(rlc_artnet artnet_var) {
         case 0:
           last_blue = next_universe[i] * dimmer_per;
           for (int j = 0; j < pixel_per_section; j++) {
-            pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+            switch (CURRENT_MODE) {
+              case RGB_IC:
+                pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+                break;
+              case RGB:
+                rgb_out(CRGB(last_red, last_green, last_blue), 255);
+                break;
+            }
             led_index++;
           }
           break;
@@ -167,5 +213,5 @@ void output_artnet(rlc_artnet artnet_var) {
       data_index++;
     }
   }
-  pixels.show();
+  if (CURRENT_MODE == RGB_IC) pixels.show();
 }
