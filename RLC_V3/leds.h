@@ -37,9 +37,11 @@ void drive_pixel(CRGB rgb_val, uint8_t factor);
 
 void ramp_up_rgb(CRGB rgb_val);
 
-void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t*data);
+void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data);
 
 void show_segments(uint16_t segs);
 
 void output_artnet(rlc_artnet artnet_var);
+
+void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data);
 #endif

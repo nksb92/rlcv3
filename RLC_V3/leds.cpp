@@ -77,38 +77,13 @@ void ramp_up_rgb(CRGB rgb_val) {
 
 void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
   uint16_t data_index = 1;
-  uint8_t led_index = 0;
+  uint16_t led_index = 0;
   int remainder = 0;
   int dim_factor = data[dimmer_channel];
   CRGB color(0, 0, 0);
 
-  for (int i = start; i < dimmer_channel; i++) {
-    remainder = data_index % 3;
-    switch (remainder) {
-      case 1:
-        color.r = data[i];
-        break;
-      case 2:
-        color.g = data[i];
-        break;
-      case 0:
-        color.b = data[i];
-        for (int j = 0; j < pixel_per_section; j++) {
-          color.nscale8_video(dim_factor);
-          switch (CURRENT_MODE) {
-            case RGB_IC:
-              pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
-              break;
-            case RGB:
-              rgb_out(color, 255);
-              break;
-          }
-          led_index++;
-        }
-        break;
-    }
-    data_index++;
-  }
+  universe_out(start, dimmer_channel, dim_factor, pixel_per_section, color, data_index, led_index, data);
+  
   if (CURRENT_MODE == RGB_IC) pixels.show();
 }
 
@@ -136,45 +111,54 @@ void show_segments(uint16_t segs) {
 void output_artnet(rlc_artnet artnet_var) {
   uint16_t sections = artnet_var.get_section_number();
   uint16_t pixel_per_section = NUM_PIXEL / sections;
-  uint16_t start = artnet_var.get_start_channel() - 1;
+  uint16_t start = artnet_var.get_start_channel() - 1;  // minus one: start artnet data at index 0, smallest address 1
+  uint16_t end = artnet_var.get_end_channel() - 1;      // minus one: end artnet data at index 511, highest address 512
   uint16_t start_next = 0;
-  uint16_t end = artnet_var.get_end_channel();
   uint16_t end_next = 0;
-  uint8_t* current_universe = artnet_var.get_current_data();
-  uint8_t* next_universe = artnet_var.get_next_data();
   uint16_t data_index = 1;
   uint16_t led_index = 0;
-  float dimmer_per = current_universe[end] / 255;
+  uint8_t* current_universe = artnet_var.get_current_data();
+  uint8_t* next_universe = artnet_var.get_next_data();
+  uint8_t dimmer_factor = current_universe[end];
+  CRGB color(0, 0, 0);
 
   if (end < start) {
     end_next = end;
     end = UNIVERSE_SIZE;
     start_next = 0;
-    dimmer_per = next_universe[end_next] / 255;
+    dimmer_factor = next_universe[end_next];
   }
 
-  uint8_t last_red = 0;
-  uint8_t last_blue = 0;
-  uint8_t last_green = 0;
+  universe_out(start, end, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe);
+  if (start_next != end_next) {
+    data_index--;
+    universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe);
+  }
 
-  for (int i = start; i < end; i++) {
-    int remainder = data_index % 3;
+  if (CURRENT_MODE == RGB_IC) pixels.show();
+}
+
+void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data) {
+  uint8_t remainder = 0;
+  for (int i = start_index; i < end_index; i++) {
+    remainder = data_index % 3;
     switch (remainder) {
       case 1:
-        last_red = current_universe[i] * dimmer_per;
+        color.r = data[i];
         break;
       case 2:
-        last_green = current_universe[i] * dimmer_per;
+        color.g = data[i];
         break;
       case 0:
-        last_blue = current_universe[i] * dimmer_per;
+        color.b = data[i];
         for (int j = 0; j < pixel_per_section; j++) {
+          color.nscale8_video(dimmer_factor);
           switch (CURRENT_MODE) {
             case RGB_IC:
-              pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
+              pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
               break;
             case RGB:
-              rgb_out(CRGB(last_red, last_green, last_blue), 255);
+              rgb_out(color, 255);
               break;
           }
           led_index++;
@@ -183,35 +167,4 @@ void output_artnet(rlc_artnet artnet_var) {
     }
     data_index++;
   }
-
-  if (end_next != start_next) {
-    data_index--;
-    for (int i = start_next; i < end_next; i++) {
-      int remainder = data_index % 3;
-      switch (remainder) {
-        case 1:
-          last_red = next_universe[i] * dimmer_per;
-          break;
-        case 2:
-          last_green = next_universe[i] * dimmer_per;
-          break;
-        case 0:
-          last_blue = next_universe[i] * dimmer_per;
-          for (int j = 0; j < pixel_per_section; j++) {
-            switch (CURRENT_MODE) {
-              case RGB_IC:
-                pixels.setPixelColor(led_index, pixels.Color(last_red, last_green, last_blue));
-                break;
-              case RGB:
-                rgb_out(CRGB(last_red, last_green, last_blue), 255);
-                break;
-            }
-            led_index++;
-          }
-          break;
-      }
-      data_index++;
-    }
-  }
-  if (CURRENT_MODE == RGB_IC) pixels.show();
 }
