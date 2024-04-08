@@ -15,7 +15,7 @@ rgb_dmx::rgb_dmx() {
 }
 
 void rgb_dmx::install_dmx() {
-  dmx_driver_install(dmxPort, &config, DMX_INTR_FLAGS_DEFAULT);
+  dmx_driver_install(dmxPort, &config, NULL, 0);
   dmx_set_pin(dmxPort, TRANSMIT_PIN, RECEIVE_PIN, ENABLE_PIN);
 }
 
@@ -84,5 +84,5 @@ void rgb_dmx::set_universe(uint8_t *_data) {
 
 void rgb_dmx::send_universe() {
   dmx_write(dmxPort, data, UNIVERSE_SIZE);
-  dmx_send(dmxPort, UNIVERSE_SIZE);
+  dmx_send(dmxPort);
 }

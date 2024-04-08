@@ -15,7 +15,10 @@
 #define RESOLUTION 8
 #define DATA_OUT 8
 #define CHIPSET WS2812B
-#define COLOR_ORDER RGB
+#define COLOR_ORDER_WS2815 NEO_GRB
+#define COLOR_ORDER_WS2811 NEO_RGB
+// #define COLOR_ORDER COLOR_ORDER_WS2815
+#define COLOR_ORDER COLOR_ORDER_WS2811
 
 /**
  * Initializes the LED pins as outputs.

@@ -20,10 +20,10 @@ void init_display(Adafruit_SSD1306& dp) {
   dp.setTextWrap(false);
   x_scroll = SCREEN_WIDTH / 3;
 
-  if (CURRENT_MODE == RGB) {
-    last_menu_index = BITMAP_MAIN_MENU_LEN - 1;
-    uint8_t* MENU_ORDER = new uint8_t(last_menu_index);
-  }
+  // if (CURRENT_MODE == RGB) {
+  //   last_menu_index = BITMAP_MAIN_MENU_LEN - 1;
+  //   uint8_t* MENU_ORDER = new uint8_t(last_menu_index);
+  // }
 }
 
 void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {

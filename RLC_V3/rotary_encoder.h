@@ -18,6 +18,7 @@
 #define DT_PIN 4
 
 #define LONG_PRESS_TIME 750
+#define ACCERLERATION_SPEED 75
 
 /**
  * Initialize the rotary encoder module with the specified EncoderButton object.
