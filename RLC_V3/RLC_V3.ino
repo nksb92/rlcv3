@@ -1,3 +1,7 @@
+// The ESP32S3 Board has problems with the pins and interrupts
+// It could however help, to config the pins beforehand
+// further testing in the future needed
+
 #include "dmx.h"
 #include "leds.h"
 #include "rotary_encoder.h"
@@ -51,13 +55,21 @@ void setup() {
 
   // init all classes and functions
   main_sw.init();
+  Serial.println("MAIN INIT DONE");
   init_eeprom();
-  init_led();
+  Serial.println("EEPROM INIT DONE");
   init_display(display);
+  Serial.println("DISPLAY INIT DONE");
+  init_led();
+  Serial.println("LED INIT DONE");
   init_encoder(enc_button);
+  Serial.println("ENCODER INIT DONE");
   dmx_val.install_dmx();
+  Serial.println("DMX INIT DONE");
   seg.init_segments();
+  Serial.println("SEGMENT INIT DONE");
   artnet_var.init(on_artnet_frame);
+  Serial.println("ARTNET INIT DONE");
 
   // read non volatile memory and set variables accordingly
   read_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);

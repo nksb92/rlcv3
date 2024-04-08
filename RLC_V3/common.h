@@ -22,8 +22,8 @@
 //                   ONLY UNCOMMENT ONE OF THE OPTIONS
 //
 // #define RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
-#define RGB // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
-// #define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c
+// #define RGB // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
+#define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c
 // ------------------------------------------------------------------------------------------------------
 
 #ifdef RGB_IC
@@ -36,6 +36,7 @@
 
 #ifdef PANEL
 #define NUM_PIXEL 5
+#define SLAVE_ADR_STRT 0x08
 #endif
 
 /**
