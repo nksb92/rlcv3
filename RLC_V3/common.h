@@ -16,13 +16,27 @@
 #define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
 #define STD_UNIVERSE 0
-#define NUM_PIXEL 75
-// #define NUM_PIXEL 1  // for usage with RGB
-#define RGB_IC 0
-#define RGB 1
 
-#define CURRENT_MODE RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
-// #define CURRENT_MODE RGB  // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
+// ------------------------------------------------------------------------------------------------------
+//
+//                   ONLY UNCOMMENT ONE OF THE OPTIONS
+//
+// #define RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
+#define RGB // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
+// #define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c
+// ------------------------------------------------------------------------------------------------------
+
+#ifdef RGB_IC
+#define NUM_PIXEL 144
+#endif
+
+#ifdef RGB
+#define NUM_PIXEL 1
+#endif
+
+#ifdef PANEL
+#define NUM_PIXEL 5
+#endif
 
 /**
 * An enum to define the possible hsv modes.
@@ -217,7 +231,7 @@ class main {
 
 public:
   void init() {
-    if (CURRENT_MODE == RGB) last_menu = MAIN_LAST - 1;
+    // if (CURRENT_MODE == RGB) last_menu = MAIN_LAST - 1;
   }
 
   /**
