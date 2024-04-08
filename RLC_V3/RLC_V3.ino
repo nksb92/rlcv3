@@ -9,6 +9,7 @@
 #include "nvm.h"
 #include "rlc_artnet.h"
 #include "segments.h"
+#include "fan_control.h"
 #include "common.h"
 
 int16_t encoder_val = 0;
@@ -38,6 +39,10 @@ rlc_artnet artnet_var;
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+#ifdef PANEL
+fan_control fan;
+#endif
+
 void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
   uint16_t current_universe = artnet_var.get_start_universe();
   if (universe == current_universe) {
@@ -53,7 +58,11 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Startup");
 
-  // init all classes and functions
+// init all classes and functions
+#ifdef PANEL
+  fan.init_fan();
+  Serial.println("FAN INIT DONE");
+#endif
   main_sw.init();
   Serial.println("MAIN INIT DONE");
   init_eeprom();

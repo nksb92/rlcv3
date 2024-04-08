@@ -3,7 +3,9 @@
 
 CRGB red_segment(128, 0, 0);
 CRGB blue_segment(0, 0, 128);
+#ifdef RGB_IC
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, COLOR_ORDER + NEO_KHZ800);
+#endif
 
 void init_led() {
 #ifdef RGB_IC

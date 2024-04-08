@@ -28,6 +28,7 @@
 
 #ifdef RGB_IC
 #define NUM_PIXEL 144
+#define DATA_OUT 8
 #endif
 
 #ifdef RGB
@@ -35,6 +36,12 @@
 #endif
 
 #ifdef PANEL
+#define MAX_SPEED 200
+#define MIN_SPEED 25
+#define FAN_CHANNEL 3
+#define PWM_PIN 8
+#define PWM_RESOLUTION 8
+#define PWM_FAN_FREQ 25000
 #define NUM_PIXEL 5
 #define SLAVE_ADR_STRT 0x08
 #endif
