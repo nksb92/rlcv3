@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include <ArtnetWifi.h>
+#include <WiFi.h>
 
 #define UNIVERSE_SIZE 513
 #define LAST_DMX_ADDRESS 512

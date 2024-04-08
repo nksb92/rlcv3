@@ -16,13 +16,13 @@
 #define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
 #define STD_UNIVERSE 0
-// #define NUM_PIXEL 144
-#define NUM_PIXEL 1  // for usage with RGB
+#define NUM_PIXEL 75
+// #define NUM_PIXEL 1  // for usage with RGB
 #define RGB_IC 0
 #define RGB 1
 
-// #define CURRENT_MODE RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
-#define CURRENT_MODE RGB  // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
+#define CURRENT_MODE RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
+// #define CURRENT_MODE RGB  // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
 
 /**
 * An enum to define the possible hsv modes.
