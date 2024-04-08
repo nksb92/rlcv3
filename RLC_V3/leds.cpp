@@ -6,22 +6,23 @@ CRGB blue_segment(0, 0, 128);
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, COLOR_ORDER + NEO_KHZ800);
 
 void init_led() {
-  #ifdef RGB_IC
-    pixels.begin();
-    rgb_out(red_segment, 0);
-  #endif
+#ifdef RGB_IC
+  pixels.begin();
+  rgb_out(red_segment, 0);
+#endif
 
-  #ifdef RGB
-    ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
-    ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
-    ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
-    ledcAttachPin(RED_PIN, RED_CHANNEL);
-    ledcAttachPin(GREEN_PIN, GREEN_CHANNEL);
-    ledcAttachPin(BLUE_PIN, BLUE_CHANNEL);
-  #endif
+#ifdef RGB
+  ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
+  ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
+  ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
+  ledcAttachPin(RED_PIN, RED_CHANNEL);
+  ledcAttachPin(GREEN_PIN, GREEN_CHANNEL);
+  ledcAttachPin(BLUE_PIN, BLUE_CHANNEL);
+#endif
 
-  #ifdef PANEL
-  #endif
+#ifdef PANEL
+// no init needed for panel i2c mode
+#endif
 }
 
 void hsv_out(C_HSV hsv_val) {
@@ -34,24 +35,35 @@ void hsv_out(C_HSV hsv_val) {
   rgb_out(temp_rgb, 255);
 }
 
+void send_data_i2c(CRGB led_val, uint8_t slave_adr) {
+  Wire.beginTransmission(slave_adr);
+  Wire.write(led_val.r);
+  Wire.write(led_val.g);
+  Wire.write(led_val.b);
+  Wire.endTransmission(true);
+}
+
 void rgb_out(CRGB led_val, uint8_t factor) {
   led_val.nscale8_video(factor);
 
-  #ifdef RGB_IC
-    for (int i = 0; i < NUM_PIXEL; i++) {
-      pixels.setPixelColor(i, pixels.Color(led_val.r, led_val.g, led_val.b));
-    }
-    pixels.show();
-  #endif
+#ifdef RGB_IC
+  for (int i = 0; i < NUM_PIXEL; i++) {
+    pixels.setPixelColor(i, pixels.Color(led_val.r, led_val.g, led_val.b));
+  }
+  pixels.show();
+#endif
 
-  #ifdef RGB
-    ledcWrite(RED_CHANNEL, led_val.r);
-    ledcWrite(GREEN_CHANNEL, led_val.g);
-    ledcWrite(BLUE_CHANNEL, led_val.b);
-  #endif
-  
-  #ifdef PANEL
-  #endif
+#ifdef RGB
+  ledcWrite(RED_CHANNEL, led_val.r);
+  ledcWrite(GREEN_CHANNEL, led_val.g);
+  ledcWrite(BLUE_CHANNEL, led_val.b);
+#endif
+
+#ifdef PANEL
+  for (int i = SLAVE_ADR_STRT; i < SLAVE_ADR_STRT + NUM_PIXEL; i++) {
+    send_data_i2c(led_val, i);
+  }
+#endif
 }
 
 void ramp_up_hsv(C_HSV hsv_val) {
@@ -80,15 +92,14 @@ void ramp_up_rgb(CRGB rgb_val) {
 void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
   uint16_t data_index = 1;
   uint16_t led_index = 0;
-  int remainder = 0;
   int dim_factor = data[dimmer_channel];
   CRGB color(0, 0, 0);
 
   universe_out(start, dimmer_channel, dim_factor, pixel_per_section, color, data_index, led_index, data);
-  
-  #ifdef RGB_IC
-   pixels.show();
-  #endif
+
+#ifdef RGB_IC
+  pixels.show();
+#endif
 }
 
 void show_segments(uint16_t segs) {
@@ -103,13 +114,30 @@ void show_segments(uint16_t segs) {
     } else {
       color = blue_segment;
     }
+
+#ifdef RGB_IC
     for (int j = 0; j < pixel_per_seg; j++) {
       pixels.setPixelColor(count, pixels.Color(color.r, color.g, color.b));
       count++;
     }
+#endif
+
+#ifdef RGB
+    rgb_out(color, 255);
+#endif
+
+#ifdef PANEL
+    for (int j = 0; j < pixel_per_seg; j++) {
+      send_data_i2c(color, SLAVE_ADR_STRT + count);
+      count++;
+    }
+#endif
+
     col_sel++;
   }
+#ifdef RGB_IC
   pixels.show();
+#endif
 }
 
 void output_artnet(rlc_artnet artnet_var) {
@@ -139,9 +167,9 @@ void output_artnet(rlc_artnet artnet_var) {
     universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe);
   }
 
-  #ifdef RGB_IC
-   pixels.show();
-  #endif
+#ifdef RGB_IC
+  pixels.show();
+#endif
 }
 
 void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data) {
@@ -159,15 +187,16 @@ void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_facto
         color.b = data[i];
         for (int j = 0; j < pixel_per_section; j++) {
           color.nscale8_video(dimmer_factor);
-          #ifdef RGB_IC
-            pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
-          #endif
-          #ifdef RGB
-            rgb_out(color, 255);
-          #endif
-          #ifdef PANEL
 
-          #endif 
+#ifdef RGB_IC
+          pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
+#endif
+#ifdef RGB
+          rgb_out(color, 255);
+#endif
+#ifdef PANEL
+          send_data_i2c(color, SLAVE_ADR_STRT + led_index);
+#endif
           led_index++;
         }
         break;

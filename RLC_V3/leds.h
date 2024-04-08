@@ -4,6 +4,7 @@
 #include "common.h"
 #include <Adafruit_NeoPixel.h>
 #include "segments.h"
+#include "Wire.h"
 
 #define RED_PIN 10
 #define GREEN_PIN 9
