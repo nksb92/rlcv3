@@ -16,12 +16,13 @@ int16_t encoder_val = 0;
 uint8_t main_state = 1;
 uint8_t artnet_state = 0;
 uint8_t current_deepness = 0;
-unsigned long last_millis = 0;
 unsigned long last_added_dot = 0;
 unsigned long last_scroll_time = 0;
-uint16_t standby_time = 30000;
+unsigned long last_hundret_update = 0;
 uint8_t scroll_time = 110;
 uint16_t add_dot_time = 500;
+uint16_t display_standby_time = STD_STANDBY_TIME;
+uint16_t fan_run_on_time = 0;  //every 100 ms subtracted, at zero fan turns off
 
 bool artnet_data = false;
 bool change_vals = true;
@@ -54,15 +55,17 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
 }
 
 void setup() {
-  delay(2000);
-  Serial.begin(115200);
-  Serial.println("Startup");
-
-// init all classes and functions
+  // init fan instantly
 #ifdef PANEL
   fan.init_fan();
   Serial.println("FAN INIT DONE");
 #endif
+
+  delay(2000);
+  Serial.begin(115200);
+  Serial.println("Startup");
+
+  // init all classes and functions
   main_sw.init();
   Serial.println("MAIN INIT DONE");
   init_eeprom();
@@ -113,7 +116,6 @@ void setup() {
   }
 
   Serial.println("Startup complete.");
-  last_millis = millis();
   set_event_status(true);
 }
 
@@ -181,6 +183,7 @@ void loop() {
     current_deepness = main_sw.get_deepness();
     switch (current_deepness) {
       case MAIN_MENU:
+        fan_run_on_time = STD_FAN_RUN_ON_TIME;
         switch (artnet_state) {
           case CONNECTING:
             artnet_var.set_current_fsm(MENU);
@@ -246,6 +249,9 @@ void loop() {
             }
             hsv_out(hsv_val);
             hsv_display_update(display, hsv_val);
+            #ifdef PANEL
+            fan.calc_hsv_speed(hsv_val);
+            #endif
             break;
 
           case RGB_PAGE:
@@ -265,6 +271,9 @@ void loop() {
             }
             rgb_out(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
+            #ifdef PANEL
+            fan.calc_rgb_speed(rgb_val.get_rgb());
+            #endif
             break;
 
           case DMX_PAGE:
@@ -314,15 +323,36 @@ void loop() {
     change_vals = false;
     encoder_val = 0;
     set_dspl_standby(false);
-    last_millis = millis();
+    display_standby_time = STD_STANDBY_TIME;
     set_event_status(change_vals);
   }
 
-  // no action for 30 secs will set the display in standby mode
-  if (millis() - last_millis >= standby_time && !get_standby_status()) {
-    set_dspl_standby(true);
-    display.clearDisplay();
-    display.display();
+  if (millis() - last_hundret_update >= 100) {
+#ifdef PANEL
+    // let the fan run on for a certain time to cooldown panel
+    // after that turn down to minimun speed
+    if (fan_run_on_time != 0) {
+      fan_run_on_time--;
+      if (fan_run_on_time == 0) {
+        fan.set_target_speed(MIN_SPEED);
+      }
+    }
+
+    // check to update fan speed every 100 ms
+    fan.update();
+
+#endif
+    // no action for 30 secs will set the display in standby mode
+    if (!get_standby_status()) {
+      display_standby_time--;
+      if (display_standby_time == 0) {
+        set_dspl_standby(true);
+        display.clearDisplay();
+        display.display();
+      }
+    }
+
+    last_hundret_update = millis();
   }
 
   // hanlde everthing periodically

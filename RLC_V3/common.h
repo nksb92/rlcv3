@@ -16,6 +16,8 @@
 #define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
 #define STD_UNIVERSE 0
+#define STD_FAN_RUN_ON_TIME 200
+#define STD_STANDBY_TIME 300
 
 // ------------------------------------------------------------------------------------------------------
 //
@@ -36,8 +38,8 @@
 #endif
 
 #ifdef PANEL
-#define MAX_SPEED 200
-#define MIN_SPEED 25
+#define MAX_SPEED 225
+#define MIN_SPEED 50
 #define FAN_CHANNEL 3
 #define PWM_PIN 8
 #define PWM_RESOLUTION 8
