@@ -1,3 +1,6 @@
+#ifndef FAN_CONTROL_H
+#define FAN_CONTROL_H
+
 #include "common.h"
 
 #define LEVEL_ONE_FAN_TH    128
@@ -27,4 +30,7 @@ public:
   void update();
   void calc_hsv_speed(C_HSV color);
   void calc_rgb_speed(CRGB color);
+  void evaluate_sum(uint16_t _sum);
 };
+
+#endif

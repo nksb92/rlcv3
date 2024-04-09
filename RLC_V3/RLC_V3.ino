@@ -9,7 +9,11 @@
 #include "nvm.h"
 #include "rlc_artnet.h"
 #include "segments.h"
+
+#ifdef PANEL
 #include "fan_control.h"
+#endif
+
 #include "common.h"
 
 int16_t encoder_val = 0;
@@ -23,6 +27,7 @@ uint8_t scroll_time = 110;
 uint16_t add_dot_time = 500;
 uint16_t display_standby_time = STD_STANDBY_TIME;
 uint16_t fan_run_on_time = 0;  //every 100 ms subtracted, at zero fan turns off
+uint16_t last_rgb_sum = 0;
 
 bool artnet_data = false;
 bool change_vals = true;
@@ -196,6 +201,7 @@ void loop() {
         break;
 
       case SUB_MENU:
+        fan_run_on_time = 0;
         switch (main_state) {
           case ARTNET_NODE:
             artnet_var.add_channel_node(0);
@@ -316,6 +322,9 @@ void loop() {
             dmx_val.set_number_segments(seg.get_num_seg());
             artnet_var.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);
+            #ifdef PANEL
+            fan.evaluate_sum(128);
+            #endif
             break;
         }
         break;
@@ -371,14 +380,20 @@ void loop() {
         case DMX_PAGE:
           dmx_val.hanlde_dmx();
           if (dmx_val.get_rec_status()) {
-            set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
+            last_rgb_sum = set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
+            #ifdef PANEL
+            fan.evaluate_sum(last_rgb_sum);
+            #endif
             dmx_val.set_rec_status(false);
           }
           break;
 
         case ARTNET_NODE:
           if (artnet_state == ARTNET_PAGE) {
-            set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
+            last_rgb_sum = set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
+            #ifdef PANEL
+            fan.evaluate_sum(last_rgb_sum);
+            #endif
             dmx_val.send_universe();
           }
         case ARTNET_REC:
@@ -407,7 +422,10 @@ void loop() {
 
               artnet_var.artnet_parse();
               if (artnet_data) {
-                output_artnet(artnet_var);
+                last_rgb_sum = output_artnet(artnet_var);
+                #ifdef PANEL
+                fan.evaluate_sum(last_rgb_sum);
+                #endif
                 artnet_data = false;
               }
 

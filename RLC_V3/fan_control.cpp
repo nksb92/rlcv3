@@ -43,23 +43,25 @@ void fan_control::calc_hsv_speed(C_HSV color) {
 
 void fan_control::calc_rgb_speed(CRGB color) {
   uint16_t sum = 0;
-  uint8_t fan_speed = MIN_SPEED;
-
   sum += color.r + color.g + color.b;
+  evaluate_sum(sum);
+}
 
-  if (sum >= LEVEL_ONE_FAN_TH) {
+void fan_control::evaluate_sum(uint16_t _sum) {
+  uint8_t fan_speed = MIN_SPEED;
+  if (_sum >= LEVEL_ONE_FAN_TH) {
     fan_speed = LEVEL_TWO_FAN_SPEED;
   }
-  if (sum >= LEVEL_TWO_FAN_TH) {
+  if (_sum >= LEVEL_TWO_FAN_TH) {
     fan_speed = LEVEL_THREE_FAN_SPEED;
   }
-  if (sum >= LEVEL_THREE_FAN_TH) {
+  if (_sum >= LEVEL_THREE_FAN_TH) {
     fan_speed = LEVEL_FOUR_FAN_SPEED;
   }
-  if (sum >= LEVEL_FOUR_FAN_TH) {
+  if (_sum >= LEVEL_FOUR_FAN_TH) {
     fan_speed = LEVEL_FIVE_FAN_SPEED;
   }
-  if (sum >= LEVEL_FIVE_FAN_TH) {
+  if (_sum >= LEVEL_FIVE_FAN_TH) {
     fan_speed = LEVEL_SIX_FAN_SPEED;
   }
   target_speed = fan_speed;

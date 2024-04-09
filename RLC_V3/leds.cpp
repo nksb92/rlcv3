@@ -91,17 +91,19 @@ void ramp_up_rgb(CRGB rgb_val) {
   }
 }
 
-void set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
+uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
   uint16_t data_index = 1;
   uint16_t led_index = 0;
+  uint16_t sum = 0;
   int dim_factor = data[dimmer_channel];
   CRGB color(0, 0, 0);
 
-  universe_out(start, dimmer_channel, dim_factor, pixel_per_section, color, data_index, led_index, data);
+  sum = universe_out(start, dimmer_channel, dim_factor, pixel_per_section, color, data_index, led_index, data, sum);
 
 #ifdef RGB_IC
   pixels.show();
 #endif
+  return sum;
 }
 
 void show_segments(uint16_t segs) {
@@ -142,7 +144,7 @@ void show_segments(uint16_t segs) {
 #endif
 }
 
-void output_artnet(rlc_artnet artnet_var) {
+uint16_t output_artnet(rlc_artnet artnet_var) {
   uint16_t sections = artnet_var.get_section_number();
   uint16_t pixel_per_section = NUM_PIXEL / sections;
   uint16_t start = artnet_var.get_start_channel() - 1;  // minus one: start artnet data at index 0, smallest address 1
@@ -151,6 +153,7 @@ void output_artnet(rlc_artnet artnet_var) {
   uint16_t end_next = 0;
   uint16_t data_index = 1;
   uint16_t led_index = 0;
+  uint16_t sum = 0;
   uint8_t* current_universe = artnet_var.get_current_data();
   uint8_t* next_universe = artnet_var.get_next_data();
   uint8_t dimmer_factor = current_universe[end];
@@ -163,19 +166,21 @@ void output_artnet(rlc_artnet artnet_var) {
     dimmer_factor = next_universe[end_next];
   }
 
-  universe_out(start, end, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe);
+  sum = universe_out(start, end, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe, sum);
   if (start_next != end_next) {
     data_index--;
-    universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe);
+    sum = universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe, sum);
   }
 
 #ifdef RGB_IC
   pixels.show();
 #endif
+  return sum;
 }
 
-void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data) {
+uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum = 0) {
   uint8_t remainder = 0;
+  uint16_t temp_sum = 0;
   for (int i = start_index; i < end_index; i++) {
     remainder = data_index % 3;
     switch (remainder) {
@@ -189,6 +194,12 @@ void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_facto
         color.b = data[i];
         for (int j = 0; j < pixel_per_section; j++) {
           color.nscale8_video(dimmer_factor);
+
+          temp_sum += color.r + color.g + color.b;
+
+          if (temp_sum > sum) {
+            sum = temp_sum;
+          }
 
 #ifdef RGB_IC
           pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
@@ -205,4 +216,5 @@ void universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_facto
     }
     data_index++;
   }
+  return sum;
 }
