@@ -16,14 +16,24 @@
 #define STD_SEGMENTS 1
 #define STD_START_ADDRESS 1
 #define STD_UNIVERSE 0
+#define STD_FAN_RUN_ON_TIME 200
+#define STD_STANDBY_TIME 300
+#define MAX_SPEED 225
+#define MIN_SPEED 50
+#define FAN_CHANNEL 3
+#define PWM_PIN 8
+#define PWM_RESOLUTION 8
+#define PWM_FAN_FREQ 25000 
+#define SLAVE_ADR_STRT 0x08
+#define DATA_OUT 8
 
 // ------------------------------------------------------------------------------------------------------
 //
 //                   ONLY UNCOMMENT ONE OF THE OPTIONS
 //
-// #define RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
+#define RGB_IC // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
 // #define RGB // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
-#define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c
+// #define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c
 // ------------------------------------------------------------------------------------------------------
 
 #ifdef RGB_IC
@@ -36,7 +46,6 @@
 
 #ifdef PANEL
 #define NUM_PIXEL 5
-#define SLAVE_ADR_STRT 0x08
 #endif
 
 /**
