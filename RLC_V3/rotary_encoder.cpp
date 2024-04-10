@@ -9,6 +9,9 @@ bool change = true;
 // Indicates whether the display is in standby mode
 bool standby = false;
 
+// Indicates whether the save screen is shown
+bool save_screen = false;
+
 // Indicates whether the button has been pressed
 bool press = false;
 
@@ -26,10 +29,12 @@ void init_encoder(EncoderButton& eb) {
 }
 
 void encoder_handler(EncoderButton& eb) {
-  if (!standby) {
+  if (!standby && !save_screen) {
     enc_val += eb.increment();
   }
-  change = true;
+  if (!save_screen) {
+    change = true;
+  }
 }
 
 int16_t get_encoder_val() {
@@ -39,16 +44,16 @@ int16_t get_encoder_val() {
 }
 
 void long_press_handler(EncoderButton& eb) {
-  if (!standby) {
+  if (!standby && !save_screen) {
     long_press = true;
   }
 }
 
-bool get_long_press(){
+bool get_long_press() {
   return long_press;
 }
 
-void set_long_press(bool state){
+void set_long_press(bool state) {
   long_press = state;
 }
 
@@ -59,25 +64,25 @@ void press_handler(EncoderButton& eb) {
   change = true;
 }
 
-bool get_press_state(){
+bool get_press_state() {
   return press;
 }
 
-void set_press_state(bool state){
+void set_press_state(bool state) {
   press = state;
 }
 
 void double_press_handler(EncoderButton& eb) {
-  if (!standby) {
+  if (!standby && !save_screen) {
     double_press = true;
   }
 }
 
-bool get_double_press(){
+bool get_double_press() {
   return double_press;
 }
 
-void set_double_press(bool state){
+void set_double_press(bool state) {
   double_press = state;
 }
 
@@ -93,7 +98,14 @@ void set_dspl_standby(bool state) {
   standby = state;
 }
 
-bool get_standby_status()
-{
+bool get_standby_status() {
   return standby;
+}
+
+bool get_saved_screen_state() {
+  return save_screen;
+}
+
+void set_saved_screen(bool state) {
+  save_screen = state;
 }

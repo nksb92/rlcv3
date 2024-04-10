@@ -127,4 +127,8 @@ void set_dspl_standby(bool state);
 
 bool get_standby_status();
 
+bool get_saved_screen_state();
+
+void set_saved_screen(bool state);
+
 #endif

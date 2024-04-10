@@ -137,11 +137,19 @@ void loop() {
     set_long_press(false);
   }
 
-  if (enc_button.isPressed()) {
+  if (enc_button.isPressed() && !get_saved_screen_state()) {
     if (enc_button.currentDuration() > LONG_PRESS_TIME && !long_press_triggered) {
       button_long_pressed = true;
       long_press_triggered = true;
     }
+  }
+
+  // reacting first to button pressed if saved screen is shown
+  // making sure no further action is done with that button press
+  if (get_saved_screen_state() && button_pressed) {
+    set_saved_screen(false);
+    set_press_state(false);
+    button_pressed = get_press_state();
   }
 
   if (button_pressed) {
@@ -255,9 +263,9 @@ void loop() {
             }
             hsv_out(hsv_val);
             hsv_display_update(display, hsv_val);
-            #ifdef PANEL
+#ifdef PANEL
             fan.calc_hsv_speed(hsv_val);
-            #endif
+#endif
             break;
 
           case RGB_PAGE:
@@ -277,9 +285,9 @@ void loop() {
             }
             rgb_out(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
-            #ifdef PANEL
+#ifdef PANEL
             fan.calc_rgb_speed(rgb_val.get_rgb());
-            #endif
+#endif
             break;
 
           case DMX_PAGE:
@@ -322,9 +330,9 @@ void loop() {
             dmx_val.set_number_segments(seg.get_num_seg());
             artnet_var.set_number_segments(seg.get_num_seg());
             seg_display_update(display, seg);
-            #ifdef PANEL
+#ifdef PANEL
             fan.evaluate_sum(128);
-            #endif
+#endif
             break;
         }
         break;
@@ -367,13 +375,19 @@ void loop() {
   // hanlde everthing periodically
   switch (current_deepness) {
     case MAIN_MENU:
+      if (button_double_pressed) {
+        set_double_press(false);
+      }
       break;
     case SUB_MENU:
       // save variables to EEPROM
       if (button_double_pressed) {
+        Serial.print("Saved, Deepness: ");
+        Serial.println(current_deepness);
         write_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
         set_double_press(false);
         display_saved_status(display);
+        set_saved_screen(true);
       }
 
       switch (main_state) {
@@ -381,9 +395,9 @@ void loop() {
           dmx_val.hanlde_dmx();
           if (dmx_val.get_rec_status()) {
             last_rgb_sum = set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
-            #ifdef PANEL
+#ifdef PANEL
             fan.evaluate_sum(last_rgb_sum);
-            #endif
+#endif
             dmx_val.set_rec_status(false);
           }
           break;
@@ -391,9 +405,9 @@ void loop() {
         case ARTNET_NODE:
           if (artnet_state == ARTNET_PAGE) {
             last_rgb_sum = set_pixel(artnet_var.get_start_channel(), artnet_var.get_end_channel(), seg.get_num_seg(), artnet_var.get_current_data());
-            #ifdef PANEL
+#ifdef PANEL
             fan.evaluate_sum(last_rgb_sum);
-            #endif
+#endif
             dmx_val.send_universe();
           }
         case ARTNET_REC:
@@ -423,9 +437,9 @@ void loop() {
               artnet_var.artnet_parse();
               if (artnet_data) {
                 last_rgb_sum = output_artnet(artnet_var);
-                #ifdef PANEL
+#ifdef PANEL
                 fan.evaluate_sum(last_rgb_sum);
-                #endif
+#endif
                 artnet_data = false;
               }
 
