@@ -382,8 +382,6 @@ void loop() {
     case SUB_MENU:
       // save variables to EEPROM
       if (button_double_pressed) {
-        Serial.print("Saved, Deepness: ");
-        Serial.println(current_deepness);
         write_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
         set_double_press(false);
         display_saved_status(display);

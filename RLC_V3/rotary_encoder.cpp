@@ -25,12 +25,18 @@ void init_encoder(EncoderButton& eb) {
   eb.setLongClickHandler(long_press_handler);
   eb.setEncoderHandler(encoder_handler);
   eb.setLongClickDuration(500);
+  eb.setRateLimit(50);
   change = true;
 }
 
 void encoder_handler(EncoderButton& eb) {
   if (!standby && !save_screen) {
-    enc_val += eb.increment();
+    int temp = eb.increment();
+    if (temp >= 0) {
+      enc_val += temp * temp;
+    } else {
+      enc_val += (-1 * (temp * temp));
+    }
   }
   if (!save_screen) {
     change = true;
