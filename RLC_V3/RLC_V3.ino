@@ -176,10 +176,8 @@ void loop() {
 
           case ARTNET_NODE:
           case ARTNET_REC:
-            if (artnet_state == ARTNET_PAGE) {
-              artnet_var.next_selection();
-              display_artnet_rec(display, artnet_var);
-            }
+            artnet_var.next_selection();
+            display_artnet_rec(display, artnet_var, main_state);
             break;
 
           case SEGMENT_CNTRL:
@@ -219,7 +217,7 @@ void loop() {
               case MENU:
                 artnet_var.connect_wifi();
                 artnet_var.set_current_fsm(CONNECTING);
-                display_connecting_artnet(display, artnet_var);
+                display_artnet_rec(display, artnet_var, main_state);
                 artnet_state = artnet_var.get_current_fsm();
                 last_added_dot = millis();
                 break;
@@ -301,23 +299,19 @@ void loop() {
           case ARTNET_NODE:
           case ARTNET_REC:
             if (encoder_val != 0) {
-              switch (artnet_state) {
-                case ARTNET_PAGE:
-                  switch (artnet_var.get_current_sel()) {
-                    case UNIVERSE:
-                      artnet_var.add_universe(encoder_val);
-                      break;
-                    case CHANNEL:
-                      if (main_state == ARTNET_NODE) {
-                        artnet_var.add_channel_node(encoder_val);
-                      } else {
-                        artnet_var.add_channel(encoder_val);
-                      }
-                      break;
+              switch (artnet_var.get_current_sel()) {
+                case UNIVERSE:
+                  artnet_var.add_universe(encoder_val);
+                  break;
+                case CHANNEL:
+                  if (main_state == ARTNET_NODE) {
+                    artnet_var.add_channel_node(encoder_val);
+                  } else {
+                    artnet_var.add_channel(encoder_val);
                   }
-                  display_artnet_rec(display, artnet_var);
                   break;
               }
+              display_artnet_rec(display, artnet_var, main_state);
             }
             break;
 
@@ -409,19 +403,28 @@ void loop() {
             dmx_val.send_universe();
           }
         case ARTNET_REC:
+          if (artnet_var.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
+            if (millis() - last_scroll_time >= scroll_time) {
+              scroll();
+              display_artnet_rec(display, artnet_var, main_state);
+              last_scroll_time = millis();
+            }
+          }
           // on connection loss, jump to connecting state
           switch (artnet_state) {
             case CONNECTING:
               if (!get_standby_status()) {
                 if (millis() - last_added_dot >= add_dot_time) {
-                  display_connecting_artnet(display, artnet_var);
+                  // display_connecting_artnet(display, artnet_var);
+                  display_artnet_rec(display, artnet_var, main_state);
                   artnet_var.add_dot();
                   last_added_dot = millis();
                 }
               }
               if (artnet_var.get_wifi_status()) {
                 artnet_var.set_current_fsm(ARTNET_PAGE);
-                display_artnet_rec(display, artnet_var);
+                artnet_var.set_dots(3);
+                display_artnet_rec(display, artnet_var, main_state);
                 artnet_var.begin_artnet();
               }
               break;
@@ -441,13 +444,6 @@ void loop() {
                 artnet_data = false;
               }
 
-              if (artnet_var.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
-                if (millis() - last_scroll_time >= scroll_time) {
-                  scroll();
-                  display_artnet_rec(display, artnet_var);
-                  last_scroll_time = millis();
-                }
-              }
               break;
           }
           break;

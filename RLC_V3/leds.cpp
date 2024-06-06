@@ -14,6 +14,8 @@ void init_led() {
 #endif
 
 #ifdef RGB
+  // esp32 boards version 3.0.0 breaks i2c api
+  // init of pwm pin also changes
   ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
   ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
   ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
