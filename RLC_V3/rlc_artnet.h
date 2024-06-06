@@ -79,6 +79,7 @@ public:
   void set_current_fsm(uint8_t val);
   void set_current_universe_nmbr(uint16_t val);
   void set_current_channel(uint16_t channel);
+  void set_dots(uint8_t _dots);
 };
 
 #endif

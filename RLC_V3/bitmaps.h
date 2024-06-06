@@ -303,4 +303,52 @@ const unsigned char* BITMAP_SUB_MENU_ARRAY[BITMAP_SUB_MENU_LEN] = {
   BITMAP_SAVED_SCREEN
 };
 
+enum {
+	LAN_SYMBOL,
+	WIFI_SYMBOL_1,
+	WIFI_SYMBOL_2,
+	WIFI_SYMBOL_3
+};
+
+#define BITMAP_ICONS_LEN 4
+
+int W_H_MATRIX_ICONS[BITMAP_ICONS_LEN][2] = {
+	{15, 12},
+	{6, 4},
+	{10, 6},
+	{14, 8}
+};
+
+int X_Y_MATRIX_ICONS[BITMAP_ICONS_LEN][2] = {
+	{105, 1},
+	{12, 7},
+	{10, 5}, 
+	{8, 3}
+};
+
+// 'LAN_SYMBOL', 14x8px
+const unsigned char BITMAP_LAN_SYMBOL [] PROGMEM = {
+	0xff, 0xfe, 0xaa, 0xaa, 0xaa, 0xaa, 0x80, 0x02, 0x80, 0x02, 0x80, 0x02, 0x80, 0x02, 0xe0, 0x0e, 
+	0xe0, 0x0e, 0xfc, 0x7e, 0xfc, 0x7e, 0x7f, 0xfc
+};
+// 'WIFI_SYMBOL_1', 14x8px
+const unsigned char BITMAP_WIFI_SYMBOL_1 [] PROGMEM = {
+	0x78, 0x84, 0x30, 0x30
+};
+// 'WIFI_SYMBOL_2', 14x8px
+const unsigned char BITMAP_WIFI_SYMBOL_2 [] PROGMEM = {
+	0x3f, 0x00, 0x40, 0x80, 0x9e, 0x40, 0x21, 0x00, 0x0c, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+// 'WIFI_SYMBOL_3', 14x8px
+const unsigned char BITMAP_WIFI_SYMBOL_3 [] PROGMEM = {
+	0x1f, 0xe0, 0x20, 0x10, 0x4f, 0xc8, 0x90, 0x24, 0x27, 0x90, 0x08, 0x40, 0x03, 0x00, 0x03, 0x00
+};
+
+const unsigned char* BITMAP_ICONS_ARRAY[BITMAP_ICONS_LEN] = {
+	BITMAP_LAN_SYMBOL,
+	BITMAP_WIFI_SYMBOL_1,
+	BITMAP_WIFI_SYMBOL_2,
+	BITMAP_WIFI_SYMBOL_3
+};
+
 #endif

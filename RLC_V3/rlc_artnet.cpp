@@ -85,7 +85,7 @@ void rlc_artnet::add_channel(int value) {
 
 void rlc_artnet::add_dot() {
   number_dots++;
-  if (number_dots > 5) number_dots = 1;
+  if (number_dots > 3) number_dots = 1;
 }
 
 void rlc_artnet::add_channel_node(int value) {
@@ -192,4 +192,9 @@ void rlc_artnet::set_current_universe_nmbr(uint16_t val) {
 void rlc_artnet::set_current_channel(uint16_t channel) {
   channel_start = 0;
   add_channel(channel);
+}
+
+void rlc_artnet::set_dots(uint8_t _dots)
+{
+  number_dots = _dots;
 }
