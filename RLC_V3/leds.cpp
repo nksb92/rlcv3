@@ -1,3 +1,4 @@
+#include "Print.h"
 #include "HWCDC.h"
 #include "leds.h"
 
@@ -16,6 +17,11 @@ void init_led() {
 #ifdef RGB
   // esp32 boards version 3.0.0 breaks i2c api
   // init of pwm pin also changes
+  // ledcAttach(RED_PIN, PWM_FREQ, RESOLUTION);
+  // ledcAttach(GREEN_PIN, PWM_FREQ, RESOLUTION);
+  // ledcAttach(BLUE_PIN, PWM_FREQ, RESOLUTION);
+  
+  // Method before 3.0.0
   ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
   ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
   ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
@@ -98,9 +104,10 @@ uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_s
   uint16_t led_index = 0;
   uint16_t sum = 0;
   int dim_factor = data[dimmer_channel];
+  
   CRGB color(0, 0, 0);
 
-  sum = universe_out(start, dimmer_channel, dim_factor, pixel_per_section, color, data_index, led_index, data, sum);
+  sum = universe_out(start, dimmer_channel, dim_factor, NUM_PIXEL/pixel_per_section, color, data_index, led_index, data, sum);
 
 #ifdef RGB_IC
   pixels.show();
@@ -181,6 +188,7 @@ uint16_t output_artnet(rlc_artnet artnet_var) {
 }
 
 uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum = 0) {
+  
   uint8_t remainder = 0;
   uint16_t temp_sum = 0;
   for (int i = start_index; i < end_index; i++) {
@@ -194,9 +202,9 @@ uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_f
         break;
       case 0:
         color.b = data[i];
+        color.nscale8_video(dimmer_factor);
         for (int j = 0; j < pixel_per_section; j++) {
-          color.nscale8_video(dimmer_factor);
-
+          
           temp_sum += color.r + color.g + color.b;
 
           if (temp_sum > sum) {

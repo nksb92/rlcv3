@@ -7,6 +7,7 @@ fan_control::~fan_control() {
 }
 
 void fan_control::init_fan() {
+  // ledcAttach(PWM_PIN, PWM_FAN_FREQ, PWM_RESOLUTION);
   ledcSetup(FAN_CHANNEL, PWM_FAN_FREQ, PWM_RESOLUTION);
   ledcAttachPin(PWM_PIN, FAN_CHANNEL);
   set_speed(MIN_SPEED);
