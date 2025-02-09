@@ -2,20 +2,19 @@
 #define ROTARY_ENCODER_H
 // https://github.com/Stutchbury/EncoderButton Encoder Libary
 #include <EncoderButton.h>
-#include "common.h"
 
 // These defines are used to specify the pin numbers for the switch,
 // data, and clock pins of the rotary encoder.
 
 // The pin number for the switch pin of the rotary encoder
 // the EncoderButton libary sets this pin to pull-up
-#define SW_PIN 2
+#define SW_PIN D0
 
 // The pin number for the CLK (clock) pin of the rotary encoder
-#define CLK_PIN 3
+#define CLK_PIN D1
 
 // The pin number for the DT (data) pin of the rotary encoder
-#define DT_PIN 4
+#define DT_PIN D2
 
 #define LONG_PRESS_TIME 750
 #define ACCERLERATION_SPEED 75
@@ -25,14 +24,14 @@
  *
  * @param eb: The EncoderButton object to use for handling button events.
  */
-void init_encoder(EncoderButton& eb);
+void init_encoder(EncoderButton &eb);
 
 /**
  * Handle the encoder event.
  *
  * @param eb: The EncoderButton object that generated the event.
  */
-void encoder_handler(EncoderButton& eb);
+void encoder_handler(EncoderButton &eb);
 
 /**
  * Get the current encoder value and reset it.
@@ -46,7 +45,7 @@ int16_t get_encoder_val();
  *
  * @param eb: The EncoderButton object that generated the event.
  */
-void long_press_handler(EncoderButton& eb);
+void long_press_handler(EncoderButton &eb);
 
 /**
  * Get the state of the long press flag.
@@ -67,7 +66,7 @@ void set_long_press(bool state);
  *
  * @param eb: The EncoderButton object that generated the event.
  */
-void press_handler(EncoderButton& eb);
+void press_handler(EncoderButton &eb);
 
 /**
  * Get the state of the press flag.
@@ -88,7 +87,7 @@ void set_press_state(bool state);
  *
  * @param eb: The EncoderButton object that generated the event.
  */
-void double_press_handler(EncoderButton& eb);
+void double_press_handler(EncoderButton &eb);
 
 /**
  * Get the state of the double press flag.
