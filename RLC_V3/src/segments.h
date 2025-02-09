@@ -3,7 +3,8 @@
 
 #include "common.h"
 
-class segments {
+class segments
+{
 private:
   uint16_t number_segments = 0;
   uint8_t current_segment = 0;
@@ -11,7 +12,6 @@ private:
   uint16_t possible_segments[NUM_PIXEL];
 
   void calc_segments();
-  
 
 public:
   segments();

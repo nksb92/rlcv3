@@ -8,22 +8,25 @@
 #define UNIVERSE_SIZE 513
 #define LAST_DMX_ADDRESS 512
 #define FIRST_DMX_ADDRESS 1
-#define LAST_UNIVERSE 99  // theroretical number of supported universes 32768, limited to 100 (0-99)
+#define LAST_UNIVERSE 99 // theroretical number of supported universes 32768, limited to 100 (0-99)
 
-enum {
+enum
+{
   MENU,
   CONNECTING,
   ARTNET_PAGE
 };
 
-enum {
+enum
+{
   UNIVERSE,
   CHANNEL,
   IP_ADDRESS,
   ARTNET_LAST
 };
 
-class rlc_artnet {
+class rlc_artnet
+{
 private:
   uint16_t current_universe = 0;
   uint16_t last_used_universe = 0;
@@ -41,7 +44,7 @@ private:
 public:
   rlc_artnet();
   ~rlc_artnet();
-  void init(void (*fptr)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data));
+  void init(void (*fptr)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data));
   void begin_artnet();
   void stop_artnet();
   void connect_wifi();
@@ -52,7 +55,6 @@ public:
   void add_universe(int value);
   void add_channel(int value);
   void add_dot();
-  void add_channel_node(int value);
 
   // artnet and dmx functions
   void artnet_parse();
@@ -69,13 +71,13 @@ public:
   uint8_t get_current_sel();
   uint8_t get_current_fsm();
   uint8_t get_number_dots();
-  uint8_t* get_current_data();
-  uint8_t* get_next_data();
+  uint8_t *get_current_data();
+  uint8_t *get_next_data();
 
   /* SETTER FUNCTIONS */
   void set_number_segments(uint16_t _segments);
-  void set_current_universe(uint8_t* data);
-  void set_next_universe(uint8_t* data);
+  void set_current_universe(uint8_t *data);
+  void set_next_universe(uint8_t *data);
   void set_current_fsm(uint8_t val);
   void set_current_universe_nmbr(uint16_t val);
   void set_current_channel(uint16_t channel);
