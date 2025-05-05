@@ -1,4 +1,3 @@
-#include "HWCDC.h"
 #include "rlc_dmx.h"
 
 /*
@@ -7,9 +6,9 @@ Pins for the communication with the RS-485 IC
 @param RECEIVE_PIN: pin for receiving data
 @param ENABLE_PIN: pin to pull RS-485 IC high or low; high for sending data, low for receiving data
 */
-#define TRANSMIT_PIN 21
-#define RECEIVE_PIN 20
-#define ENABLE_PIN 5
+#define TRANSMIT_PIN D5
+#define RECEIVE_PIN D7
+#define ENABLE_PIN D3
 
 rgb_dmx::rgb_dmx()
 {
@@ -18,7 +17,13 @@ rgb_dmx::rgb_dmx()
 void rgb_dmx::install_dmx()
 {
   dmx_driver_install(dmxPort, &config, NULL, 0);
+#ifdef SPOT
+  // dont use the enable pin, because of a double pin assignment
+  // with the fan control on the spotlight hardware
+  dmx_set_pin(dmxPort, TRANSMIT_PIN, RECEIVE_PIN, NO_PIN);
+#else
   dmx_set_pin(dmxPort, TRANSMIT_PIN, RECEIVE_PIN, ENABLE_PIN);
+#endif
 }
 
 uint16_t rgb_dmx::get_start()
