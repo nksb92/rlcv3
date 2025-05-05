@@ -14,11 +14,9 @@
 #define STD_UNIVERSE 0
 #define STD_FAN_RUN_ON_TIME 200
 #define STD_STANDBY_TIME 300
+#define STD_FAN_UPDATE_TIME 100
 
-#define MAX_SPEED 225
-#define MIN_SPEED 50
-#define FAN_CHANNEL 3
-#define PWM_PIN D8
+#define FAN_CHANNEL 4
 #define PWM_RESOLUTION 8
 #define PWM_FAN_FREQ 25000
 

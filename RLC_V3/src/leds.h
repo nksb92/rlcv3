@@ -7,9 +7,6 @@
 #include "common.h"
 #include "Wire.h"
 
-#define RED_PIN 10
-#define GREEN_PIN 9
-#define BLUE_PIN 8
 #define RED_CHANNEL 0
 #define GREEN_CHANNEL 1
 #define BLUE_CHANNEL 2
@@ -38,8 +35,6 @@ void hsv_out(C_HSV hsv_val);
 void rgb_out(CRGB led_val, uint8_t factor);
 
 void ramp_up_hsv(C_HSV hsv_val);
-
-void drive_pixel(CRGB rgb_val, uint8_t factor);
 
 void ramp_up_rgb(CRGB rgb_val);
 

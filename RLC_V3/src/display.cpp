@@ -1,4 +1,3 @@
-#include "WString.h"
 #include "display.h"
 #include "bitmaps.h"
 
