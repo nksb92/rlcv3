@@ -3,23 +3,11 @@
 
 #include "common.h"
 
-#define LEVEL_ONE_FAN_TH 128
-#define LEVEL_TWO_FAN_TH 256
-#define LEVEL_THREE_FAN_TH 384
-#define LEVEL_FOUR_FAN_TH 512
-#define LEVEL_FIVE_FAN_TH 640
-
-#define LEVEL_TWO_FAN_SPEED 100
-#define LEVEL_THREE_FAN_SPEED 125
-#define LEVEL_FOUR_FAN_SPEED 175
-#define LEVEL_FIVE_FAN_SPEED 200
-#define LEVEL_SIX_FAN_SPEED MAX_SPEED
-
 class fan_control
 {
 private:
-  uint8_t current_speed = MIN_SPEED;
-  uint8_t target_speed = MIN_SPEED;
+  uint8_t current_speed = FAN_MIN_SPEED;
+  uint8_t target_speed = FAN_MIN_SPEED;
 
 public:
   fan_control();

@@ -1,38 +1,63 @@
 #include "fan_control.h"
 
-fan_control::fan_control() {
+fan_control::fan_control()
+{
 }
 
-fan_control::~fan_control() {
+fan_control::~fan_control()
+{
 }
 
-void fan_control::init_fan() {
-  // ledcAttach(PWM_PIN, PWM_FAN_FREQ, PWM_RESOLUTION);
-  ledcSetup(FAN_CHANNEL, PWM_FAN_FREQ, PWM_RESOLUTION);
-  ledcAttachPin(PWM_PIN, FAN_CHANNEL);
-  set_speed(MIN_SPEED);
+void fan_control::init_fan()
+{
+  pinMode(PWM_PIN, OUTPUT);
+  analogWriteFrequency(PWM_FAN_FREQ);
+
+  set_speed(FAN_MIN_SPEED);
 }
 
-void fan_control::set_speed(uint8_t _speed) {
-  current_speed = _speed;
-  ledcWrite(FAN_CHANNEL, _speed);
+void fan_control::set_speed(uint8_t _speed)
+{
+  // check FAN_MIN_SPEED and FAN_ZERO_RPM mode
+  // if target speed is smaller (or equal) than FAN_MIN_SPEED and FAN_ZERO_RPM is true
+  // set fan to off
+  if (_speed <= FAN_MIN_SPEED)
+  {
+    if (FAN_ZERO_RPM)
+    {
+      _speed = 0;
+    }
+    else
+    {
+      _speed = FAN_MIN_SPEED;
+    }
+  }
+
+  analogWrite(PWM_PIN, _speed);
 }
 
-void fan_control::set_target_speed(uint8_t _target) {
+void fan_control::set_target_speed(uint8_t _target)
+{
   target_speed = _target;
 }
 
-void fan_control::update() {
-  if (current_speed < target_speed) {
-    set_speed(++current_speed);
+void fan_control::update()
+{
+  if (current_speed < target_speed)
+  {
+    current_speed++;
+    set_speed(current_speed);
   }
 
-  if (current_speed > target_speed) {
-    set_speed(--current_speed);
+  if (current_speed > target_speed)
+  {
+    current_speed--;
+    set_speed(current_speed);
   }
 }
 
-void fan_control::calc_hsv_speed(C_HSV color) {
+void fan_control::calc_hsv_speed(C_HSV color)
+{
   uint8_t hue = color.get_hue();
   uint8_t sat = map(color.get_sat_p(), 0, 100, 0, 255);
   uint8_t val = map(color.get_val_p(), 0, 100, 0, 255);
@@ -42,28 +67,22 @@ void fan_control::calc_hsv_speed(C_HSV color) {
   calc_rgb_speed(temp_rgb);
 }
 
-void fan_control::calc_rgb_speed(CRGB color) {
+void fan_control::calc_rgb_speed(CRGB color)
+{
   uint16_t sum = 0;
   sum += color.r + color.g + color.b;
+
   evaluate_sum(sum);
 }
 
-void fan_control::evaluate_sum(uint16_t _sum) {
-  uint8_t fan_speed = MIN_SPEED;
-  if (_sum >= LEVEL_ONE_FAN_TH) {
-    fan_speed = LEVEL_TWO_FAN_SPEED;
-  }
-  if (_sum >= LEVEL_TWO_FAN_TH) {
-    fan_speed = LEVEL_THREE_FAN_SPEED;
-  }
-  if (_sum >= LEVEL_THREE_FAN_TH) {
-    fan_speed = LEVEL_FOUR_FAN_SPEED;
-  }
-  if (_sum >= LEVEL_FOUR_FAN_TH) {
-    fan_speed = LEVEL_FIVE_FAN_SPEED;
-  }
-  if (_sum >= LEVEL_FIVE_FAN_TH) {
-    fan_speed = LEVEL_SIX_FAN_SPEED;
-  }
-  target_speed = fan_speed;
+void fan_control::evaluate_sum(uint16_t _sum)
+{
+  uint8_t fan_speed = FAN_MIN_SPEED;
+
+  // set fan target to values between 0 and FAN_MAX_SPEED
+  // FAN_MIN_SPEED is not used to check for FAN_ZERO_RPM mode
+  // in function set_speed()
+  fan_speed = map(_sum, 0, 765, 0, FAN_MAX_SPEED);
+
+  set_target_speed(fan_speed);
 }
