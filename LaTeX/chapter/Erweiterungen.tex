@@ -1,0 +1,706 @@
+\section{Erweiterungen Linker File Analyser}\label{kap:erweiterungen}
+
+\subsection{Entwicklungswerkzeuge}\label{kap:entwicklungstools}
+In der modernen Softwareentwicklung spielt die Auswahl der Entwicklungswerkzeuge eine zentrale Rolle.
+Die richtigen Kombinationen an Werkzeugen unterstützen den Entwickler und führen zu einem effizienten Arbeiten.
+Da es sich bei der Entwicklungsarbeit um eine Erweiterung einer bestehenden Software handelt, ist die Programmiersprache für die Entwicklung bereits festgelegt.
+Als Sprache wird Python 3 verwendet \cite{inet:PythonOrg}.
+Diese bietet als höhere Programmiersprache einige Vorteile. \\
+
+Probleme können mit Hochsprachen schneller gelöst werden.
+Über moderne \ac{IDE}s ist es leicht den Programmcode zu debuggen.
+Die Lesbarkeit ist oftmals besser.
+Dadurch kann der Programmcode auch leichter gewartet werden.
+Über Klassen kann eine übersichtliche und intuitive Strukturierung vorgenommen werden.
+Die negativen Seiten wie längere Laufzeiten werden dafür in Kauf genommen \cite{Watson2017}.\\
+
+Für das Programmieren wird der Editor Visual Studio Code \cite{inet:vscode} verwendet.
+Dies ist zwar keine \ac{IDE}, kann den Python Programmcode dennoch debuggen und ausführen.
+Eine Fülle an Erweiterungen erleichtert das Programmieren.
+In Software-Projekten mit unterschiedlichen Programmiersprachen ist der Einsatz des Editors besonders praktisch.
+Verschiedene Sprachen können einfach konfiguriert werden.
+Es ist nicht notwendig, den Editor zu wechseln.\\
+
+Die Programmierung der graphischen Benutzeroberfläche wird mit der Hilfe eines weiteren Pythonmoduls geschrieben.
+Das Modul \verb*|ttkbootstrap| \cite{inet:ttkbootstrap} bietet eine moderne Möglichkeit \ac{GUI}s in Python zu erstellen.
+Angelehnt ist das Modul an Bootstrap.
+Dies ist ein beliebtes Gerüst für die Programmierung graphischer Oberflächen von Webanwendungen \cite{inet:bootstrap}. \\
+
+Wie auch die Software-Projekte der \acs{ECU}s bei Viessmann unterliegt das Projekt der Thesis einer Versionsverwaltung.
+Eingesetzt wird dafür die Software Git \cite{inet:git}.
+Dadurch ist eine leichte Zusammenarbeit zwischen Entwicklern für beispielsweise Programmcodereviews gewährleistet.
+Git wird über die graphische Oberfläche von Sourcetree verwendet \cite{inet:sourcetree}.
+Darin ist die Versionskontrolle einfach Anwendbar. \\
+
+\subsection{Best Practices beim Programmieren mit Python}
+Beim Programmieren mit Python gibt es eine Vielzahl von Best Practices.
+Diese empfohlenen Vorgehensweisen sollen helfen, sauberen, effizienten und wartbaren Programmcode zu schreiben.
+Best Practices sind Namenskonventionen, Strukturierung des Programmcodes, Nutzung von Bibliotheken und Modulen, sowie allgemeine Prinzipien der Softwareentwicklung. \\
+
+\begin{description}[style=nextline]
+	\item[\acs{PEP} 8 Style Guide] Das Dokument \ac{PEP} Nummer 8 legt Stilregeln zur Formatierung von Python Programmcode vor \cite{Slatkin2015-xn}.
+	Gefunden werden kann es auf der Website der Python Organisation \cite{inet:pep8}.
+	Die Vorgabe zum einheitlichen Stil soll dafür sorgen, dass der Programmcode einheitlicher und verständlicher wird.
+	Der Programmcode lässt sich außerdem auch leichter warten.
+	Über verschiedene Projekte hinweg kann somit eine gute Lesbarkeit erreicht werden \cite{Slatkin2015-xn}.
+	Hierbei ist beispielsweise festgelegt, dass es maximal 79 Textzeichen pro Zeile geben soll \cite{inet:pep8}.
+	
+	\item[Docstrings] Funktionen und Klassen können mit Docstrings beschrieben und dokumentiert werden \cite{Klein2021-ko}.
+	Dies sind Kommentare direkt bei der entsprechenden Definition.
+	Darin sind Informationen über die allgemeine Funktionalität, die Übergabeparameter und den Rückgabewert enthalten.
+	Typischerweise wird dabei auch der Datentyp der Übergabewerte beschrieben.
+	Beispiele über die Ausführung oder der Parameter sind ebenfalls sinnvoll. \\
+	
+	Angezeigt wird ein Docstring, wenn der Mauszeiger über den Funktionsaufruf bewegt wird.
+	Programmcodeabschnitt \ref{pc:docstring} zeigt ein Beispiel für eine einfache Funktion.
+	Docstrings fördern obendrein die interaktive Entwicklung.
+	Über die integrierte \verb*|help|-Funktion kann die Dokumentation sogar über die Kommandozeile ausgegeben werden.
+	Für die Definition der Docstring gibt es ein Standardverfahren.
+	Details über die Grundregeln können in der gut ausgearbeiteten Python Dokumentation nachgelesen werden \cite{Slatkin2015-xn}.
+	In \ac{PEP} Nummer 257 sind diese Regeln hinterlegt \cite{inet:pep257}.
+	\begin{listing}[H]
+		\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\small, baselinestretch=1.25]{python}
+			def multiply_by_ten(parameter: int):
+				"""Multiplies the input parameter with 
+				the value of 10 and returns it.
+				
+				Args:
+				parameter (int): Integer value for multiplication.
+				
+				Returns:
+				int: Input parameter value multiplied with 10.
+				"""
+				return parameter * 10
+		\end{minted}
+		\caption{Definition einer Funktion mit Docstring}
+		\label{pc:docstring}
+	\end{listing}
+	
+	\item[Modularisierung] Programmcode soll niemals kopiert und an anderer Stelle genau gleich eingefügt werden.
+	Programmcode wird in Module, Klassen und Funktion aufgeteilt.
+	Damit können eine Menge an Anweisungen gruppiert werden.
+	Dies verbessert die Wiederverwendbarkeit des Programmcodes.
+	Die Lesbarkeit sowie Wartbarkeit wird ebenfalls vereinfacht \cite{Klein2021-ko}.
+	
+	\item[Virtuelle Umgebungen] In komplexeren Python-Programmen können transitive Abhängigkeiten auftreten.
+	Dies bedeutet, dass Pakete von den bereits installierten Paketen abhängen.
+	Global installierte Pakete können dadurch in Programmen zu Problemen führen.
+	Die Lösung wird durch virtuelle Umgebungen bereitgestellt \cite{Slatkin2015-xn}. \\
+	
+	Python bietet dafür eine Standardbibliothek an.
+	Dieses Modul heißt \verb*|pyenv|.
+	Darüber kann eine isolierte Pyhton-Umgebung erstellt werden.
+	Dadurch kann auf einem Computer mehrere Paketversionen ohne dem Auftreten von Konflikten genutzt werden.
+	Durch \verb*|pyenv| ist es möglich, unterschiedliche unabhängige Verzeichnisstrukturen aufzubauen.
+	Dies bedeutet, dass eine Umgebung mit allen Abhängigkeiten auf unterschiedlichen Computern gleich aufgesetzt werden kann.
+	Oder anders ausgedrückt: der Nutzer weiß, dass der Programmcode funktioniert \cite{Slatkin2015-xn}.
+	
+	\item[Tests] Python bietet keine statische Typüberprüfung.
+	Dies kann bei ungetesteten Programmcode zu Fehlern führen.
+	Das Schreiben von Tests ist keine Python-spezifische Angelegenheit.
+	Pythons dynamische Features erlauben allerdings eine einfache Implementierung von Tests.
+	Auch hierbei bietet Python ein integriertes Modul an.
+	Mit \verb*|unittest| können Testklassen für Programmcode angelegt und ausgeführt werden \cite{Slatkin2015-xn}.
+	Dies sollte genutzt werden, um zu überprüfen, dass der Programmcode korrekt funktioniert.
+	
+	\item[Standardbibliotheken] \enquote{Python verfolgt hinsichtlich der Standardbibliothek die Philosophie, dass sozusagen die Batterien im Lieferumfang enthalten sein sollten} \cite{Slatkin2015-xn}.
+	Daher ist es auch nicht verwunderlich, dass Python eine Vielzahl an Standardmodulen bei der Installation mitliefert.
+	An dieser Stelle sollte also das Rad nicht neu erfunden werden, sondern genau diese Module verwendet werden.
+	
+	\item[Zen of Python] Der Zen of Python beschreibt in 19 Prinzipien, wie Python Programmcode geschrieben werden soll \cite{inet:pep20}.
+	Über ein in der Programmiersprache hinterlegtes Easter-Egg können die Thesen ausgegeben werden.
+\end{description}
+
+In den folgenden Kapiteln werden die in Kapitel \textit{\ref{kap:aufgabenstellung} \nameref{kap:aufgabenstellung}} beschriebenen Erweiterungen umgesetzt.
+Dabei werden die Entwicklungswerkzeuge sowie die Best Practices angewendet.
+
+\subsection{Gruppierung von Funktionalitäten}\label{kap:aufteilung_registerkarten}
+Damit das Fenster der \ac{GUI} nicht überladen wird, wird bisher auf unterschiedliche Fenster zurückgegriffen.
+Dies bedeutet allerdings, dass für jede größere Funktionalität ein neues Fenster benötigt wird.
+Alternativ dazu ist das Nutzen eines Notizbuches mit Registerkarten. \\
+
+Mit einem Notizbuch kann es vermieden werden, den Bildschirm mit Fenstern oder einer Wand aus Widgets zu überladen \cite{skript:wegner09}.
+In einem Notizbuch können mehrere Registerkarten untergebracht werden.
+Bei komplexen \ac{GUI}s kann das Programm dadurch in logische Abschnitte unterteilt werden.
+Auf den einzelnen Registerkarten können die Widgets der Abschnitte angebracht werden.
+In Abbildung \ref{fig:exportmpuconfigtab} ist dies oben zu sehen.
+Dort ist die Registerkarte \verb*|Export| \verb*|Config| geöffnet.
+Für die restliche Funktionalität stehen zwei weitere Registerkarten zur Verfügung.\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{graphics/export_mpu_config_tab}
+	\caption{Registerkarte zum Erstellen einer \acs{MPU}-Konfiguration}
+	\label{fig:exportmpuconfigtab}
+\end{figure}
+
+Die Registerkarten können über unterschiedliche Layouts spezifisch an die geforderte Funktionalität angepasst werden.
+Der Nutzer kann auswählen, welche Registerkarte aktuell dargestellt werden soll.
+Diese Aufteilung führt, ähnlich wie verschiedene Fenster, zu einer verbesserten Benutzerfreundlichkeit. \\
+
+Das Nutzen eines Notizbuches mit Registerkarten schränkt den verfügbaren Platz pro Registerkarte ein.
+Durch verschiedene Registerkarten kann eine Anwendung außerdem unübersichtlich werden.
+Beide Nachteile treten allerdings erst bei extrem komplexen graphischen Oberflächen auf.
+Für die Softwareanwendung des \verb*|Linker| \verb*|File| \verb*|Analysers| ist dies jedoch nicht weiter relevant. \\
+
+Der Nutzer der Software kann benutzerfreundlich zwischen den Registerkarten wechseln, ohne das Hauptanwendungsfenster zu verlassen.
+Im Vergleich mit einzelnen Fenstern wird durch das Notizbuch weniger Platz auf dem Bildschirm eingenommen.
+Die Vorteile des Nutzens der Registerkarten überwiegen damit deutlich die Nachteile. \\
+
+\subsection{Linker-Konfigurationsdatei Editor}\label{kap:linker_konfig_editor}
+
+\subsubsection{Veränderungen GUI}\label{kap:veränderungen_gui}
+Damit die geforderten Funktionen aus Kapitel \textit{\ref{kap:projektanforderungen} \nameref{kap:projektanforderungen} }implementiert werden können, werden weitere Widgets benötigt.
+Die Anordnung der Widgets auf der graphischen Oberfläche wird ebenfalls angepasst.\\
+
+Für die Neuanordnung wird zunächst ein Konzept aufgestellt, welches die Funktionen abdeckt.
+Erstellt wird das Konzept in einem Programm zur Erstellung von Präsentationen von Google.
+Dabei werden geometrische Formen positioniert und somit eine Oberfläche gestaltet.
+Diese ist natürlich nicht funktional, dient allerdings zu Orientierung.
+Abbildung \ref{fig:konzept} zeigt das erste Konzept der Erweiterungen.\\
+
+\begin{figure}[H]
+	\centering
+	\frame{\includegraphics[width=0.95\linewidth]{graphics/Konzept}}
+	\caption{Konzept der GUI-Erweiterungen}
+	\label{fig:konzept}
+\end{figure}
+
+Zwischen Konzept und realer Anwendung gibt es Unterschiede.
+Die reale Anwendung kann in Abbildung \ref{fig:hauptanwendungsfensterupdated} gesehen werden.\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{graphics/hauptanwendungsfenster_updated}
+	\caption{Veränderte \acs{GUI} des Hauptanwendungsfensters}
+	\label{fig:hauptanwendungsfensterupdated}
+\end{figure}
+
+Die erste Erweiterung ist, dass die Funktionalitäten der Fenster über verschiedene Registerkarten erreichbar sind.
+Diese Änderung ist in Kapitel \textit{\ref{kap:aufteilung_registerkarten} \nameref{kap:aufteilung_registerkarten}} auf Seite \pageref{kap:aufteilung_registerkarten} genauer beschrieben.
+Neben der Zusammenführung der Fenster hat sich die Anordnung und Anzahl der Schaltflächen oberhalb der Visualisierung der Speicherregionen geändert.
+Neu hinzugekommen ist eine Schaltfläche für das Löschen einer Speicherregion.
+Diese muss dafür zunächst ausgewählt werden.
+Anschließend kann über die Schaltfläche \verb*|Delete| die Region aus der Datenstruktur gelöscht werden.
+Zu diesem Zeitpunkt existiert die Speicherregion noch in der geöffneten Datei.
+Erst wenn die Schaltfläche \verb*|Update| daneben betätigt wird, wird die Region aus der Datei entfernt.
+Dieser Extraschritt soll dafür sorgen, dass ein fehlerhaftes Löschen nicht direkt die Datei beeinflusst. \\
+
+Die weitere Schaltfläche zum Erstellen einer MPU-Konfiguration ist nicht länger in dieser Registerkarte vorhanden.
+Da kein weiteres Fenster geöffnet werden muss, hat diese Schaltfläche keine Funktion.
+Aus diesem Grund wird sie entfernt.
+Das Gleiche betrifft auch die Schaltfläche für das Öffnen des Fensters für die Visualisierung von \acs{MPU}-Konfigurationen.
+Dieses Fenster sitzt nun in einer eigenen Registerkarte. \\
+
+Die Darstellung der einzelnen Regionen einer Linker-Konfigurationsdatei ist ebenfalls angepasst.
+Angezeigt werden die Speicherregionen weiterhin in dem Feld \verb*|Regions|.
+Die Namen der Regionen werden jetzt als separates Widget für jede Region angezeigt.
+Unten in der Darstellung einer Region wird das dazugehörige Segment angezeigt.
+In der Mitte befindet sich die Option zur Auswahl der Region für das Löschen oder Erstellen einer \acs{MPU}-Konfiguration.
+Die Widgets für die Adressierung haben kleinere Änderungen erhalten.
+Zum einen sind die Widgets für die Startadresse sowie die Größe indessen vom Nutzer bearbeitbar.
+Die Endadresse der Regionen ist nicht bearbeitbar.
+Eine visuelle Unterscheidung soll deutlich machen, in welche Textfelder der Wert geändert werden kann.
+Ein oranger Rahmen ist bearbeitbar, ein Grauer nicht.
+Diese Kennzeichnung zieht sich außerdem über die weiteren neuen Widgets hinweg.
+In diesem Fall ist es nicht nötig, dass alle drei Felder bearbeitet werden müssen.
+Zwei der Felder reichen aus, der dritte Wert kann errechnet werden. \\
+
+Eine größere Änderung kann auf der rechten Seite der Abbildung \ref{fig:hauptanwendungsfensterupdated} gesehen werden.
+Dort können oben neue Speicherregionen angelegt werden.
+Dafür muss der Name, die Startadresse sowie die Größe des Bereichs angegeben werden.
+Die Endadresse wird auch hierbei errechnet.
+Die Region muss anschließend einem Segment zugeordnet werden.
+Dafür steht unterhalb der Eingabefelder eine Auswahl zur Verfügung.
+Darin befinden sich alle vom Skript in der Linker-Konfigurationsdatei gefundenen Segmente.
+Über die Schaltfläche \verb*|Create| kann dann die Speicherregion angelegt werden.
+Wie auch beim Löschen wird die Region zunächst zur Datenstruktur hinzugefügt.
+Die Datei wird erst über die Schaltfläche \verb*|Update| aktualisiert. \\
+
+Wie auch die Regionen kann der Benutzer über die Oberfläche eigene Segmente definieren.
+Dafür kann der gewünschte Name unter dem Schriftzug \verb*|Create| \verb*|Segment| eingetragen werden.
+Darunter kann ausgewählt werden, ob das Segment über die IAR-Embedded Workbench auswählbar sein soll.
+Der letzte Schritt ist das Erstellen über die Schaltfläche \verb*|Create|. \\
+
+Die Änderungen auf den weiteren Registerkarten sind überschaubar.
+Die Registerkarte \verb*|Visualize| \verb*|Config| wurde leicht modifiziert.
+Das Resultat ist in Abbildung \ref{fig:visualizewindow} zu sehen. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{graphics/visualize_window}
+	\caption{Modifizierte Registerkarte Visualize Config}
+	\label{fig:visualizewindow}
+\end{figure}
+
+Der Dateiname wird beim äußeren \verb*|Labelframe|-Widget als Text angezeigt.
+Die geschützten Speicherregionen werden nun zusammen angezeigt.
+Weiter wird die Darstellung der Regionen und Subregionen leicht verändert.
+Die Regionen werden inzwischen nummeriert.
+In der geladenen Konfiguration werden zwei Regionen der \ac{MPU} verwendet.
+Bei dieser Architektur sind insgesamt acht Regionen konfigurierbar \cite{cortex_M0+_programming_manual}. \\
+
+Auf der Registerkarte \verb*|Export| \verb*|Config| ist eine Liste mit den aktuell ausgewählten Regionen dazugekommen.
+Zu sehen ist diese Änderung bereits auf Abbildung \ref{fig:exportmpuconfigtab} auf Seite \pageref{fig:exportmpuconfigtab}.
+Dies soll helfen, dem Nutzer beim Erstellen einer Konfiguration nicht den Überblick zu verlieren, welche Regionen ausgewählt sind.
+Weiter ist die Schaltfläche \verb*|Cancel| verschwunden.
+Diese war nur für das Schließen des Fensters gedacht und erfüllt somit keine Funktion.
+
+\subsubsection{Informationssuche mit regulären Ausdrücken}\label{kap:info_re}
+Reguläre Ausdrücke sind ein mächtiges Werkzeug zur Mustererkennung in Texten \cite{Kaminski2016}.
+Mit regulären Ausdrücken wird durch eine spezielle Syntax ein Textmuster beschrieben, welches auf verschiedene Textausschnitte angewendet werden kann \cite{Ernesti2023-iy}.
+Textmuster können Telefonnummer, E-Mailadressen, Postleitzahlen oder ähnlich identifizierbare Textstücke sein.
+Reguläre Ausdrücke bieten die Möglichkeit gezielt Informationen aus Texten herauszufiltern, zu ersetzen oder zu validieren.
+Es ist also möglich, bei Bedarf Muster durch andere Muster zu ersetzen \cite{Dorn2020-lb}.
+In vielen Programmsprachen sind reguläre Ausdrücke integriert.
+So auch in der Programmiersprache Python 3.
+Über die Standardbibliothek \verb*|re| kann auf die Funktionalität der regulären Ausdrücke zugegriffen werden \cite{inet:python_re}.  \\
+
+Ein regulärer Ausdruck ist eine Zeichenkette.
+Diese definiert ein Suchmuster.
+Bei den Zeichen der Kette kann in zwei Kategorien unterschieden werden.
+Zum einen gibt es konkrete Wörter, welche genau so im Text vorkommen müssen.
+Auf der anderen Seite steht die Verwendung von Metazeichen.
+Diese haben eine spezielle Bedeutung \cite{Kaminski2016}.
+Beispielsweise steht der Punkt \enquote*{.} für ein beliebiges Zeichen, der Stern \enquote*{*} für null oder mehrmaliges Vorkommen des vorangegangenen Zeichens.
+Eine Übersicht von wichtigen Metazeichen kann in Tabelle \ref{tab:wichtige_regex} gefunden werden. \\
+
+\begin{table}[H]
+	\centering
+	\caption{Wichtige reguläre Ausdrücke}
+	\begin{tabular}{|c|l|}
+		\hline
+		\textbf{Zeichen} & \textbf{Bedeutung} \\
+		\hline \hline
+		. & Beliebiges Zeichen \\
+		\hline
+		* & null oder mehr Vorkommen des vorangegangenen Zeichens \\
+		\hline
+		+ & ein oder mehr Vorkommen des vorangegangenen Zeichens \\
+		\hline
+		? & null oder ein Vorkommen des vorangegangenen Zeichens \\
+		\hline
+		() & Gruppieren von Zeichen zu einer Einheit \\
+		\hline
+		[] & Definition einer Zeichenauswahl \\
+		\hline
+		\{\} & Genaue Anzahl \{n\} oder Bereich \{n-m\} von Vorkommen angeben \\
+		\hline
+		\^{} & Anfang einer Zeile \\
+		\hline
+		\$ & Ende einer Zeile \\
+		\hline
+		| & Trennt verschiedene Suchausdrücke voneinander\\
+		\hline
+		0-9 & Alle Zahlen zwischen 0 und 9\\
+		\hline
+	\end{tabular}
+	\label{tab:wichtige_regex}
+\end{table}
+Die Funktionsweise der Informationssuche in Textdateien kann durch ein einfaches Beispiel gezeigt werden.
+Dabei sollen aus einer Log-Datei die \acs{IP}-Adressen herausgesucht werden.
+Eine \acs{IP}-Adresse ist eine 32-Bit lange binäre Adresse.
+Diese wird in vier Teile je ein Byte unterteilt \cite{Metter2012-dz}.
+Beispielsweise ist \verb*|214.84.214.5| die dezimale Form einer solchen Adresse.
+Verschiedene Metazeichen spielen zusammen, um eine passende Zeichenkette zu erstellen.
+Für das Suchmuster wird die folgende Zeichenkette verwendet:
+\begin{quote}
+	\centering
+	\verb*|\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b|
+\end{quote}
+Die Programmiersprache ist Python 3.
+Python bietet ein Standardmodul für das Nutzen von regulären Ausdrücken.
+Darin sind verschiedene Methoden enthalten, um Texte nach Informationen zu filtern.
+Mit der Methode \verb*|findall| können alle zu der Zeichenkette passenden Textabschnitte herausgefiltert werden.
+In Programmcodeabschnitt \ref{pc:beispiel_regex_ip} ist das Beispiel dargestellt. \\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\small, baselinestretch=1.25]{python}
+		import re
+		
+		# Regulärer Ausdruck für eine IP-Adresse
+		ip_pattern = r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
+		
+		# Datei öffnen und lesen
+		with open('logfile.txt', 'r') as file:
+			content = file.read()
+		
+		# IP-Adressen extrahieren
+		ip_addresses = re.findall(ip_pattern, content)
+		
+		# Gefundene IP-Adressen ausgeben
+		print(ip_addresses)
+	\end{minted}
+	\caption{Beispiel IP-Adresse}
+	\label{pc:beispiel_regex_ip}
+\end{listing}
+
+Darin wird zunächst das Modul \verb*|re| importiert und die Zeichenkette als String gespeichert.
+Anschließend wird die Datei eingelesen und Textzeilen in einer Variable gespeichert.
+Aus diesen Textzeilen wird dann mit der Methode \verb*|findall| und der Zeichenkette die \acs{IP}-Adressen herausgefiltert.
+Das Ergebnis wird dem Nutzer ausgegeben.
+In der Textdatei sind 3 \acs{IP}-Adressen angeben.
+Für das Beispiel ist die Struktur jeder Zeile der Datei wie \verb*|IP:252.128.4.5| aufgebaut.
+Das Ergebnis ist eine Liste mit den drei in der Datei angegebenen Adressen:
+\begin{quote}
+	\centering
+	\verb*|['255.214.26.2','224.243.125.216','252.128.4.5']|.
+\end{quote}
+
+Die Zeichenketten werden von einem Entwickler für einen gewissen Anwendungszweck definiert.
+Zum schnellen und einfachen Testen solcher Ausdrücke können Online-Tools verwendet werden.
+Ein Beispiel dafür ist die Webseite \verb*|regex101.com| \cite{inet:regex101}.
+Diese Seite bietet eine interaktive Webanwendung, um reguläre Ausdrücke zu erstellen, zu testen und zu debuggen.
+Die Oberfläche sowie die weiteren Funktionen können das Arbeiten mit den Zeichenketten erleichtern.
+Dort ist es möglich, reguläre Ausdrücke direkt im Browser einzugeben und anhand von Text zu sehen, welche Auswirkung die Zeichenkette hat.
+Weiter gibt es detaillierte Erklärungen für jedes Teilstück der Zeichenkette.
+Komplexe Ausdrücke lassen sich auf diese Art leichter verstehen.
+Verschiedene Programmiersprachen werden unterstützt, Python ist eine davon. \\
+
+Im Skript und der graphischen Oberfläche finden diverse reguläre Ausdrücke Verwendung.
+Für das bessere Gruppieren dieser Zeichenketten wird eine Klasse angelegt.
+Dort werden die Ausdrücke als Attribute der Klasse gespeichert.
+Das Projekt nutzt mehrere Dateien für den Programmcode.
+Durch die Strukturierung in Klassenform ist es leicht die Klasse von einer in eine andere Datei zu importieren.
+
+\subsubsection{Verbesserter Parser-Algorithmus}\label{kap:verbesserung_parser}
+Informationen aus Dateien herauszufiltern ist eine häufige Aufgabe in der Datenverarbeitung.
+Dafür wird häufig ein Parser-Algorithmus eingesetzt.
+Parsen bedeutet, den Text nach bestimmten Formulierungen oder Strukturen zu analysieren.
+Der Einsatz von regulären Ausdrücken eignen sich an dieser Stelle besonders gut.
+Die Funktionsweise ist im vorherigen Kapitel \textit{\ref{kap:info_re} \nameref{kap:info_re}} beschrieben.
+Im Falle der graphischen Oberfläche werden damit die benötigten Informationen aus einer Linker-Konfigurationsdatei herausgefiltert.
+Der zu Beginn der Thesis bestehende Parser-Algorithmus muss aufgrund der Anforderungen erweitert werden. \\
+
+Die Anforderungen an das Erweitern der Software führen zu einer Erweiterung des Algorithmus für das Herausfiltern von Informationen aus der Linker-Konfigurationsdatei.
+Zusätzlich zu den Speicherregionen muss der Parser-Algorithmus die Segmente finden und anschließend den Namen und Reihenfolge bestimmen.
+Da die Segmente keiner Syntax des Linkers entsprechen, werden für das Kennzeichnen Kommentare verfasst.
+Darin ist ein Schlüsselwort sowie der Name des Segments implementiert.
+Die Reihenfolge wird über die \verb*|if-else|-Abfrage bestimmt. \\
+
+Der Ablauf des Parser-Algorithmus kann in Abbildung \ref{fig:ablaufanalyselinkerfile} gefunden werden.
+Aufgerufen wird die Funktion über die \ac{GUI}.
+Jede eingelesene Linker-Konfigurationsdatei durchläuft diesen Ablauf. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{graphics/ablauf_analyse_linker_file}
+	\caption{Ablaufdiagramm Analyse einer Linker-Konfigurationsdatei}
+	\label{fig:ablaufanalyselinkerfile}
+\end{figure}
+Nach dem Aufruf werden zunächst alle Symboldefinitionen der Adressen herausgefiltert und gespeichert.
+Dabei werden die Definitionen sowie deren Werte in einer Datenstruktur abgelegt.
+Dafür wird die Datei bereits einmal komplett durchsucht.
+Diese Funktion wird mehrfach verwendet.
+Daher wird die Funktionalität in einer separaten Funktion zusammengefasst.
+Bei einem Fehler wird der Ablauf abgebrochen und eine leere Datenstruktur zurückgeben.
+In der \ac{GUI} wird dem Nutzer außerdem eine Fehlermeldung angezeigt. \\
+
+Tritt kein Fehler auf, wird die Linker-Konfigurationsdatei geöffnet und Zeile für Zeile durchgegangen. 
+Mit der \verb*|search|-Methode des Moduls für reguläre Ausdrücke wird nach einer Definition für Segmente gesucht. 
+In Programmcodeabschnitt \ref{pc:search_method} kann die vereinfachte Abfrage gefunden werden. 
+Wird ein Segment gefunden, wird der Name des Segments in einer Variable gespeichert. 
+Der Name wird mit der Hilfe der \verb*|split|-Methode extrahiert.\\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\small, baselinestretch=1.25]{python}
+		if re.search(SEGMENT, Textzeile):
+			last_segment = re.split(SEGMENT, Textzeile)[-1].strip()
+	\end{minted}
+	\caption{Suchmethode für Segmente}
+	\label{pc:search_method}
+\end{listing}
+
+%\begin{minipage}{\linewidth}
+%	\begin{lstlisting}[caption={Suchmethode für Segmente}, language=Python, label=pc:search_method]
+%		
+%\end{minipage}\\
+
+Eine Definition eines Segmentes kann in Programmcodeabschnitt \ref{pc:adressdefinitionen} (Zeile 2) gefunden werden.
+Wird in einer Textzeile eine Definition gefunden, wird in einer Variable der Name des Segments gespeichert.
+Alle Regionen, die anschließend gefunden werden, werden diesem Segment zugeordnet.
+Ist das Segment über den Linker auswählbar, wird die Nummer ebenfalls gespeichert und dem Segment zugewiesen.
+Die Nummer kann dabei in der \verb*|if|-Abfrage gefunden werden.\\
+
+Wenn kein Segment gefunden wird oder das aktuelle gespeichert ist, wird die Textzeile weiter nach Regionen durchsucht.
+Wie auch die Segmente wird mit der \verb*|search|-Methode nach einer Definition für die Speicherregionen gesucht.
+Sollte diese Abfrage nicht wahr sein, wird mit der nächsten Zeile der Datei fortgefahren.
+Beim Finden einer Speicherregion werden zunächst die Start- und Endadressen aufgelöst.
+Auflösen bedeutet, den wahren Wert hinter der Definition zu finden.
+Dies ist notwendig, weil bei einer Definition der Region Symboldefinitionen als Start- und Endwerte angegeben werden.
+Der wahre Wert ist in Definitionen verschachtelt.
+Dies kann in Programmcodeabschnitt \ref{pc:adressdefinitionen} gesehen werden.
+Der Wert einer solchen Start- oder Endadresse kann damit nicht über die \ac{GUI} bearbeitet werden.
+Es besteht nämlich die Gefahr, dass die Symboldefinition an einer weiteren Stelle verwendet wird.
+In diesem Fall kann das direkte Bearbeiten zu Problemen führen. \\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\small, baselinestretch=1.25]{c}
+		//=================================================================
+		// SEGMENT: Beispielsegment
+		if (SEGMENT_NUMBER==0) {
+			
+			define exported symbol SYMBOL_DEF_0 = 0x20002400;
+			define exported symbol SYMBOL_DEF_1 = 0x200025F0;
+			
+			define exported symbol SYMBOL_START = SYMBOL_DEF_0;
+			define exported symbol SYMBOL_END   = SYMBOL_DEF_1 + 15;
+			define region BEISPIEL = mem:[from SYMBOL_START to SYMBOL_END];
+		}
+	\end{minted}
+	\caption{Symboldefinitionen von Start- und Endwerten}
+	\label{pc:adressdefinitionen}
+\end{listing}
+
+Beim Auflösen der Symboldefinition von Start- und Endadressen wird der Symbolwert so lange mit der Definition ersetzt, bis ein hexadezimaler Wert gefunden wird.
+In dem Beispiel aus Programmcodeabschnitt \ref{pc:adressdefinitionen} wird die Region \verb*|BEISPIEL| durch die Definitionen \verb*|SYMBOL_START| und \verb*|SYMBOL_END| definiert.
+Der Algorithmus sucht nun nach diesen Definitionen in der Liste mit allen Symboldefinitionen und Werten.
+Ist eine Definition gefunden, wird der Wert geprüft.
+Ist dieser eine weitere Definition, wird erneut die Liste durchsucht.
+Sollte der Wert ein hexadezimaler Wert sein, wird dieser als wahrer Wert der ursprünglichen Definition gespeichert.
+Realisiert ist dies über eine Liste, in der der letzte Wert dem hexadezimalen Wert entspricht. \\
+
+In der Linker-Konfigurationsdatei ist es außerdem möglich, Berechnungen in die Definitionen der Werte zu schreiben.
+Das Skript kann dies ebenfalls umwandeln.
+Dafür wird die Definition aus der Berechnung herausgefiltert.
+Anschließend wird der Wert der Definition mit dem zugehörigen Wert ersetzt.
+Ist dies ein hexadezimaler Wert, wird die Adresse berechnet.
+Ansonsten wird der Wert weiter aufgelöst.\\
+
+Im Beispiel ergibt sich also für die Speicherregion \verb*|BEISPIEL| zwei Listen mit den aufgelösten Werten.
+\begin{quote}
+	\centering
+	Startwerte: \verb*|[SYMBOL_START,SYMBOL_DEF_0,0x20002400]| \\
+	Endwerte: \verb*|[SYMBOL_END,SYMBOL_DEF_1+15,0x200025FF]|
+\end{quote}
+Die Start- sowie Endwerte werden zusammen mit dem Namen der Region in einer Datenstruktur gespeichert.
+Wird das Ende der Datei erreicht, gibt die Funktion die Datenstruktur mit allen Regionen als Rückgabewert zurück.
+Damit ist der Ablauf beendet.
+
+\subsubsection{Aufbau Datenstruktur}\label{kap:aufbau_datenstruktur}
+Für die Softwareentwicklung sind Datenstrukturen ein fundamentaler Bestandteil.
+Diese werden benötigt, um Informationen und Daten effizient zu speichern, zu organisieren und zu verwalten. \\
+
+Wie im vorherigen Kapitel beschrieben, werden gewisse Daten aus den Linker-Konfigurationsdateien herausgefiltert.
+Für den weiteren Zugriff werden diese in einer Datenstruktur gespeichert. 
+Die Struktur kann in Programmcodeabschnitt \ref{pc:datenstruktur} gefunden werden.\\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\small, baselinestretch=1.25]{json}
+		[
+			{
+				"name" : "BEISPIEL",
+				"start" : [
+					"SYMBOL_START", 
+					"SYMBOL_DEF_0", 
+					"0x20002400"
+				],
+				"end" : [
+					"SYMBOL_END",
+					"SYMBOL_DEF_1 + 15", 
+					"0x200025FF"
+				],
+				"segment" : "Beispielsegment",
+				"sequenze" : -1,
+				"change_flag" : "None"
+			}
+		]
+	\end{minted}
+	\caption{Datenstruktur Parser-Algorithmus}
+	\label{pc:datenstruktur}
+\end{listing}
+
+Für jede der Speicherregionen aus der Linker-Konfigurationsdatei wird ein Eintrag in einer Liste angelegt.
+Der Eintrag besteht aus einem \verb*|Dictionary|.
+Damit können Einträge einem Wert zugewiesen werden.
+\verb*|Dictionaries| sind sehr mächtige Datentypen von Python.
+Sie können während der Laufzeit beliebig erweitert oder verkleinert werden.
+Der Zugriff auf einen Wert des Wörterbuches erfolgt mit sogenannten Schlüsseln \cite{Klein2021-ko}.
+Im obigen Beispiel ist einer der Schlüssel \verb*|name| und der dazugehörige Wert \verb*|BEISPIEL|. \\
+
+Weiter sind die Start- und Endwerte in dieser Struktur vorhanden.
+Es wird die gesamte Liste der aufgelösten Werte gespeichert.
+Da jeder Region ein Segment zugewiesen ist, ist der Segmentname der nächste Eintrag.
+Danach folgt mit \verb*|sequenze| eine Zahl.
+Bei nicht über die IAR-Workbench auswählbaren Segmenten wird die Zahl auf $-1$ gesetzt.
+Ansonsten wird darin die Zahl gespeichert, welche in der \verb*|if-else|-Abfrage in der Datei steht.
+Zu sehen ist das Statement in Programmcodeabschnitt \ref{pc:adressdefinitionen} auf Seite \pageref{pc:adressdefinitionen}.
+Als letzter Schlüssel wird in dem Wörterbuch eine Kennzeichnung für Änderungen angelegt.
+Dieser ist zunächst für die Analyse der Linker-Konfigurationsdatei nicht wichtig.
+In Kapitel \textit{\ref{kap:aktualisieren_linker_file} \nameref{kap:aktualisieren_linker_file}} wird dieser Wert von großer Bedeutung sein.
+Darüber wird nämlich festgehalten, ob eine Speicherregion geändert wurde.
+Auch bei neu hinzugefügten Regionen wird dies über den Punkt dargestellt. \\
+
+Die Datenstruktur wird in der Klasse der graphischen Oberfläche als Variable gespeichert.
+Dadurch ist es möglich, überall in der Klasse auf die Informationen zuzugreifen.
+Änderungen an den Informationen ist damit auch einfach möglich.
+Dies ist besonders wichtig, da über die \ac{GUI} die Werte der Regionen abgeändert werden können.
+
+\subsubsection{Aktualisieren der Linker-Konfigurationsdatei}\label{kap:aktualisieren_linker_file}
+Die Fähigkeit, Dateien zu aktualisieren, ist ein grundlegender Aspekt vieler Softwareanwendungen.
+Eine Update-Funktion ermöglicht es, vorhandene Informationen in einer Datei zu verändern, zu ergänzen oder zu löschen.
+Dieses Kapitel befasst sich detailliert mit der Implementierung, Ablauf und Bedeutung der Update-Funktion der \verb*|Linker| \verb*|File| \verb*|Analyser| Software. \\
+
+Nachdem vom Nutzer Änderungen an den Speicherregionen gemacht wurden, können diese über die \verb*|Update|-Schaltfläche in die Datei übernommen werden.
+Nach Betätigen der Schaltfläche bekommt der Nutzer eine Fragemeldung, ob die Datei aktualisiert werden soll.
+Darin ist die Information über den Speicherpfad und Dateinamen der zuletzt geöffneten Linker-Konfigurationsdatei angegeben.
+Wird die Frage bestätigt, fängt im Hintergrund der Ablauf des Algorithmus an zu arbeiten. \\
+
+Für die Zukunft ist der Ablauf wie in Abbildung \ref{fig:ablaufupdatefunction-funktionsaufruf}.
+Der Unterschied zu er aktuellen Implementation ist das Überprüfen auf Änderungen.
+Dies soll vor dem Funktionsaufruf des Skriptes \verb*|Update| \verb*|Linker-File| stattfinden.
+Wenn keine Änderungen vorhanden sind, wird eine Informationsmeldung an den Nutzer zurückgegeben.
+Sind Änderungen vorhanden, bekommt der Nutzer diese angezeigt.
+Dabei wird dieser gefragt, ob er fortführen möchte.
+Bei keinen erkannten Änderungen oder der Nutzer nicht fortführen möchte, wird der Ablauf abgebrochen und zurück in die \ac{GUI} gesprungen. \\
+
+Wird fortgefahren, wird der Funktionsaufruf \verb*|Update| \verb*|Linker-File| gestartet.
+Bei einem Fehler während des Aufrufs wird dies dem Nutzer mit einer entsprechenden Meldung angezeigt.
+Läuft das Skript erfolgreich ab, bekommt der Nutzer eine Erfolgsmeldung.
+Anschließend wird zur \ac{GUI} zurückgekehrt. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\linewidth]{graphics/ablauf_update_function-Funktionsaufruf}
+	\caption{Ablauf Aufruf der Update-Funktion aus der GUI}
+	\label{fig:ablaufupdatefunction-funktionsaufruf}
+\end{figure}
+
+Der weitere Ablauf des Funktionsaufrufs vom Skript wird in Abbildung \ref{fig:ablaufupdatefunction-funktionaler-ablauf} erläutert.
+Der Ablauf des Skriptes zum Aktualisieren der Linker-Konfigurationsdatei kann in vier Bereiche unterteilt werden. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"graphics/ablauf_update_function-Funktionaler Ablauf"}
+	\caption{Übersicht Ablauf Aktualisierungsskript Linker-Konfigurationsdatei}
+	\label{fig:ablaufupdatefunction-funktionaler-ablauf}
+\end{figure}
+
+Als erster Schritt werden alle benötigten Informationen gesammelt.
+Die Informationen sind essentiell für den weiteren Ablauf des Skriptes.
+Der Ablauf dieses Schrittes ist in Abbildung \ref{fig:ablaufupdatefunction-infos-sammeln} (Seite \pageref{fig:ablaufupdatefunction-infos-sammeln}) dargestellt. \\
+
+Anschließend werden die Segmente aktualisiert.
+Segmente können lediglich neu hinzugefügt werden.
+Dennoch kann in einem neuen Segment bereits eine Speicherregion über die \ac{GUI} definiert sein.
+Daher wird dies zuerst aktualisiert.
+Zu sehen ist dieser Ablauf des Schrittes in Abbildung \ref{fig:ablaufupdatefunction-segmente-updaten} (Seite \pageref{fig:ablaufupdatefunction-segmente-updaten}).\\
+
+Der größte Teil der Funktion ist das Aktualisieren der Speicherregionen.
+Dies passiert im dritten Schritt des Skriptes.
+Alle Änderungen der Regionen werden an diesem Punkt in die Datei geschrieben.
+In Abbildung \ref{fig:ablaufupdatefunction-regionen-updatendrawio} (Seite \pageref{fig:ablaufupdatefunction-regionen-updatendrawio}) ist der genaue Ablauf zu sehen.\\
+
+Im letzten Schritt wird die Datei mit den aktualisierten Segmenten und Speicherregionen beschrieben.
+Dieser Ablauf kann in Abbildung \ref{fig:ablaufupdatefunction-datei-beschreiben} (Seite \pageref{fig:ablaufupdatefunction-datei-beschreiben}) gefunden werden. \\
+
+Für das Sammeln der Informationen findet als Erstes ein Funktionsaufruf statt.
+Darin werden alle definierten Symbole der zuletzt geöffneten Linker-Konfigurationsdatei extrahiert.
+Gespeichert werden die Symbole in einer Liste.
+Darin hat jedes Symbol einen zugehörigen Wert.
+Dies ist über ein Dictionary für jeden Eintrag der Liste realisiert.
+Tritt dabei kein Fehler auf, wird mit dem Ablauf fortgefahren. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\linewidth]{"graphics/ablauf_update_function-Infos sammeln"}
+	\caption{Ablauf Informationen extrahieren}
+	\label{fig:ablaufupdatefunction-infos-sammeln}
+\end{figure}
+
+Der nächste Funktionsaufruf sucht alle definierten Segmente einer Linker-Konfigurationsdatei.
+Auch hierbei wird überprüft, ob ein Fehler auftritt.
+Tritt in einem der zwei Funktionsaufrufe ein Fehler auf, wird dieser zurückgegeben.
+Der gesamte Ablauf des Aktualisierens der Datei wird abgebrochen. \\
+
+Tritt kein Fehler auf, wird der Ablauf weiter durchgegangen.
+Die Segmente werden in einer Liste gespeichert.
+Wie bereits in Kapitel \textit{\ref{kap:aufbau_datenstruktur} \nameref{kap:aufbau_datenstruktur}} erläutert, wird dem Segment eine Zahl zugeordnet.
+Als Nächstes wird die höchste in den \verb*|if-else|-Bedingungen stehende Zahl herausgesucht und gespeichert.
+Diese wird benötigt, falls ein neues Segment auswählbar angelegt wird.
+Diese Zahl wird für das neue Segment an der entsprechenden Stelle hochgezählt.
+Anschließend wird eine Liste mit allen Segmenten angelegt.
+Damit sind alle benötigten Informationen für den weiteren Verlauf zurechtgelegt. \\
+
+Der nächste Schritt ist das Aktualisieren der Segment-Definitionen in der Datei.
+Der Ablauf kann in Abbildung \ref{fig:ablaufupdatefunction-segmente-updaten} gefunden werden.
+Dort wird die zuletzt verwendete Datei zunächst geöffnet und Zeile für Zeile durchsucht. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"graphics/ablauf_update_function-Segmente Updaten"}
+	\caption{Ablauf aktualisieren der Segmente}
+	\label{fig:ablaufupdatefunction-segmente-updaten}
+\end{figure}
+
+Als Erstes wird nach einer Segment-Definition in der Datei gesucht.
+Die nicht auswählbaren Segmente sind zuerst in der Datei definiert.
+Wird eine Definition gefunden, wird zunächst die Bezeichnung herausgefiltert.
+Anschließend wird diese Bezeichnung von der Liste mit allen Segmenten gelöscht.
+Damit können alle bestehenden Segmente ignoriert werden.
+Dies wird so lange weiter gemacht, bis das Ende der nicht auswählbaren Segmente erreicht ist.
+Gekennzeichnet ist dies durch den Anfang der auswählbaren Segmente.
+An dieser Stelle werden alle aus der Liste übriggebliebenen Segmente an dieser Stelle zu einer Liste als eigene Definitionen hinzugefügt.
+Damit es bei einem Absturz des Programms während des Ablaufes nicht zu einem Informationsverlust kommt, werden die Änderungen zunächst in einer Liste gespeichert.
+Alle Zeilen ohne Änderungen werden ebenfalls in der passenden Reihenfolge zu der Liste hinzugefügt.
+Wird das Ende der auswählbaren Segmente erreicht werden die auswählbaren Segmente als Definition zu der Liste hinzugefügt.
+Damit befinden sich alle Informationen über die Segmente in der richtigen Reihenfolge in der Speicherstruktur.
+Die Datei wird zunächst wieder geschlossen. \\
+
+Als nächster Schritt steht das Aktualisieren der Speicherregionen an.
+Der gesamte Ablauf kann in Abbildung \ref{fig:ablaufupdatefunction-regionen-updatendrawio} gefunden werden. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"graphics/ablauf_update_function-Regionen Updaten"}
+	\caption{Ablauf aktualisieren der Speicherregionen}
+	\label{fig:ablaufupdatefunction-regionen-updatendrawio}
+\end{figure}
+
+Die Liste mit den Textzeilen wird dafür Zeile für Zeile durchgegangen.
+Solange nicht das Ende der Liste erreicht ist, wird als Erstes nach einer Segment-Definition gesucht.
+Wird eine Solche gefunden, werden alle neuen Regionen, welche diesem Segment zugeordnet sind, an dieser Stelle einer weiteren Liste hinzugefügt.
+Auch hierbei werden alle entsprechenden Textzeilen einer weiteren Liste hinzugefügt.
+Damit können Informationen gesammelt werden, ohne die ursprüngliche Liste oder Datei zu verändern.
+Eine Region wird mit einer Definition für die Start- und Endadresse sowie die eigentliche Region angelegt. \\
+
+Weiter wird die Textzeile der Liste nach einer Definition einer Speicherregion durchsucht.
+Wird eine Region gefunden, wird die Bezeichnung in der Datenstruktur gesucht.
+Die Datenstruktur wird von der \ac{GUI} übergeben.
+Wird die passende Region gefunden, wird diese auf Änderungen geprüft.
+Dafür steht ein Eintrag in der Datenstruktur für Änderungen zur Verfügung.
+Zeigt diese Kennzeichnung eine Änderung der Region an, werden die Start- und Endwerte der Bereichsdefinitionen verglichen.
+Werden dabei Änderungen erkannt, wird überprüft, ob die entsprechende Definition verschachtelt ist.
+Wenn dies der Fall ist, wird eine neue Symbol-Definition für den betroffenen Adresswert angelegt.
+Im anderen Fall wird der Wert der Definition angepasst.
+Dabei wird nicht darauf geachtet, ob diese Definition in weiteren Speicherregionen verwendet wird.
+In Zukunft kann dies eine Verbesserung des Algorithmus darstellen.
+Die Definition der Speicherregion wird anschließend mit den neuen Werten aktualisiert. \\
+
+Bei einer Kennzeichnung, dass die Region gelöscht werden soll werden die Textzeilen übersprungen.
+Dies bedeutet, diese Zeilen werden nicht in die weitere Liste für das Speichern der Informationen übernommen.
+Die Speicherregion wird damit also gelöscht.
+Ist die Kennzeichnung keine der beiden Möglichkeiten, wird die Zeile unverändert in die Liste übernommen.
+Dieser Ablauf wird so lange fortgeführt, bis die erste Liste am Ende angekommen ist.
+Damit kann der generelle Ablauf zum nächsten Schritt übergehen. \\
+
+Zuletzt müssen die Änderungen noch in die Datei gebracht werden.
+Dabei wird eine Ablaufreihenfolge eingehalten, damit keine Informationen aus den ersten drei Schritten verloren geht.
+Dieser Ablauf ist in Abbildung \ref{fig:ablaufupdatefunction-datei-beschreiben} zu sehen. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"graphics/ablauf_update_function-Datei Beschreiben"}
+	\caption{Ablauf Linker-Konfigurationsdatei beschreiben}
+	\label{fig:ablaufupdatefunction-datei-beschreiben}
+\end{figure}
+
+Zunächst wird eine temporäre Datei im Verzeichnis der Originalen angelegt.
+Darin werden alle Zeilen der Liste mit den aktualisierten Informationen geschrieben.
+Im nächsten Schritt wird die originale Linker-Konfigurationsdatei gelöscht.
+Zum Schluss wird die temporäre Datei umbenannt.
+Verwendet wird der originale Dateiname.
+Damit ist der Ablauf beendet und es kann mit einer Meldung zurück zur \ac{GUI} gekehrt werden.
+Tritt in einem Teil des Funktionsablaufes ein Fehler auf, wird der Ablauf unterbrochen und der Fehler zurückgegeben.
+
+% \subsection{Objekt-Mapping}\label{kap:linker_objekt_mapping}

@@ -1,0 +1,144 @@
+\section{Software einer ECU}\label{kap:projektaufbau}
+\subsection{Verzeichnisstruktur}
+Ein gut strukturiertes Verzeichnis ist entscheidend für die Effizienz und Wartbarkeit eines Softwareprojektes.
+Es soll dem Entwickler dabei helfen, einen Überblick zu behalten und teamübergreifend zusammenzuarbeiten.
+Die eingebetteten Steuergeräte von Viessmann werden hauptsächlich mit der Programmiersprache C und C++ programmiert. 
+Vereinzelt wird Assembler verwendet.
+Abbildung \ref{fig:verzeichnisstruktur} zeigt dabei den groben Aufbau eines solchen Verzeichnisses.
+Diese Struktur ist aus dem Projektverzeichnis der \ac{BMCU} abgeleitet.
+Auf der rechten Seite der Abbildung sind die Ordner, auf der Linken die Dateien dargestellt. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\linewidth]{graphics/verzeichnisstruktur}
+	\caption{Verzeichnisstruktur eines C-Projektes}
+	\label{fig:verzeichnisstruktur}
+\end{figure}
+
+Ein Software-Projekt wird in Module unterteilt.
+Dies ist notwendig, um logische Funktionalitäten zu gruppieren.
+Für die Zergliederung von Projekten gibt es unterschiedliche Vorgehensweisen.
+Bei der Bottom-Up-Methode werden Einzelaufgaben zu einer Gesamtaufgabe zusammengefasst.
+Als Zweites gibt es die Top-Down-Methode.
+Dabei werden die Gesamtaufgaben von oben nach unten in kleinere Teilaufgaben zerlegt.
+Eine Mischung aus beiden Methoden ist natürlich auch möglich \cite{Garcia2017-op}. \\
+
+Logisch zusammenhängende Module bestehen aus Source- und Header-Dateien.
+Dabei beschreiben typischerweise eine Header- und eine Source-Datei ein in sich abgeschlossenes Modul mit entsprechender Funktionalität.
+Dies erhöht die Übersichtlichkeit des Programms und ist ab einer gewissen Projektgröße unabdingbar.
+Außerdem wird die Zeit für das Kompilieren eines Projektes reduziert, weil nur noch die geänderten Dateien neu übersetzt werden müssen \cite{Klima2010-br}.
+Weiter können in sich abgeschlossene Module über verschiedene Projekte hinweg genutzt werden.\\
+
+Eine Header-Datei ist dabei wie eine Bauanleitung für den Compiler.
+Sie werden in dem Ordner \verb*|include/| (Abbildung \ref{fig:verzeichnisstruktur}) abgelegt.
+Darin werden ausgewählte Funktionen für die Steuerungen beschrieben \cite{Klima2010-br}.
+Diese fungieren als Schnittstellen zu anderen Modulen.
+Weiter werden dort Deklarationen für die Programmierung hinterlegt.
+Besonders bei der Programmierung mit Mikrocontrollern ist der Zugriff auf Steuer- und Statusregister wichtig.
+Diese Festen Hardwareadressen werden typischerweise in Header-Dateien über Definitionen angelegt \cite{Wust2010-jg}.
+Oftmals werden direkt Bitmasken für einen einfacheren Zugriff angefertigt.
+Header-Dateien werden für das Kompilieren von Source-Dateien benötigt, da die Schnittstellen nach außen darin beschrieben sind.\\
+
+Die Source-Dateien enthalten den eigentlichen Quellcode.
+Diese Dateien werden in dem Ordner \verb*|src/| (Abbildung \ref{fig:verzeichnisstruktur}) abgelegt.
+Darin ist die Funktionalität implementiert.
+Variablen, die speziell in diesem Modul benötigt werden, können auch in der Source-Datei angelegt werden \cite{Garcia2017-op}.
+Die zugehörige Header-Datei muss in die Source-Datei über eine Präprozessor-Anweisung eingebunden werden. \\
+
+Dieser Quelltext muss vom Compiler in ausführbaren Programmcode umgewandelt werden.
+Dabei entstehen Objektdateien.
+Wie der genaue Ablauf dabei ist, kann im nächsten Kapitel \textit{\ref{fig:toolchain} \nameref{fig:toolchain}} gefunden werden.
+Die Objektdateien werden in dem Ordner \verb*|out/| abgelegt.
+Wichtig sind diese Dateien besonders während des Linking-Prozesses. \\
+
+Die weiteren Ordner bilden die Struktur für die Dokumentation, externe und interne Bibliotheken sowie für Tests.
+Für ein Projekt sind außerdem spezielle Dateien im Verzeichnis nötig.
+Die Dateien sind in der Abbildung \ref{fig:verzeichnisstruktur} auf der linken Seite dargestellt.
+Zunächst gibt es das Makefile.
+Diese Datei wird typischerweise jedoch nicht zwangsweise in C-Projekten verwendet.
+Darin werden Pfadangaben und andere Steuerparameter definiert.
+Diese Datei steuert die Arbeit des Compilers \cite{Schmitt2019-nd}.
+Unterschiedliche Compiler haben dafür unterschiedliche Dateitypen und Syntaxen.\\
+
+In der \verb*|README.md| werden wichtige Informationen zum Verzeichnis, Projekt und jeweiligen Software festgehalten.
+Sie dient als Einführung und Anleitung für das Projekt.
+Ein Nutzer sollte diese Datei lesen, wenn er das erste Mal auf das Projekt zugreift.
+Darin können nämlich Fragen zur Installation oder Verwendung der Software direkt geklärt werden \cite{inet:ionos}.
+Weiter verbessert eine gut geschriebene \verb*|README.md|-Datei die Zugänglichkeit und Benutzerfreundlichkeit des Projekts. \\
+
+Das Verzeichnis wird nicht nur lokal gespeichert, sondern unter Versionskontrolle auf einem Server abgelegt.
+Verwendet wird dabei die Versionsverwaltung via Git \cite{inet:git}.
+Das Verzeichnis oder \verb*|Repository| kann von unterschiedlichen Entwicklern geklont und bearbeitet werden \cite{Preisel2017-eu}.
+Es gibt Dateien oder Ordner, die nicht versioniert gespeichert werden müssen.
+Mit der Datei \verb*|.gitignore| können Unterverzeichnisse, Einzeldateien sowie Dateitypen von der Versionierung ausgeschlossen werden.
+Weiter ermöglicht Git das Einbinden von Submodulen in ein Verzeichnis.
+Dies kann über die Datei \verb*|.gitmodules| konfiguriert werden.
+
+\subsection{Toolchain}\label{fig:toolchain}
+Vom Programmcode zur Ausführung auf dem Mikrocontroller.
+Die Programmiersprache C ist für den Menschen zwar gut lesbar, ein Mikrocontroller kann damit allerdings nichts anfangen.
+Dieser benötigt eine Datei mit Anweisungen in einer für ihn verständlichen Sprache.
+Das bedeutet, es wird ein Bitmuster mit den entsprechenden Befehlen benötigt \cite{Flik2004-dl}.
+Dieses sogenannte Maschinenprogramm kann in den Speicher des Mikrocontrollers geladen und ausgeführt werden. \\
+
+Das Programmieren mit Assembler oder gar in Maschinensprache ist eine Seltenheit geworden.
+Kleine Änderungen müssen an diversen Stellen berücksichtigt werden, damit das Programm weiterhin lauffähig bleibt \cite{Flik2004-dl}.
+Auch die Portabilität des Programmcodes ist ein Problem.
+Assembler Befehlssätze sind auf eine Rechnerarchitektur angepasst.
+Änderungen der Hardware führen daher zwangsweise zu einer Anpassung des Programms.
+Stattdessen wird in einer höheren Programmiersprache der Programmcode entwickelt.
+Bei einer Hochsprache kann durch den Compiler der Maschinencode für verschiedene Prozessoren erzeugt werden \cite{Wust2010-jg}.\\
+
+Das Umwandeln des Programmcodes aus der Hochsprache benötigt für ein lauffähiges Image mehr als nur den Compiler.
+Vor dem Compiler werden Definitionen im Programmcode durch ihre Werte ersetzt.
+Diese Aufgabe übernimmt der Präprozessor.
+Nach dem Compileraufruf sorgt der Linker dafür, dass aus allen generierten Objektdateien eine ausführbare Datei erstellt wird.
+Dieser Ablauf der verschiedenen Werkzeuge wird Toolchain genannt. \\
+
+Damit der Ablauf der Toolchain gewährleistet ist, muss diese konfiguriert werden.
+Dafür gibt es spezielle Dateien.
+Die Linker-Konfigurationsdatei ist für den weiteren Verlauf dieser Thesis von besonderer Bedeutung.
+Der Ablauf der Toolchain für die Programmiersprache C ist in Abbildung \ref{fig:ablaufcompiler} dargestellt \cite{Küveler2013}.\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{graphics/ablauf_compiler}
+	\caption{Ablauf der Toolchain}
+	\label{fig:ablaufcompiler}
+\end{figure}
+
+Dieser Ablauf wird beim Starten des Übersetzungsvorganges durchlaufen.
+\begin{description}[style=nextline]
+	\item[Präprozesssor] Ersetzt die im Programmcode beschriebenen Definitionen durch die entsprechenden Werte.
+	Er durchsucht den Quelltext nach für ihn bestimmten Anweisungen.
+	Der Quellcode wird durch den Präprozessor modifiziert, bevor es mit dem Compile-Vorgang weiter geht \cite{Klima2010-br}.
+	Gekennzeichnet werden die Anweisungen für den Präprozessor mit dem Symbol \#.
+	
+	\item[Compiler] Der Compiler übersetzt ein Programm von einer Quellsprache in eine Zielsprache \cite{Watson2017}.
+	In diesem Fall wird von C in Maschinencode übersetzt.
+	Ein Zwischenschritt zu Assembler ist dabei auch möglich.
+	Dies hängt vom Compiler bzw. dessen Konfiguration ab.\\
+	Während des Compiler-Vorgangs kann der Programmcode außerdem optimiert werden.
+	Dabei gibt es verschiedene Optimierungsverfahren.
+	Es kann zum Beispiel eine Optimierung nach Laufzeit stattfinden.
+	Dabei werden gegebenenfalls die Assemblerbefehle umsortiert, ohne die Logik des Programms zu ändern \cite{Klima2010-br}.
+	Bei der \acs{SR}-Software der \acsp{ECU} wird der Schritt des Optimierens allerdings übersprungen.
+	Ein Software-Projekt besteht im Allgemeinen aus mehreren Quelltextdateien.
+	Für jede dieser Dateien wird der Präprozessor- und Compiler-Prozess durchlaufen.
+	Dadurch wird für jede Datei eine Objekt-Datei erzeugt \cite{Klima2010-br}.
+	
+	\item[Linker] Der Linker fügt die Objekt-Dateien zu einem ausführbaren Programm zusammen.
+	Weitere Informationen können in Kapitel \textit{\ref{kap:aufgabe_linker} \nameref{kap:aufgabe_linker}} zu diesem Schritt gefunden werden.
+\end{description}
+Der letzte Schritt in der Welt der Embedded-Geräte ist das Programmieren des Programmcodes auf den Mikrocontroller.
+Zum Programmieren wird eine entsprechende Schnittstelle benötigt.
+Dann kann das ausführbare Programm auf den Controller geladen und gestartet werden.
+Passende Programmiergeräte können durch den Hersteller der Controller zur Verfügung gestellt werden \cite{Wust2010-jg}.
+Die Software wird dabei in den Speicher des Mikrocontrollers geladen.
+Typischerweise im Flash-Speicher.
+Dadurch ist ein schnelles und einfaches Aufspielen möglich \cite{Wust2010-jg}.
+Dieser Schritt ist in der Abbildung \ref{fig:ablaufcompiler} nicht dargestellt. \\
+
+Der Linker sorgt dafür, dass alle Teile des Programms korrekt zusammengefügt werden.
+Ein tieferes Verständnis ist für den weiteren Verlauf der Thesis wichtig.
+Daher wird im nächsten Kapitel \textit{\ref{kap:linker} \nameref{kap:linker}} tiefer auf die Funktion und Konfiguration eingegangen.

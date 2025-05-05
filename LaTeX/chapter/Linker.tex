@@ -1,0 +1,206 @@
+\section{Linker}\label{kap:linker}
+
+\subsection{Aufgabe}\label{kap:aufgabe_linker}
+Der Linker ist ein essentieller Bestandteil der Toolchain.
+Dieser führt die verschiedenen Teile des Programms zusammen.
+Am Ende erzeugt der Linker eine ausführbare Datei.
+Die Hauptfunktionen des Linkers können in die folgenden Punkte unterteilt werden:
+\begin{description}[style=nextline]
+	\item[Symbolauflösung] Der Linker sucht nach symbolischen Referenzen in den Objekt-Dateien und Bibliotheken.
+	Dies können beispielsweise Funktions- oder Variablennamen sein.
+	Dies stellt sicher, dass jede Referenz eine Definition hat.
+	Beim Kompilieren eines C-Programms werden in der Regel mehrere Objekt-Dateien erzeugt.
+	Diese Dateien enthalten Teile des endgültigen Programmcodes.
+	Beispielsweise befindet sich in der Hauptdatei dann Referenzen auf die anderen Dateien.
+	Der Linker durchsucht die anderen Objektdateien nach diesen Referenzen und löst sie anschließend auf.
+	
+	\item[Adresszuweisung] Der Linker weißt den relativen Adressen der einzelnen Objektdateien und Bibliotheken absolute Speicheradressen zu.
+	Dies geschieht, damit sichergestellt ist, dass die endgültig ausführbare Datei korrekt im Speicher angeordnet ist.
+	Dabei wird in Text-, Daten- und \ac{BSS}-Segment unterschieden.
+	Das Textsegment enthält den ausführbaren Maschinencode.
+	Im Datensegment werden die initialisierten globalen und statischen Variablen organisiert.
+	Das \ac{BSS}-Segment enthält die nicht initialisierten Variablen.
+	Diese werden beim Programmstart typischerweise auf null gesetzt.
+	
+	\item[Bibliotheken einbinden] Damit alle externen Funktionen und Daten verfügbar sind, bindet der Linker die benötigten Bibliotheken in das Programm ein.
+	Dabei wird zwischen zwei Arten von Bibliotheken unterschieden.
+	Statische Bibliotheken werden beim Link-Prozess fest in das ausführbare Programm eingebunden.
+	Dabei wird lediglich die verwendeten Funktionen eingebunden.
+	Im Vergleich zu dynamischen Bibliotheken erhöht dies die Größe der Programmdatei.
+	Die dynamischen Bibliotheken werden zur Laufzeit des Programms geladen.
+	Diese Art reduziert zwar die Größe der ausführbaren Datei, sorgt allerdings für zusätzlichen Aufwand während der Laufzeit.
+	
+	\item[Erstellen ausführbare Datei] Im letzten Schritt erzeugt der Linker eine ausführbare Datei.
+	Diese kann anschließend auf das Zielsystem aufgespielt und gestartet werden.
+	Typischerweise sind diese Dateien im \ac{ELF}-, \ac{PE}- oder Objekt-Format gespeichert.
+\end{description}
+
+Die Erläuterung der Aufgaben des Linkers zeigt, dass es ohne diese Funktionsweise nahezu unmöglich ist, komplexe Softwareprojekte durchzuführen.
+Damit der Linker die Dateien zusammenfügen kann, benötigt er weitere Informationen.
+Diese werden über eine Datei bereitgestellt.
+Neben dieser Datei werden dem Linker weitere Informationen, Bibliotheken und Objektdateien zur Verfügung gestellt.
+Eine detaillierte Ansicht des Linker-Prozesses kann in Abbildung \ref{fig:linkercloserlook} gefunden werden.\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\linewidth]{graphics/linker_closer_look}
+	\caption[Detaillierte Darstellung des Linker-Prozesses]{Detaillierte Darstellung des Linker-Prozesses \cite{iar_guide}}
+	\label{fig:linkercloserlook}
+\end{figure}
+
+Auf den Aufbau der Linker-Konfigurationsdatei wird im folgenden Kapitel weiter eingegangen.
+Kapitel \textit{\ref{kap:aufbau_linker_konfig} \nameref{kap:aufbau_linker_konfig}} geht weiter auf den Aufbau der Datei ein.
+Weiter wird dort auch die Syntax der Definitionen der Speicherbereiche und Segmente erläutert. 
+
+\subsection{Linker-Konfigurationsdatei}\label{kap:linker_konfigurationsdatei}
+
+\subsubsection{Verwendung}\label{kap:linker_konfig_verwendung}
+Die Linker-Konfigurationsdatei muss an dieser Stelle in Zusammenhang mit der IAR-Embedded Workbench \ac{IDE} betrachtet werden.
+Diese \ac{IDE} wird häufig bei der Entwicklung von Software für eingebettete Systeme genutzt.
+Die Konfigurationsdatei des Linkers ist vom Typ \verb*|icf|.
+Darin wird definiert, wie der Speicher des Zielsystems verwendet wird.
+Die Anordnung der Programmteile im Speicher wird ebenfalls festgelegt.\\
+
+Im Grunde ist eine \verb*|icf|-Datei eine Textdatei.
+Mit spezifischer Syntax werden darin Anweisungen für den Linker verfasst.
+Je nach Projekt kann der Aufbau variieren.
+Mehr zum Aufbau kann im folgenden Kapitel gefunden werden.
+In der IAR-Workbench muss die Linker-Konfigurationsdatei zunächst eingebunden werden.
+Der Linker muss anschließend über die Einstellungen so konfiguriert werden, dass dieser die Datei verwendet. \\
+
+Die Anpassung der Linker-Konfigurationsdatei erfolgt manuell durch einen Entwickler.
+Eine weitere Nutzungsmöglichkeit der Datei ist das Definieren von benutzerdefinierten Regionen und Segmenten.
+Darüber hinaus können Daten, Konstanten und Programmcode in spezifischen Speicherbereichen platziert werden. \\
+
+Da Teile des Programmcodes sicherheitsrelevante Software beinhaltet, ist es wichtig, dass alle Objektdateien einer Speicherregion zugewiesen sind.
+Diese Anforderung ist normativ bedingt.
+\begin{quote}
+	\enquote{Die Unabhängigkeit der Ausführung zwischen Softwareelementen, die auf einem einzelnen Computersystem (bestehend aus einem oder mehreren Prozessoren zusammen mit Speicher und anderen Hardwaregeräten, die von den Prozessoren gemeinsam genutzt werden) implementiert sind, kann durch eine Anzahl verschiedener Methoden erreicht und gezeigt werden.} \cite{FunkSicher}
+\end{quote}
+In der Norm DIN EN 61508-3:2011-02 Anhang F werden Verfahren zum Erreichen von Nicht-Beeinflussung zwischen Softwareelementen auf einem einzelnen Rechner beschrieben.
+Genauer definiert Anhang F.4 die Erreichung räumlicher Unabhängigkeit.
+Als erster Punkt ist dort die Verwendung eines Hardware-Speicherschutzes zwischen unterschiedlichen Elementen beschrieben.
+Dies kann beispielsweise durch die Verwendung der \ac{MPU} umgesetzt werden.
+Mit der Hilfe der Software der \ac{GUI} kann für eine Speicherregion, also ein Element, die \ac{MPU} konfiguriert werden.
+Damit ist ein Zugriff auf den Speicher des sicherheitsrelevanten Bereichs nur während der Ablaufphase der sicherheitsrelevanten Software möglich. \\
+
+Ein weiterer Punkt aus der Norm beschreibt den Einsatz eines Betriebssystems \cite{FunkSicher}.
+Dies wird aktuell nicht auf den Mikrocontrollern verwendet.
+Da das Schützen der Speicherbereiche mit der \ac{MPU} noch nicht vollständig implementiert ist, wird eine andere Möglichkeit benötigt, um Daten vor ungewolltem Schreibzugriff zu schützen. 
+Dies wird über den Einsatz einer \ac{CRC}-Prüfung realisiert.
+Es bleibt die Verwendung \enquote{strenger Entwurfs-, Sourcecode- und wenn möglich Objektcode-Analyse} \cite{FunkSicher}, um zu verhindern, dass explizite oder implizite Speicherreferenzen zwischen Softwareelementen zu einem Überschreiben von Daten führen. 
+Dies bedeutet, dass alle Objekt-Dateien einer Speicherregion zugewiesen sein müssen.
+Dadurch kann verhindert werden, dass ein nicht sicherheitsrelevantes Modul in den Speicherbereich der sicherheitsrelevanten Software abgelegt wird. 
+Ein aktiver Schutz gegen das Beschreiben des sicherheitsrelevanten Bereichs ist dies jedoch nicht. \\
+
+%IEC 60730 Tabelle H.6 H.2 Kapitel 9.12.2.4
+
+\subsubsection{Aufbau und Syntax}\label{kap:aufbau_linker_konfig}
+Der Aufbau einer Linker-Konfigurationsdatei kann in drei Teile untergliedert werden.
+Diese sind allerdings nicht fest in der Syntax vorgeschrieben.
+Der Aufbau der Datei ergibt sich aus einem logischen Ablauf von Definitionen und Platzierungen.
+
+\begin{description}[style=nextline]
+	\item[Kopfzeile] In den Kopfzeilen befinden sich zunächst allgemeine Informationen und Einstellungen.
+	Darin ist eine kurze Dokumentation mit wichtigen Informationen über die Datei und das Modul enthalten.
+	
+	\item[Speicherregionen] Dieser Abschnitt definiert die verschiedenen Speicherregionen. 
+	Verschiedene Bereiche können dabei für Flash-Speicher, RAM oder spezielle Peripheriespeicher angelegt werden.
+	
+	\item[Platzierungen] Bei der Platzierung werden verschiedene Programmteile, Daten oder Stack den zuvor definierten Speicherbereichen zugeordnet. Hierbei werden die Objekt-Dateien den Speicherbereichen zugewiesen.
+\end{description}
+
+Die Syntax der Linker-Konfigurationsdatei im \verb*|.icf|-Dateiformat kann in Programmcodeabschnitt \ref{pc:syntax_linker} gefunden werden.
+Darin sind verschiedene Formen der Syntax anzutreffen.
+Kommentare werden über einen doppelten Schrägstrich eingefügt. \\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=4, xleftmargin=10pt, breaklines, fontsize=\small, baselinestretch=1.25, escapeinside=!!]{c}
+		- Kopfzeile -
+		// ### MODULE DOC START: 'stm32f103xB_Sections'
+		// -----------------------------------------------------------
+		// Modulbeschreibung:
+		// 	 ...
+		// -----------------------------------------------------------
+		// ### MODULE DOC END: 'stm32f103xB_Sections'
+		
+		define symbol __STACK_SIZE__ = 0x400;
+		define symbol __HEAP_SIZE__  = 0x200;
+		
+		define block CSTACK with alignment = 8, size = __STACK_SIZE__  { };
+		define block HEAP   with alignment = 8, size = __HEAP_SIZE__   { };
+		
+		- Speicherregionen -
+		//============================================================
+		// SEGMENT: Beispielsegment
+		define memory mem with size = 4G;
+		define region ROM_region = mem:[from 0x08000000 to 0x080FFFFF];
+		define region RAM_region = mem:[from 0x20000000 to 0x2001FFFF];
+		
+		- Platzierungen -
+		place at start of ROM_region { readonly };
+		place in RAM_region {block HEAP, block CSTACK, section .data, section .bss}
+		if (SEGMENT_NUMBER == 0) { !\label{pcl:segment_0}!
+			place in NSR_CODE	{ section NSR_CODE,
+								   ro code object filename.o } 
+		} else if (SEGMENT_NUMBER == 1) {
+			...
+		}
+	\end{minted}
+	\caption{Syntax Linker-Konfigurationsdatei}
+	\label{pc:syntax_linker}
+\end{listing}
+
+Der Aufbau einer Linker-Konfigurationsdatei fängt mit einer Dokumentation über die Datei an.
+Darin befindet sich eine Modulbeschreibung sowie Hinweise zum Handhaben der Datei.
+Darunter sind alle Segmente der Datei aufgezählt und kurz beschrieben.
+Dabei wird nach \ac{RAM} und \ac{ROM} unterschieden. \\
+
+Es folgt ein Teil, welcher vom Linker-Konfigurationsdatei Editor der IAR-Workbench verwaltet wird.
+Darin ist der generelle Start und die Größe des Speichers hinterlegt.
+Danach werden die unterschiedlichen Segmente definiert.
+Dafür wird zunächst eine Start- sowie Endadresse in einer symbolischen Konstanten gespeichert.
+Anschließend die Region definiert.
+Die Regionen befinden sich immer unter einer Segmentzuordnung.
+Dies ist in Programmcodeabschnitt \ref{pc:definition_speicherbereich} dargestellt. \\
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=4, xleftmargin=10pt, breaklines, fontsize=\small, baselinestretch=1.25]{c}
+		define exported symbol SR_CODE_BEGIN = 0x0801D000;
+		define exported symbol SR_CODE_END   = 0x0803AFFF;
+		define region SR_CODE = mem:[from SR_CODE_BEGIN to SR_CODE_END];
+	\end{minted}
+	\caption{Definition eines Speicherbereichs über symbolische Konstanten}
+	\label{pc:definition_speicherbereich}
+\end{listing}
+
+Im letzten Abschnitt des Programmcodeabschnittes \ref{pc:syntax_linker} werden die Objekt-Dateien den Regionen zugewiesen.
+Dies bietet die Möglichkeit, Objektdateien Speicherbereiche zuzuweisen \cite{inet:iar_placing}.
+Innerhalb der \verb*|if|-Abfrage aus Programmcodeabschnitt \ref{pc:syntax_linker} (Zeile \ref{pcl:segment_0}) ist eine solche Zuordnung zu sehen.
+Die \verb*|if|-Abfrage ermöglicht mit einer einzelnen Linker-Konfigurationsdatei unterschiedliche Aufteilungen eines Projektes mit eigenen Projektdateien.
+Somit kann genau zwischen \ac{SR} und \ac{NSR} Programmcode unterschieden werden.
+Die Variable \verb*|SEGMENT_NUMBER| wird in den Projektoptionen konfiguriert.
+%S. 262
+Beim Linken wird die Variable wie eine Symboldefinition in der Linker-Konfigurationsdatei behandelt \cite{booklet:iar_project}.
+Daher kann in einem Projekt die Variable auf den Wert \verb*|0| und in einem Anderen auf den Wert \verb*|1| gesetzt werden. \\
+
+Zum Platzieren von Variablen in bestimmten Speicherregionen gibt es bei der IAR Workbench eine spezielle Syntax.
+Angewandt wird dies direkt in den Source-Dateien.
+Die Syntax ist in Programmcodeabschnitt \ref{pc:placing_variables} zu sehen.
+Zwei Möglichkeiten stehen dafür zur Verfügung.
+Entweder in der Zeile der Variablendefinition oder als Blockanweisung.
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, breaklines, fontsize=\small, baselinestretch=1.25, ignorelexererrors]{c}
+		uint8_t variable_one @ "RAM_region";
+		
+		#pragma default_variable_attributes  = @ "RAM_region"
+		
+		uint8_t variable_two;
+		uint8_t variable_three;
+		
+		#pragma default_variable_attributes  = 
+	\end{minted}
+	\caption{Platzierung der Variablen in Speicherregionen}
+	\label{pc:placing_variables}
+\end{listing}
