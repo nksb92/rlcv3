@@ -1,0 +1,136 @@
+\section{Verwendung Linker File Analyser}\label{kap:verwendung_lfa}
+\subsection{Öffnen von Linker-Konfigurationsdateien}
+Nach dem Starten der Software wird der Nutzer mit einer graphischen Benutzeroberfläche begrüßt.
+Diese kann in Abbildung \ref{fig:hauptanwendungsfensterleer} gesehen werden.
+Darin ist die Funktionalität der Software teilweise limitiert.
+Diese Limitierungen werden aufgelöst, sobald eine Linker-Konfigurationsdatei eingelesen wird. 
+Die Registerkarte \verb*|Visualize| \verb*|Config| ist dabei uneingeschränkt nutzbar. \\
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{graphics/hauptanwendungsfenster_leer}
+	\caption{Hauptanwendungsfenster ohne Regionen}
+	\label{fig:hauptanwendungsfensterleer}
+\end{figure}
+
+Über die Schaltfläche \verb*|Open| kann ein Dialogfenster zur Auswahl der Datei geöffnet werden.
+Darin kann eine passende Linker-Konfigurationsdatei ausgewählt werden.
+Das Dialogfenster ist in Abbildung \ref{fig:filedialog} dargestellt.
+Limitiert ist die Auswahl des Dateityps.
+Lediglich \verb*|icf|-Dateien können ausgewählt werden. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\linewidth]{graphics/file_dialog}
+	\caption{Dialogfenster Datei auswählen}
+	\label{fig:filedialog}
+\end{figure}
+
+Nach dem Öffnen einer Datei werden alle inaktiven Schaltflächen auf aktiv gestellt.
+Damit steht dem Nutzer die volle Funktionalität der Software zur Verfügung.
+Die eingelesenen Regionen werden wie in Abbildung \ref{fig:hauptanwendungsfensterupdated} auf Seite \pageref{fig:hauptanwendungsfensterupdated} dargestellt.
+Die weiteren Funktionsabläufe werden in den beiden folgenden Kapiteln näher beschrieben.
+
+\subsection{Editieren von Linker-Konfigurationsdateien}
+Wie im vorherigen Kapitel beschrieben, können Linker-Konfigurationsdateien geöffnet werden.
+Die darin enthaltenen Speicherregionen werden über die graphische Oberfläche dargestellt.
+Das generelle Aussehen der GUI kann auf den Abbildungen \ref{fig:hauptanwendungsfensterleer} (Seite \pageref{fig:hauptanwendungsfensterleer}) und \ref{fig:hauptanwendungsfensterupdated} (Seite \pageref{fig:hauptanwendungsfensterupdated}) gesehen werden.\\
+
+Die Speicherregionen können vom Benutzer angepasst werden.
+Es kann die Startadresse sowie die Größe einer Region geändert werden.
+Dies kann über die Textfelder geschehen.
+Die Farbe Orange zeigt dabei die Textfelder an, welche editierbar sind.
+Über die Schaltfläche \verb*|Update| können Änderungen in die Linker-Konfigurationsdatei übernommen werden. \\
+
+Weiter können in diesem Fenster neue Speicherregionen angelegt werden.
+Dafür kann auf der rechten Seite der \ac{GUI} der Name sowie Startadresse und Speichergröße definiert werden.
+Darunter kann ausgewählt werden, in welchem Segment die Region angelegt werden soll.
+Auch hierbei wird die Änderung erst beim Aktualisieren in die Datei geschrieben. \\
+
+Als letzte Funktion kann ein Segment angelegt werden.
+Die dazugehörigen Optionen können unterhalb des Bereichs für das Anlegen von Speicherregionen gefunden werden.
+Dabei kann der Name definiert werden.
+Außerdem kann ausgewählt werden, ob der Bereich über die \ac{IDE} auswählbar sein soll.
+
+\subsection{Erstellen und Visualisieren von MPU-Konfigurationen}
+Mithilfe der \ac{MPU} ist es möglich, Speicherbereiche vor ungewolltem Beschreiben zu schützen.
+Definiert in der Linker-Konfigurationsdatei sind diese Bereiche über die \ac{GUI} dargestellt.
+In der Registerkarte \verb*|Linker| \verb*|File| \verb*|Editor| können die unterschiedlichen Speicherbereiche vorgemerkt werden.
+Die Registerkarte \verb*|Export| \verb*|Config| bietet die Funktionen, um Konfigurationen für die \ac{MPU} zu erstellen. \\
+
+Dabei werden auf der rechten Seite zunächst die vorgemerkten Speicherbereiche aufgelistet.
+Diese Auflistung wird bei jedem Aufruf der Registerkarte aktualisiert.
+Auf der linken Seite der Registerkarte befinden sich Optionen.
+Als Erstes kann dort der Speicherort eingestellt werden.
+Darunter kann entweder ein Dateiname aus den ausgewählten Regionen erstellt oder ein eigener Name angelegt werden.
+Die Mikrocontroller-Architektur kann ebenfalls ausgewählt werden.
+Dafür stehen die vom Skript unterstützen über ein Auswahl-Widget zur Verfügung.
+Mit dem Schalter in dem \verb*|Combine|-Labelframe kann zwischen zwei Modi gewält werden.
+Der erste Modus erstellt aus allen Regionen eine einzelne Konfiguration.
+Dies funktioniert allerdings nur bei zusammenhängenden Speicherbereichen.
+Als zweiter Modus wird für jede Speicherregion eine eigene Konfiguration erstellt. \\
+
+Über die Schaltfläche \verb*|Create| wird der Prozess des Erstellens der Konfiguration gestartet.
+Sollte dabei ein Fehler auftreten, wird dies dem Nutzer über ein Nachrichtenfenster angezeigt.
+Bei erfolgreichem Durchlauf des Skripts wird eine Erfolgsnachricht ausgegeben.
+Die Konfiguration wird in einer Header-Datei gespeichert.
+Darin werden die Einträge eines Arrays generiert.
+Das Array wird weiterhin von Nutzer manuell angelegt.
+Damit kann die Bezeichnung des Arrays frei gewählt werden.
+Die Header-Datei kann an der richtigen Stelle in den Source-Code eingebunden und in die Register der \ac{MPU} geladen werden.
+In Programmcodeabschnitt \ref{pc:beispielkonfig} kann eine solche Header-Datei gefunden werden. \\
+
+Darin werden unterschiedliche Kommentare eingepflegt.
+Diese dienen dazu, bei der Visualisierung die Regionen und Subregionen korrekt darzustellen.
+In der generierten Header-Datei befindet sich zusätzlich eine Beschreibung und Warnung, diese Datei nicht manuell zu bearbeiten.
+Im Beispiel aus Programmcodeabschnitt \ref{pc:beispielkonfig} ist dies weggelassen, weil es nicht weiter für das Verständnis der Dateistruktur beiträgt.
+
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=3, xleftmargin=10pt, fontsize=\footnotesize, baselinestretch=1.25, breaklines]{c}
+		#ifndef MPU_REGIONS_H
+		#define MPU_REGIONS_H
+		// ------------------------------------------------------------------------
+		// FILE PROPERTIES (PROTECTED):
+		// PROTECTED MEMORY AREAS: SR_DATA_CRC|SR_DATA|SR_ISR_DATA|SR_ISR_DATA_INV_RED
+		// ARCHITECTURE: M0+ | START: 0x20002600 | END: 0x20003DFF |  SIZE: 0x1800
+		// ------------------------------------------------------------------------
+		
+		// REGION_NUMBER: 1
+		// PROTECTED REGION: START: 0x20002600 | END: 0x20002FFF | SIZE: 0xA00 (5 * 0x200)
+		// ACTUAL: START: 0x20002000 | SIZE: 0x1000 | SRD: 0x07
+		{ .region_address        = (0x20002000UL),
+			.region_flags_and_size = ((MPU_REGION_SIZE_4KB << MPU_RASR_SIZE_Pos)
+			| (MPU_RASR_ENABLE_Msk << MPU_RASR_ENABLE_Pos)
+			| MPU_RASR_S_Msk
+			| (MPU_REGION_PRIV_RO_URO << MPU_RASR_AP_Pos)
+			| (0x07 << MPU_RASR_SRD_Pos))
+		},
+		
+		// REGION_NUMBER: 2
+		// PROTECTED REGION: START: 0x20003000 | END: 0x20003DFF | SIZE: 0xE00 (7 * 0x200)
+		// ACTUAL: START: 0x20003000 | SIZE: 0x1000 | SRD: 0x80
+		{ .region_address        = (0x20003000UL),
+			.region_flags_and_size = ((MPU_REGION_SIZE_4KB << MPU_RASR_SIZE_Pos)
+			| (MPU_RASR_ENABLE_Msk << MPU_RASR_ENABLE_Pos)
+			| MPU_RASR_S_Msk
+			| (MPU_REGION_PRIV_RO_URO << MPU_RASR_AP_Pos)
+			| (0x80 << MPU_RASR_SRD_Pos))
+		},
+		#endif
+	\end{minted}
+	\caption{MPU-Konfigurationsdatei}
+	\label{pc:beispielkonfig}
+\end{listing}
+
+Für die Visualisierung einer solchen Konfiguration steht die Registerkarte \verb*|Visualize| \verb*|Config| zur Verfügung.
+Die Schaltflächen unter dem Labelframe-Widget mit dem Text \verb*|Regions| bietet verschiedene Optionen.
+Über die Schaltfläche \verb*|Add| kann eine Konfigurationsdatei ausgewählt werden.
+Dafür öffnet sich ein ähnliches Fenster wie aus Abbildung \ref{fig:filedialog} (Seite \pageref{fig:filedialog}).
+Weiter bietet die Schaltfläche \verb*|Last| \verb*|Config| die Möglichkeit die zuletzt erstellte Konfiguration zu laden.
+Ist noch keine erstellt worden, wird dem Nutzer eine entsprechende Meldung angezeigt.
+Zuletzt kann über die Schaltfläche \verb*|Clear| alle angezeigten Darstellungen der Konfigurationen aus der Registerkarte gelöscht werden. \\
+
+Die Abbildung \ref{fig:visualizewindow} (Seite \pageref{fig:visualizewindow}) zeigt dabei die Darstellung der Konfigurationsdatei aus Programmcodeabschnitt \ref{pc:beispielkonfig}.
+Die Kommentare der Datei geben die Informationen über die Bezeichnung der Regionen, die Startadresse, Größe sowie Endadresse.
+Dies wird in dem Informationsfeld links neben einer Darstellung der Konfiguration angezeigt.
+Rechts daneben ist aufgeschlüsselt, welche Subregionen aktiv bzw. nicht aktiv sind.
+Eine entsprechende Farblegende ist unten rechts zu finden.

@@ -1,0 +1,132 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt,a4paper,captions=tableheading]{article}
+% you may add/remove "twoside" above
+% or "12pt"
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% TIMES-LIKE FONT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{mathptmx}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FONTS ETC.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[skip=15pt]{caption}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CODE HIGHLIGHTING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyvrb}  
+\usepackage{minted} 
+\usepackage{helvet}
+
+\usepackage{xcolor}
+\definecolor{border}{HTML}{ff5500}
+
+\usepackage{tcolorbox}
+\usepackage{etoolbox}
+% for angular corners, Argument: arc is angular
+\BeforeBeginEnvironment{minted}{\begin{tcolorbox}[colback=white, colframe=border, boxrule=0.4mm, arc=15px]}
+\AfterEndEnvironment{minted}{\end{tcolorbox}}
+
+%\setminted{style=abap}
+\setminted{style=arduino}
+\usepackage{fancyhdr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% MISC USEPACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% font to Times
+%\fontfamily{ptm}\selectfont
+% font Arial
+
+%\renewcommand{\familydefault}{\sfdefault}
+% for figures
+\counterwithin{figure}{section}
+\usepackage{graphicx}
+\graphicspath{ {./graphics/} }
+% for the Distances
+\usepackage[left=1.50cm, right=1.50cm, top=3.00cm, bottom=2.00cm]{geometry}
+% für comment section
+\usepackage{verbatim}
+% für Zeilenabstand 1,5
+\usepackage[onehalfspacing]{setspace}
+% for spacing \hlines, default was 3pt,
+% but led to a weird overall layout
+\usepackage{tabularx}
+% for long tables
+\usepackage{longtable}
+% to use the title and author
+%\usepackage{titling}
+% the options avoid boxes around the links
+\usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+% for bibliography
+\usepackage[numbers,square,sort]{natbib}
+\bibliographystyle{unsrt}
+% for subfigures
+\usepackage[caption = false]{subfig}
+%\usepackage{subcaption}
+%for graphic/ table positioning
+\usepackage{float}
+%Hurenkind und Schusterjunge unterbinden
+\usepackage[subfigure]{tocloft}
+\clubpenalty=10000
+\widowpenalty=10000
+%for no shifting at the beginning of paragraph
+\parindent 0pt
+%for section in equation number
+\numberwithin{equation}{section}
+% rotating tables
+\usepackage{rotating}
+% degree
+\usepackage{textcomp}
+%line overflow handling
+\setlength{\emergencystretch}{10em}
+% multirow tables
+\usepackage{multirow}
+% si units
+\usepackage[per-mode = fraction, exponent-product = \cdot, locale = DE]{siunitx}
+% variable space
+\usepackage{xspace}
+%for graphic/ table positioning
+\usepackage{float}
+%für das Einbinden von Tabellen
+\usepackage{booktabs}
+%quotation
+\usepackage{csquotes}
+%abkürzungsverzeichnis
+\usepackage[printonlyused]{acronym}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FORMAT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\cftfigpresnum}{Figure }
+\renewcommand{\cfttabpresnum}{Table }
+\renewcommand{\listoflistingscaption}{Sourcecode}
+\renewcommand{\listingscaption}{Sourcecode}
+\renewcommand{\cftfigaftersnum}{:}
+\renewcommand{\cfttabaftersnum}{:}
+
+\setlength{\cftfignumwidth}{2.7cm}
+\setlength{\cfttabnumwidth}{2.7cm}
+\linespread{1.25}
+\setlength{\cftfigindent}{0cm}
+\setlength{\cfttabindent}{0cm}

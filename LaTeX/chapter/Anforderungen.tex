@@ -1,0 +1,93 @@
+\section{Aufgabenstellung}\label{kap:aufgabenstellung}
+\subsection{Aktueller Stand}\label{kap:atueller_stand}
+In der Linker-Konfigurationsdatei werden Speicherregionen für das \ac{ROM} und das \ac{RAM} angelegt.
+Diesen Regionen werden zur Separierung unterschiedliche Softwareblöcke zugewiesen.
+Für die Zuweisung der Softwareartefakte, des \acs{ROM}-Programmcodes und Konstanten sowie \acs{RAM}-Variablen gibt es verschiedene Möglichkeiten.
+Der \acs{ROM}-Programmcode kann über die Compileroptionen der \ac{IDE} einem Modul zugeordnet werden.
+\acs{ROM}-Konstanten und \acs{RAM}-Variablen können über eine spezielle Direktive direkt im Sourcecode verlinkt werden.
+Die Syntax der Linker-Konfigurationsdatei bietet eine weitere Direktive zur Zuordnung an.
+Dadurch können \acs{ROM}-Programmcode, \acs{ROM}-Konstanten und \acs{RAM}-Variablen von Drittanbietern in den Speicherbereichen platziert werden.
+Drittanbieter sind in diesem Zusammenhang auch Softwaremodule von Viessmann, welche als Bibliothek eingesetzt werden. \\
+
+Grundstein der Thesis ist das Analysetool \verb*|Linker| \verb*|File| \verb*|Analyser|.
+Für den Nutzer der Software bietet es eine graphische Benutzeroberfläche.
+Darüber kann eine Linker-Konfigurationsdatei eingelesen und die darin definierten Speicherregionen angezeigt werden.
+In Abbildung \ref{fig:anwendungsübersicht} können die drei separaten Fenster der Anwendung gefunden werden.\\
+
+\begin{figure}[H]
+	\centering
+	\subfloat[\label{fig:hauptanwendungsfenster}Hauptanwendungsfenster]{{\includegraphics[width=.75\linewidth]{graphics/gui_main_window_regions} }} \\
+	\subfloat[\label{fig:mpu_konfiguration}MPU-Konfiguration]{{\includegraphics[width=0.53\linewidth]{graphics/gui_options_mpu} }} \\
+	\subfloat[\label{fig:mpu_visualisierung}MPU-Visualisierung]{{\includegraphics[width=0.75\linewidth]{graphics/gui_show_window} }} 
+	\qquad	
+	\caption{verschiedene Fenster der graphischen Benutzeroberfläche}
+	\label{fig:anwendungsübersicht}
+\end{figure}
+
+Eine wichtige Funktion der Software ist das Erstellen von Konfigurationen für die \ac{MPU} eines Mikrocontrollers.
+Dafür kann eine oder mehrere Speicherregionen im Hauptanwendungsfenster (Abbildung \ref{fig:hauptanwendungsfenster}) ausgewählt werden.
+Weiter ist es wichtig, dass für das Erstellen von Konfigurationen für die \acs{MPU} gewisse Regeln eingehalten werden. 
+Diese werden im Hintergrund geprüft.
+Sollten dabei Verstöße auftreten, wird dies dem Nutzer als Fehlermeldung zurückgeben.
+Über die Optionen (Abbildung \ref{fig:mpu_konfiguration}) kann der Speicherort der Datei oder auch die verwendete Architektur des Mikrocontrollers ausgewählt werden.
+Im Hintergrund wird mit einem effizientem Algorithmus die Konfiguration erstellt.
+Dabei werden die Bits der entsprechenden Register des Controllers gesetzt. 
+Auf dem Mikrocontroller stehen dafür verschiedene Regionen zur Verfügung.
+Gespeichert wird diese Konfiguration in einer Header-Datei.\\
+
+In einem weiteren Fenster können die Konfigurationen visualisiert werden.
+Abbildung \ref{fig:mpu_visualisierung} zeigt die Darstellung der Regionen und Subregionen einer solchen Konfiguration.
+Dieses Fenster ermöglicht einen einfachen Überblick der Konfiguration.
+Verschiedene Farben zeigen dabei die aktiven bzw. inaktiven Subregionen an. \\
+
+\subsection{Projektanforderungen}\label{kap:projektanforderungen}
+In der heutigen Zeit spielen \ac{GUI}s eine entscheidende Rolle als Schnittstelle zwischen Nutzer und Software.
+So auch beim Softwaretool \verb*|Linker| \verb*|File| \verb*|Analyser|.
+Dieses Softwaretool soll erweitert werden.
+Bei der bestehenden Software sollen die Stärken und Schwächen analysiert werden.
+Abgeleitet davon werden Erweiterungen geplant und Anforderungen gesetzt.
+Die bestehende Funktionalität wird bereits im vorherigen Kapitel (\ref{kap:atueller_stand} \nameref{kap:atueller_stand}) erläutert.
+Die folgenden drei Punkte stellen die resultierenden Anforderungen an die Erweiterungen dar. \\
+
+\begin{description}[style=nextline]
+	\item[Gruppierung der Einzelfenster]
+	Die verschiedenen Fenster der Software sollen für eine verbesserte Übersicht in einer Hauptanwendung vereint werden.
+	Die Funktion dieser bereits vorhandenen Fenster soll bestehen bleiben.
+	In diesem Hauptanwendungsfenster sollen alle Funktionen gebündelt bedienbar sein.
+	Einzelne Fenster sollen weiterhin für das Anzeigen von Informations-, Warn- oder Fehlermeldungen genutzt werden können.
+	
+	\item[Manipulation der Speicherbereiche]
+	Die Definition der Speicherbereiche in der Linker-Konfigurationsdatei ist unübersichtlich.
+	Die Änderungen der Bereichsadressen oder Bereichsgröße sind aufwändig und fehleranfällig.
+	Daher soll es über das Werkzeug möglich sein, dies zu ändern.
+	Die Linker-Konfigurationsdatei soll mit den neuen Informationen aktualisiert und die Änderungen übernommen werden.
+	Über das Ändern der bereits vorhandenen Speicherregionen hinaus soll es weitere Funktionen für das Erstellen und Löschen von Regionen geben.
+	Auch diese Veränderung der Speicherregionen soll in die Linker-Konfigurationsdatei eingebracht werden.
+	Die Segmentierung der Speicherregionen soll dabei berücksichtigt werden.
+	Neue Segmente sollen über die \ac{GUI} angelegt werden können.
+	Diese Erweiterung geht mit einer Änderung bzw. Anpassung der Elemente der \ac{GUI} einher.
+	Dafür müssen Widgets angepasst, hinzugefügt oder gelöscht werden.
+	
+	\item[Artefaktzuweisung der Speicherregionen]
+	Die Software-Artefakte sollen in den Speicherregionen platziert werden.
+	Diese Zuweisung erfolgt aktuell manuell durch einen Entwickler.
+	Dieser Schritt soll automatisiert werden.
+	Abgeleitet aus der Norm DIN EN 61508:2011-02 müssen alle Software-Artefakte einem Speicherbereich zugeordnet sein.
+	Das Automatisieren dieses Schrittes soll Fehler vermeiden und sicherstellen, dass jedes Artefakt zugeordnet ist.
+	Ein gegebenes Software-Projekt soll dabei automatisch durchsucht werden.
+	Dabei soll ein nicht zugewiesenes Artefakt gekennzeichnet werden.
+\end{description}
+
+Für die beschriebenen Anforderungen ist die Einarbeitung in die Syntax der Linker-Konfigurationsdateien essentiell.
+Weiter wird ein klares Verständnis für den Ablauf der Toolchain und besonders die Aufgabe des Linkers benötigt.
+Eine Einarbeitung und Recherche ist dafür wichtig.\\
+
+Im folgenden Kapitel wird zunächst auf den Aufbau der Software-Projekte einer \ac{ECU} eingegangen.
+Darin wird die Verzeichnisstruktur erläutert.
+Die Toolchain für das Überführen von Programmcode zu einer ausführbaren Datei folgt danach.
+Auf die besondere Rolle des Linkers und dessen Konfiguration wird ab Kapitel \textit{\ref{kap:linker} \nameref{kap:linker}} (Seite \pageref{kap:linker}) eingegangen.
+Mit den Grundlagen dieser Kapitel werden anschließend die Erweiterungen beschrieben.
+Zunächst wird allerdings auf die Werkzeuge für die Entwicklung sowie die Best Practices eingegangen.
+Kapitel \ref{kap:zusammenfassung} fasst die Thesis zusammen.
+Darin wird auch die komplette Funktionalität der Software-Anwendung beschrieben.
+Es folgt eine Aufführung der Projektergebnisse und zum Abschluss eine Zukunftsaussicht.
