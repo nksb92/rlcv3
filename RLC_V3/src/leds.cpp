@@ -72,6 +72,9 @@ void rgb_out(CRGB led_val, uint8_t factor)
   ledcWrite(RED_CHANNEL, led_val.r);
   ledcWrite(GREEN_CHANNEL, led_val.g);
   ledcWrite(BLUE_CHANNEL, led_val.b);
+  // ledcWrite(RED_PIN, led_val.r);
+  // ledcWrite(GREEN_PIN, led_val.g);
+  // ledcWrite(BLUE_PIN, led_val.b);
 #endif
 
 #ifdef LED_OUT_I2C

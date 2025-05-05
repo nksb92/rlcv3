@@ -1,7 +1,5 @@
-// The ESP32S3 Board has problems with the pins and interrupts
-// It could however help, to config the pins beforehand
-// further testing in the future needed
-
+#include <Arduino.h>
+#include "common.h"
 #include "rlc_dmx.h"
 #include "leds.h"
 #include "rotary_encoder.h"
@@ -63,14 +61,19 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
 
 void setup()
 {
+  Serial.begin(115200);
   // init fan instantly
 #ifdef FAN_USAGE
   fan.init_fan();
   Serial.println("FAN INIT DONE");
 #endif
+  // init led instantly because of rgb ic
+  // -> without 2 secconds startup delays
+  //    rgb values set to 255 because of pullup
+  init_led();
+  Serial.println("LED INIT DONE");
 
   delay(2000);
-  Serial.begin(115200);
   Serial.println("Startup");
 
   // init all classes and functions
@@ -80,8 +83,6 @@ void setup()
   Serial.println("EEPROM INIT DONE");
   init_display(display);
   Serial.println("DISPLAY INIT DONE");
-  init_led();
-  Serial.println("LED INIT DONE");
   init_encoder(enc_button);
   Serial.println("ENCODER INIT DONE");
   dmx_val.install_dmx();
@@ -131,6 +132,8 @@ void setup()
 
 void loop()
 {
+  // polling all states
+  // ----------------------------------------------------------------------------------------------------------------------
   enc_button.update();
   change_vals = get_event_status();
   button_pressed = get_press_state();
@@ -138,6 +141,8 @@ void loop()
   encoder_val = get_encoder_val();
   artnet_state = artnet_var.get_current_fsm();
 
+  // handling button press and long press
+  // ----------------------------------------------------------------------------------------------------------------------
   if (get_long_press())
   {
     long_press_triggered = false;
@@ -244,7 +249,9 @@ void loop()
     button_long_pressed = false;
   }
 
-  // handle everything on event
+  // handling encoder value
+  // if encoder value is not zero, change the values of the current page
+  // ----------------------------------------------------------------------------------------------------------------------
   if (change_vals)
   {
     switch (current_deepness)
@@ -346,7 +353,7 @@ void loop()
         artnet_var.set_number_segments(seg.get_num_seg());
         seg_display_update(display, seg);
 #ifdef FAN_USAGE
-        fan.evaluate_sum(128);
+        fan.evaluate_sum(128 * 3);
 #endif
         break;
       }
@@ -359,7 +366,9 @@ void loop()
     set_event_status(change_vals);
   }
 
-  if (millis() - last_hundret_update >= 100)
+  // handling display standby and fan update
+  // ----------------------------------------------------------------------------------------------------------------------
+  if (millis() - last_hundret_update >= STD_FAN_UPDATE_TIME)
   {
 #ifdef FAN_USAGE
     // let the fan run on for a certain time to cooldown panel
@@ -369,7 +378,7 @@ void loop()
       fan_run_on_time--;
       if (fan_run_on_time == 0)
       {
-        fan.set_target_speed(MIN_SPEED);
+        fan.set_target_speed(FAN_MIN_SPEED);
       }
     }
 
@@ -377,7 +386,7 @@ void loop()
     fan.update();
 
 #endif
-    // no action for 30 secs will set the display in standby mode
+    // no action for 30 (STD_STANDBY_TIME * STD_FAN_UPDATE_TIME = 300 * 100 = 30000 ms) secs will set the display in standby mode
     if (!get_standby_status())
     {
       display_standby_time--;
@@ -393,6 +402,7 @@ void loop()
   }
 
   // hanlde everthing periodically
+  // ----------------------------------------------------------------------------------------------------------------------
   switch (current_deepness)
   {
   case MAIN_MENU:
@@ -474,7 +484,6 @@ void loop()
 #endif
           artnet_data = false;
         }
-
         break;
       }
       break;
