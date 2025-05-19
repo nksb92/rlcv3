@@ -2,8 +2,8 @@
 #define DISPLAY_H
 
 #include <Wire.h>
+#include "dmx.h"
 #include "common.h"
-#include "rlc_dmx.h"
 #include "segments.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -21,7 +21,7 @@
  *
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  */
-void init_display(Adafruit_SSD1306 &dp);
+void init_display(Adafruit_SSD1306& dp);
 
 /**
  * Updates the OLED display with the current HSV values.
@@ -29,7 +29,7 @@ void init_display(Adafruit_SSD1306 &dp);
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  * @param out_val: the C_HSV object containing the current HSV values
  */
-void hsv_display_update(Adafruit_SSD1306 &dp, C_HSV out_val);
+void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val);
 
 /**
  * Updates the OLED display with the current RGB values.
@@ -37,7 +37,7 @@ void hsv_display_update(Adafruit_SSD1306 &dp, C_HSV out_val);
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  * @param rgb_val: the C_RGB object containing the current RGB values
  */
-void rgb_display_update(Adafruit_SSD1306 &dp, C_RGB rgb_val);
+void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val);
 
 /**
  * Updates the OLED display with the current DMX values.
@@ -45,30 +45,30 @@ void rgb_display_update(Adafruit_SSD1306 &dp, C_RGB rgb_val);
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  * @param dmx_val: the rgb_dmx object containing the current DMX values
  */
-void dmx_display_update(Adafruit_SSD1306 &dp, rgb_dmx dmx_val);
+void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val);
 
-void seg_display_update(Adafruit_SSD1306 &dp, segments seg);
+void seg_display_update(Adafruit_SSD1306& dp, segments seg);
 
 /**
  * Displays that the EEPROM data has been saved.
  *
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  */
-void display_saved_status(Adafruit_SSD1306 &dp);
+void display_saved_status(Adafruit_SSD1306& dp);
 
 /**
  * Displays the startup message.
  *
  * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
  */
-void display_startup(Adafruit_SSD1306 &dp);
+void display_startup(Adafruit_SSD1306& dp);
 
-void display_menu(Adafruit_SSD1306 &dp, uint8_t index);
+void display_menu(Adafruit_SSD1306& dp, uint8_t index);
 
-void display_artnet_rec(Adafruit_SSD1306 &dp, rlc_artnet artnet_var, uint8_t menu_index);
+void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var, uint8_t menu_index);
 
 void scroll();
 
-void display_connecting_artnet(Adafruit_SSD1306 &dp, rlc_artnet artnet_var);
+void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var);
 
 #endif

@@ -60,11 +60,11 @@ void menu_structure::add_current(int val)
     int temp = current + val;
     if (temp >= last_menu)
     {
-        current = HSV_PAGE;
+        current = MAIN_LAST - 1;
     }
     else if (temp < 0)
     {
-        current = last_menu - 1;
+        current = HSV_PAGE;
     }
     else
     {
@@ -77,6 +77,6 @@ void menu_structure::deeper()
     deepness++;
     if (deepness >= MAX_DEEP)
     {
-        deepness = 0;
+        deepness = MAIN_MENU;
     }
 }

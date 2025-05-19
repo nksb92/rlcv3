@@ -11,7 +11,7 @@ enum
     RGB_PAGE,
     DMX_PAGE,
     ARTNET_REC,
-    SEGMENT_CNTRL,
+    SETTINGS_PAGE,
     MAIN_LAST
 };
 

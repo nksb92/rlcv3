@@ -1,5 +1,3 @@
-#include "Print.h"
-#include "HWCDC.h"
 #include "leds.h"
 
 CRGB red_segment(128, 0, 0);
@@ -18,17 +16,17 @@ void init_led()
 #ifdef LED_OUT_MOSFET
   // esp32 boards version 3.0.0 breaks i2c api
   // init of pwm pin also changes
-  // ledcAttach(RED_PIN, PWM_FREQ, RESOLUTION);
-  // ledcAttach(GREEN_PIN, PWM_FREQ, RESOLUTION);
-  // ledcAttach(BLUE_PIN, PWM_FREQ, RESOLUTION);
+  ledcAttach(RED_PIN, PWM_FREQ, RESOLUTION);
+  ledcAttach(GREEN_PIN, PWM_FREQ, RESOLUTION);
+  ledcAttach(BLUE_PIN, PWM_FREQ, RESOLUTION);
 
   // Method before 3.0.0
-  ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
-  ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
-  ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
-  ledcAttachPin(RED_PIN, RED_CHANNEL);
-  ledcAttachPin(GREEN_PIN, GREEN_CHANNEL);
-  ledcAttachPin(BLUE_PIN, BLUE_CHANNEL);
+  // ledcSetup(RED_CHANNEL, PWM_FREQ, RESOLUTION);
+  // ledcSetup(GREEN_CHANNEL, PWM_FREQ, RESOLUTION);
+  // ledcSetup(BLUE_CHANNEL, PWM_FREQ, RESOLUTION);
+  // ledcAttachPin(RED_PIN, RED_CHANNEL);
+  // ledcAttachPin(GREEN_PIN, GREEN_CHANNEL);
+  // ledcAttachPin(BLUE_PIN, BLUE_CHANNEL);
 #endif
 
 #ifdef LED_OUT_I2C
@@ -69,12 +67,12 @@ void rgb_out(CRGB led_val, uint8_t factor)
 #endif
 
 #ifdef LED_OUT_MOSFET
-  ledcWrite(RED_CHANNEL, led_val.r);
-  ledcWrite(GREEN_CHANNEL, led_val.g);
-  ledcWrite(BLUE_CHANNEL, led_val.b);
-  // ledcWrite(RED_PIN, led_val.r);
-  // ledcWrite(GREEN_PIN, led_val.g);
-  // ledcWrite(BLUE_PIN, led_val.b);
+  // ledcWrite(RED_CHANNEL, led_val.r);
+  // ledcWrite(GREEN_CHANNEL, led_val.g);
+  // ledcWrite(BLUE_CHANNEL, led_val.b);
+  ledcWrite(RED_PIN, led_val.r);
+  ledcWrite(GREEN_PIN, led_val.g);
+  ledcWrite(BLUE_PIN, led_val.b);
 #endif
 
 #ifdef LED_OUT_I2C

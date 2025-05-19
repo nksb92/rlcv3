@@ -11,7 +11,7 @@ fan_control::~fan_control()
 void fan_control::init_fan()
 {
   pinMode(PWM_PIN, OUTPUT);
-  analogWriteFrequency(PWM_FAN_FREQ);
+  analogWriteFrequency(PWM_PIN, PWM_FAN_FREQ);
 
   set_speed(FAN_MIN_SPEED);
 }

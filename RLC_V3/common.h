@@ -7,8 +7,10 @@
 #include "std_defines.h"
 #include "config.h"
 
-#include <menu_structure.h>
-#include <c_hsv.h>
-#include <c_rgb.h>
+#include "menu_structure.h"
+#include "settings_menu.h"
+
+#include "c_hsv.h"
+#include "c_rgb.h"
 
 #endif
