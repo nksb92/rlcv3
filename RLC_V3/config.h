@@ -1,6 +1,10 @@
 #if !defined(CONFIG_H)
 #define CONFIG_H
 
+// first digit:  increment if breaking change occures
+// last digit:   increment before each pull request for new feature or bug fix
+#define RLCV3_FIRMWARE_VERSION "1.0"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------
 //
 //                   ONLY UNCOMMENT ONE OF THE OPTIONS

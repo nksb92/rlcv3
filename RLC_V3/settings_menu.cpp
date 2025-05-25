@@ -21,7 +21,7 @@ void settings_menu::add_setting(int value)
             }
             else
             {
-                current_menu_item = LAST_SETTING - 1;
+                current_menu_item = SEGMENTS;
             }
         }
         else
@@ -32,24 +32,24 @@ void settings_menu::add_setting(int value)
             }
             else
             {
-                current_menu_item = SEGMENTS;
+                current_menu_item = LAST_SETTING - 1;
             }
         }
     }
 }
 
-void settings_menu::handle_submenu()
-{
-    switch (current_menu_item)
-    {
-    case SEGMENTS:
-        /* code */
-        break;
-    case FIRMWARE:
-        /* code */
-        break;
-
-    default:
-        break;
+void settings_menu::deeper(){
+    if (++current_deepness > VALUE_SELECTION) {
+        current_deepness = ITEM_SELECTION;
     }
+}
+
+uint8_t settings_menu::get_deepness()
+{
+    return current_deepness;
+}
+
+uint8_t settings_menu::get_item()
+{
+    return current_menu_item;
 }

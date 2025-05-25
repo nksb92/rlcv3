@@ -51,4 +51,6 @@ void show_segments(uint16_t segs);
 uint16_t output_artnet(rlc_artnet artnet_var);
 
 uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum);
+
+void rainbow_fw();
 #endif
