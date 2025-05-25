@@ -22,15 +22,17 @@ class settings_menu
 private:
     /* data */
     uint8_t current_menu_item = SEGMENTS;
-    uint8_t current_menu_ITEM_SELECTIONelection = ITEM_SELECTION;
+    uint8_t current_deepness = ITEM_SELECTION;
 
 public:
     settings_menu(/* args */);
     ~settings_menu();
 
     void add_setting(int value);
+    void deeper();
 
-    void handle_submenu();
+    uint8_t get_deepness();
+    uint8_t get_item();
 };
 
 #endif // SETTINGS_MENU_H

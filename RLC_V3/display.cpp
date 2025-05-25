@@ -1,14 +1,15 @@
+#include <stdint.h>
 #include "display.h"
 #include "bitmaps.h"
 
 uint8_t offset = 5;
 uint8_t offset_y = 26;
 uint8_t last_menu_index = BITMAP_MAIN_MENU_LEN;
-uint8_t MENU_ORDER[] = {LEFT_END_MENU, HSV_MENU, RGB_MENU, DMX_MENU, ARTNET_REC_MENU, SETTINGS_MENU, RIGHT_END_MENU};
+uint8_t MENU_ORDER[] = { LEFT_END_MENU, HSV_MENU, RGB_MENU, DMX_MENU, ARTNET_REC_MENU, SETTINGS_MENU, RIGHT_END_MENU };
 int x_scroll = 0;
 int min_x = 0;
 
-void init_display(Adafruit_SSD1306& dp) {
+void init_display(Adafruit_SSD1306 &dp) {
   dp.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
   dp.clearDisplay();
   dp.setTextSize(1);
@@ -19,7 +20,7 @@ void init_display(Adafruit_SSD1306& dp) {
   x_scroll = SCREEN_WIDTH / 3;
 }
 
-void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {
+void hsv_display_update(Adafruit_SSD1306 &dp, C_HSV out_val) {
   uint8_t hue = out_val.get_hue();
   uint8_t sat_p = out_val.get_sat_p();
   uint8_t val_p = out_val.get_val_p();
@@ -49,7 +50,7 @@ void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val) {
   dp.display();
 }
 
-void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val) {
+void rgb_display_update(Adafruit_SSD1306 &dp, C_RGB rgb_val) {
   uint8_t red = rgb_val.get_red();
   uint8_t green = rgb_val.get_green();
   uint8_t blue = rgb_val.get_blue();
@@ -79,7 +80,7 @@ void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val) {
   dp.display();
 }
 
-void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
+void dmx_display_update(Adafruit_SSD1306 &dp, rgb_dmx dmx_val) {
   uint16_t start = dmx_val.get_start();
   uint16_t used = dmx_val.get_used_nbr();
   int16_t x1, y1;
@@ -98,28 +99,68 @@ void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
                 1);
 
   // display the start and end address centered
-  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  //calc width of new string
+  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  // calc width of new string
   dp.setCursor((x - w / 2) + (128 / 2), 28);
   dp.print(buf);
   dp.display();
 }
 
-void seg_display_update(Adafruit_SSD1306& dp, segments seg) {
+void settings_display_update(Adafruit_SSD1306 &dp, segments seg, uint8_t setting_index, uint8_t current_deepness) {
   uint16_t number_seg = seg.get_num_seg();
   dp.clearDisplay();
   dp.setTextColor(WHITE);
-  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][x],
-                X_Y_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][y],
-                BITMAP_SUB_MENU_ARRAY[NMBR_SEGMENTS_PAGE],
-                W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][WIDTH],
-                W_H_MATRIX_SUB_MENU[NMBR_SEGMENTS_PAGE][HEIGHT],
+
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_COLON][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_COLON][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_COLON],
+                W_H_MATRIX_SUB_MENU[NMBR_COLON][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_COLON][HEIGHT],
                 1);
-  dp.setCursor(62, 28);
-  dp.print(number_seg);
+
+  switch (setting_index) {
+    case SEGMENTS:
+      dp.drawBitmap(X_Y_MATRIX_SETTINGS[NMBR_SEGMENTS_OPTION][x],
+                    X_Y_MATRIX_SETTINGS[NMBR_SEGMENTS_OPTION][y],
+                    BITMAP_SETTINGS_ARRAY[NMBR_SEGMENTS_OPTION],
+                    W_H_MATRIX_SETTINGS[NMBR_SEGMENTS_OPTION][WIDTH],
+                    W_H_MATRIX_SETTINGS[NMBR_SEGMENTS_OPTION][HEIGHT],
+                    1);
+      dp.setCursor(82, 15);
+      dp.print(number_seg);
+      break;
+
+    case FIRMWARE:
+      dp.drawBitmap(X_Y_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][x],
+                    X_Y_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][y],
+                    BITMAP_SETTINGS_ARRAY[NMBR_FIRMWARE_OPTION],
+                    W_H_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][WIDTH],
+                    W_H_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][HEIGHT],
+                    1);
+      dp.setCursor(82, 15);
+      dp.print(RLCV3_FIRMWARE_VERSION);
+      break;
+    default:
+      break;
+  }
+
+  switch (current_deepness) {
+    case ITEM_SELECTION:
+      draw_circle_menu_orientation(dp, LAST_SETTING, 28, setting_index);
+      break;
+    case VALUE_SELECTION:
+      dp.fillRect(81, 21, 47, 2, WHITE);
+      // draw lines around values
+      break;
+    default:
+      break;
+  }
+
+  // dp.setCursor(62, 28);
+  // dp.print(number_seg);
   dp.display();
 }
 
-void display_saved_status(Adafruit_SSD1306& dp) {
+void display_saved_status(Adafruit_SSD1306 &dp) {
   dp.setTextColor(WHITE);
   dp.clearDisplay();
   dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SAVED_SCREEN][x],
@@ -132,21 +173,24 @@ void display_saved_status(Adafruit_SSD1306& dp) {
 }
 
 // index 0-4
-void display_menu(Adafruit_SSD1306& dp, uint8_t index) {
+void display_menu(Adafruit_SSD1306 &dp, uint8_t index) {
   // entry zero is the left arrow for indicating left end of menu
   index++;
   int previos = 0;
   int next = 0;
   previos = index - 1;
-  if (previos < 0) previos = last_menu_index - 1;
+  if (previos < 0)
+    previos = last_menu_index - 1;
   next = index + 1;
-  if (next >= last_menu_index) next = 0;
+  if (next >= last_menu_index)
+    next = 0;
 
   dp.clearDisplay();
 
-  dp.drawBitmap(2, 30, BITMAP_SCROLLBAR, 123, 1, 1);
-  dp.drawBitmap(44, 2, BITMAP_MAIN_MENU_SEL, 40, 26, 1);
-  dp.drawBitmap(6 + previos * 24, 29, BITMAP_SCROLLBAR_HANDLE, 7, 3, 1);
+  draw_circle_menu_orientation(dp, MAIN_LAST, 28, index - 1);
+  // dp.drawBitmap(2, 30, BITMAP_SCROLLBAR, 123, 1, 1);
+  dp.drawBitmap(44, 1, BITMAP_MAIN_MENU_SEL, 40, 23, 1);
+  // dp.drawBitmap(6 + previos * 24, 29, BITMAP_SCROLLBAR_HANDLE, 7, 3, 1);
 
   dp.drawBitmap(X_Y_MATRIX_MAIN_MENU[MENU_ORDER[previos]][x] - 42,
                 X_Y_MATRIX_MAIN_MENU[MENU_ORDER[previos]][y],
@@ -170,7 +214,7 @@ void display_menu(Adafruit_SSD1306& dp, uint8_t index) {
   dp.display();
 }
 
-void display_artnet_rec(Adafruit_SSD1306& dp, rlc_artnet artnet_var, uint8_t menu_index) {
+void display_artnet_rec(Adafruit_SSD1306 &dp, rlc_artnet artnet_var, uint8_t menu_index) {
   uint16_t start_channel = artnet_var.get_start_channel();
   uint16_t end_channel = artnet_var.get_end_channel();
   uint16_t start_universe = artnet_var.get_start_universe();
@@ -271,7 +315,7 @@ void scroll() {
   }
 }
 
-void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
+void display_connecting_artnet(Adafruit_SSD1306 &dp, rlc_artnet artnet_var) {
   uint8_t dots = artnet_var.get_number_dots();
   int16_t x1, y1;
   uint16_t w, h;
@@ -290,9 +334,30 @@ void display_connecting_artnet(Adafruit_SSD1306& dp, rlc_artnet artnet_var) {
     buf = String(buf + ".");
   }
 
-  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  //calc width of new string
+  dp.getTextBounds(buf, x, y, &x1, &y1, &w, &h);  // calc width of new string
   dp.setCursor((x - w / 2) + (128 / 2), 28);
   dp.print(buf);
 
   dp.display();
+}
+
+void draw_circle_menu_orientation(Adafruit_SSD1306 &dp, uint8_t n, uint8_t y_position, uint8_t menu_pos) {
+  uint16_t center_position = SCREEN_WIDTH / 2;
+  uint8_t gap_size = 5;
+  uint8_t radius = 2;
+  uint8_t diameter = 2 * radius;
+  // 3 circles -> 2 gaps -> one on each side of center
+  // 4 circles -> 3 gaps -> 1,5 on each side of center
+  float number_gaps_one_side = (n - 1) / 2;
+  uint16_t start_x_pos = center_position - ((n / 2 - 0.5) * diameter + (number_gaps_one_side * gap_size)) - 1;
+
+  for (uint8_t i = 0; i < n; i++) {
+    // void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+    if (i == menu_pos) {
+      dp.fillCircle(start_x_pos, y_position, radius, WHITE);
+    } else {
+      dp.drawCircle(start_x_pos, y_position, radius, WHITE);
+    }
+    start_x_pos += diameter + gap_size;
+  }
 }

@@ -3,7 +3,7 @@
   Project:          RLC_V3
   Author:           Niko Kassubek
   Microcontroller:  SeeedStudio XIAO ESP32-C3
-  
+
 */
 
 /* ************ LIBRARY DEPENDENCIES ************ **
@@ -31,7 +31,7 @@
 #include "rlc_artnet.h"
 #include "segments.h"
 
-#ifdef PANEL
+#ifdef FAN_USAGE
 #include "fan_control.h"
 #endif
 
@@ -47,7 +47,7 @@ unsigned long last_hundret_update = 0;
 uint8_t scroll_time = 110;
 uint16_t add_dot_time = 500;
 uint16_t display_standby_time = STD_STANDBY_TIME;
-uint16_t fan_run_on_time = 0;  //every 100 ms subtracted, at zero fan turns off
+uint16_t fan_run_on_time = 0;  // every 100 ms subtracted, at zero fan turns off
 uint16_t last_rgb_sum = 0;
 
 bool artnet_data = false;
@@ -65,12 +65,13 @@ segments seg;
 rlc_artnet artnet_var;
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+settings_menu option_menu;
 
-#ifdef PANEL
+#ifdef FAN_USAGE
 fan_control fan;
 #endif
 
-void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
+void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data) {
   uint16_t current_universe = artnet_var.get_start_universe();
   if (universe == current_universe) {
     artnet_var.set_current_universe(data);
@@ -82,7 +83,7 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
 
 void setup() {
   // init fan instantly
-#ifdef PANEL
+#ifdef FAN_USAGE
   fan.init_fan();
   Serial.println("FAN INIT DONE");
 #endif
@@ -200,7 +201,8 @@ void loop() {
             break;
 
           case SETTINGS_PAGE:
-            seg_display_update(display, seg);
+            option_menu.deeper();
+            settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
             break;
         }
         break;
@@ -277,7 +279,7 @@ void loop() {
             }
             hsv_out(hsv_val);
             hsv_display_update(display, hsv_val);
-#ifdef PANEL
+#ifdef FAN_USAGE
             fan.calc_hsv_speed(hsv_val);
 #endif
             break;
@@ -299,7 +301,7 @@ void loop() {
             }
             rgb_out(rgb_val.get_rgb(), 255);
             rgb_display_update(display, rgb_val);
-#ifdef PANEL
+#ifdef FAN_USAGE
             fan.calc_rgb_speed(rgb_val.get_rgb());
 #endif
             break;
@@ -327,15 +329,34 @@ void loop() {
             break;
 
           case SETTINGS_PAGE:
-            // if encoder val is zero, don't jump into functions
-            if (encoder_val != 0) {
-              seg.add_seg(encoder_val);
+            switch (option_menu.get_deepness()) {
+              case ITEM_SELECTION:
+                option_menu.add_setting(encoder_val);
+                // show segments, even without a change
+                if (option_menu.get_item() == SEGMENTS) {
+                  show_segments(seg.get_num_seg());
+                }
+                break;
+              case VALUE_SELECTION:
+                switch (option_menu.get_item()) {
+                  case SEGMENTS:
+                    // if encoder val is zero, don't jump into functions
+                    if (encoder_val != 0) {
+                      seg.add_seg(encoder_val);
+                    }
+                    show_segments(seg.get_num_seg());
+                    dmx_val.set_number_segments(seg.get_num_seg());
+                    artnet_var.set_number_segments(seg.get_num_seg());
+                    break;
+                  case FIRMWARE:
+                    break;
+                }
+                break;
             }
-            show_segments(seg.get_num_seg());
-            dmx_val.set_number_segments(seg.get_num_seg());
-            artnet_var.set_number_segments(seg.get_num_seg());
-            seg_display_update(display, seg);
-#ifdef PANEL
+
+            settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
+
+#ifdef FAN_USAGE
             fan.evaluate_sum(128);
 #endif
             break;
@@ -350,8 +371,23 @@ void loop() {
   }
 
   if (millis() - last_hundret_update >= 100) {
-#ifdef PANEL
-    // let the fan run on for a certain time to cooldown panel
+    // animate rainbow if firmware in settings is selected
+    switch (current_deepness) {
+      case SUB_MENU:
+        switch (main_state) {
+          case SETTINGS_PAGE:
+            switch (option_menu.get_item()) {
+              case FIRMWARE:
+                rainbow_fw();
+                break;
+            }
+            break;
+        }
+        break;
+    }
+
+#ifdef FAN_USAGE
+    // let the fan run on for a certain time to cooldown FAN_USAGE
     // after that turn down to minimun speed
     if (fan_run_on_time != 0) {
       fan_run_on_time--;
@@ -398,7 +434,7 @@ void loop() {
           dmx_val.hanlde_dmx();
           if (dmx_val.get_rec_status()) {
             last_rgb_sum = set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
-#ifdef PANEL
+#ifdef FAN_USAGE
             fan.evaluate_sum(last_rgb_sum);
 #endif
             dmx_val.set_rec_status(false);
@@ -441,7 +477,7 @@ void loop() {
               artnet_var.artnet_parse();
               if (artnet_data) {
                 last_rgb_sum = output_artnet(artnet_var);
-#ifdef PANEL
+#ifdef FAN_USAGE
                 fan.evaluate_sum(last_rgb_sum);
 #endif
                 artnet_data = false;
