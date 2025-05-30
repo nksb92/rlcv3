@@ -1,3 +1,4 @@
+#include <sys/_stdint.h>
 #include <stdint.h>
 #include "display.h"
 #include "bitmaps.h"
@@ -22,8 +23,8 @@ void init_display(Adafruit_SSD1306 &dp) {
 
 void hsv_display_update(Adafruit_SSD1306 &dp, C_HSV out_val) {
   uint8_t hue = out_val.get_hue();
-  uint8_t sat_p = out_val.get_sat_p();
-  uint8_t val_p = out_val.get_val_p();
+  uint8_t sat = out_val.get_sat();
+  uint8_t val = out_val.get_val();
   uint8_t current_state = out_val.get_current();
   uint8_t spacing = 43;
 
@@ -44,9 +45,9 @@ void hsv_display_update(Adafruit_SSD1306 &dp, C_HSV out_val) {
   dp.setCursor(offset, offset_y);
   dp.print(hue);
   dp.setCursor(spacing + offset, offset_y);
-  dp.print(sat_p);
+  dp.print(sat);
   dp.setCursor(2 * spacing + offset, offset_y);
-  dp.print(val_p);
+  dp.print(val);
   dp.display();
 }
 
@@ -346,10 +347,9 @@ void draw_circle_menu_orientation(Adafruit_SSD1306 &dp, uint8_t n, uint8_t y_pos
   uint8_t gap_size = 5;
   uint8_t radius = 2;
   uint8_t diameter = 2 * radius;
-  // 3 circles -> 2 gaps -> one on each side of center
-  // 4 circles -> 3 gaps -> 1,5 on each side of center
-  float number_gaps_one_side = (n - 1) / 2;
-  uint16_t start_x_pos = center_position - ((n / 2 - 0.5) * diameter + (number_gaps_one_side * gap_size)) - 1;
+  uint16_t start_x_pos = center_position - ((n * radius) + ((float)(n / 2) * gap_size)) + 1;
+  // alternative
+  // uint16_t start_x_pos = center_position - (((diameter * n) + ((n-1)*gap_size)) / 2) + 1;
 
   for (uint8_t i = 0; i < n; i++) {
     // void drawCircle(uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);

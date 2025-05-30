@@ -57,7 +57,7 @@ bool button_long_pressed = false;
 bool long_press_triggered = false;
 bool button_double_pressed = false;
 
-C_HSV hsv_val(STD_HUE, STD_SAT_P, STD_VAL_P);
+C_HSV hsv_val(STD_HUE, STD_SAT, STD_VAL);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
 rgb_dmx dmx_val;
 menu_structure main_sw;

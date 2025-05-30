@@ -2,8 +2,8 @@
 #define STD_DEFINES_H
 
 #define STD_HUE 0
-#define STD_SAT_P 100
-#define STD_VAL_P 100
+#define STD_SAT 100
+#define STD_VAL 100
 #define STD_RED 128
 #define STD_GREEN 0
 #define STD_BLUE 128
@@ -24,4 +24,4 @@
 
 #define DATA_OUT D8
 
-#endif // STD_DEFINES_H
+#endif  // STD_DEFINES_H
