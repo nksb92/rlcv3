@@ -33,7 +33,19 @@ void C_RGB::set_red(uint8_t value)
 
 void C_RGB::add_red(int value)
 {
-    rgb_color.r += value;
+    // clamp the value to 0-255 range
+    if (rgb_color.r + value > 255)
+    {
+        rgb_color.r = 255;
+    }
+    else if (rgb_color.r + value < 0)
+    {
+        rgb_color.r = 0;
+    }
+    else
+    {
+        rgb_color.r += value;
+    }
 }
 
 uint8_t C_RGB::get_red()
@@ -48,7 +60,19 @@ void C_RGB::set_green(uint8_t value)
 
 void C_RGB::add_green(int value)
 {
-    rgb_color.g += value;
+    // clamp the value to 0-255 range
+    if (rgb_color.g + value > 255)
+    {
+        rgb_color.g = 255;
+    }
+    else if (rgb_color.g + value < 0)
+    {
+        rgb_color.g = 0;
+    }
+    else
+    {
+        rgb_color.g += value;
+    }
 }
 
 uint8_t C_RGB::get_green()
@@ -63,7 +87,19 @@ void C_RGB::set_blue(uint8_t value)
 
 void C_RGB::add_blue(int value)
 {
-    rgb_color.b += value;
+    // clamp the value to 0-255 range
+    if (rgb_color.b + value > 255)
+    {
+        rgb_color.b = 255;
+    }
+    else if (rgb_color.b + value < 0)
+    {
+        rgb_color.b = 0;
+    }
+    else
+    {
+        rgb_color.b += value;
+    }
 }
 
 uint8_t C_RGB::get_blue()
