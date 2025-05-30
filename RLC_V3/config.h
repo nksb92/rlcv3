@@ -2,14 +2,14 @@
 #define CONFIG_H
 
 // first digit:  increment if breaking change occures
-// last digit:   increment before each pull request for new feature or bug fix
+// last digit:   increment before each pull request for new feature or bug fix to main branch
 #define RLCV3_FIRMWARE_VERSION "1.0"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 //
 //                   ONLY UNCOMMENT ONE OF THE OPTIONS
 //
-#define RGB_IC_TUBE // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
+#define RGB_IC_TUBE  // Sets the mode for hardware to RGB_IC: usage with led strip like WS2815, WS2812B
 // #define RGB_TUBE // Sets the mode for hardware to RGB: usage with rgb led strip driven with mosfets
 // #define PANEL // Sets the mode for hardware to PANEL: usage with slave deveices controlled via i2c and cooling fan
 // #define SPOT // Sets the mode for hardware to SPOT: usage with a single cob rgb led and cooling fan
@@ -42,7 +42,7 @@
 #ifdef RGB_IC_TUBE
 #define NO_FAN
 #define LED_OUT_RGBIC
-#define NUM_PIXEL 20
+#define NUM_PIXEL 24
 #endif
 
 #ifdef RGB_TUBE
@@ -102,4 +102,4 @@
 #if defined(LED_OUT_MOSFET) && (!defined(RED_PIN) || !defined(GREEN_PIN) || !defined(BLUE_PIN))
 #error "With LED_OUT_MOSFET active, red, green and blue pins have to be defined."
 #endif
-#endif // CONFIG_H
+#endif  // CONFIG_H
