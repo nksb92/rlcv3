@@ -40,9 +40,22 @@ void init_led() {
 }
 
 void hsv_out(C_HSV hsv_val) {
-  uint8_t hue = hsv_val.get_hue();
-  uint8_t sat = map(hsv_val.get_sat_p(), 0, 100, 0, 255);
-  uint8_t val = map(hsv_val.get_val_p(), 0, 100, 0, 255);
+  uint8_t hue = 0;
+  uint8_t sat = 0;
+  uint8_t val = 0;
+
+  hue = hsv_val.get_hue();
+
+#if defined(PERCENTAGE)
+  sat = map(hsv_val.get_sat(), 0, 100, 0, 255);
+  val = map(hsv_val.get_val(), 0, 100, 0, 255);
+#endif
+
+#if defined(FULL_RANGE)
+  sat = hsv_val.get_sat();
+  val = hsv_val.get_val();
+#endif
+
   CHSV temp_hsv(hue, sat, val);
   CRGB temp_rgb;
   hsv2rgb_rainbow(temp_hsv, temp_rgb);
@@ -85,11 +98,11 @@ void rgb_out(CRGB led_val, uint8_t factor) {
 
 void ramp_up_hsv(C_HSV hsv_val) {
   uint16_t startup_time = 1500;
-  uint16_t temp_brightness = hsv_val.get_val_p();
+  uint16_t temp_brightness = hsv_val.get_val();
   uint16_t t_delay = startup_time / temp_brightness;
 
   for (int i = 0; i <= temp_brightness; i++) {
-    hsv_val.set_val_p(i);
+    hsv_val.set_val(i);
     hsv_out(hsv_val);
     delay(t_delay);
   }
