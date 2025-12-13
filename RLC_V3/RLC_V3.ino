@@ -23,12 +23,12 @@
 
 ** ************ LIBRARY DEPENDENCIES ************ */
 
+#include "display.h"
 #include "dmx.h"
 #include "leds.h"
-#include "rotary_encoder.h"
-#include "display.h"
 #include "nvm.h"
 #include "rlc_artnet.h"
+#include "rotary_encoder.h"
 #include "segments.h"
 
 #ifdef FAN_USAGE
@@ -37,10 +37,15 @@
 
 #include "common.h"
 
-int16_t encoder_val = 0;
-uint8_t main_state = 1;
-uint8_t artnet_state = 0;
-uint8_t current_deepness = 0;
+// --- private Function Prototypes ---
+void handle_button_click();
+void handle_long_press();
+void handle_double_press();
+void handle_encoder_change();
+void handle_periodic_tasks();
+void handle_continuous_tasks();
+
+// --- Globals: Timing ---
 unsigned long last_added_dot = 0;
 unsigned long last_scroll_time = 0;
 unsigned long last_hundret_update = 0;
@@ -48,8 +53,13 @@ uint8_t scroll_time = 110;
 uint16_t add_dot_time = 500;
 uint16_t display_standby_time = STD_STANDBY_TIME;
 uint16_t fan_run_on_time = 0;  // every 100 ms subtracted, at zero fan turns off
-uint16_t last_rgb_sum = 0;
 
+// --- Globals: State ---
+int16_t encoder_val = 0;
+uint8_t main_state = 1;
+uint8_t artnet_state = 0;
+uint8_t current_deepness = 0;
+uint16_t last_rgb_sum = 0;
 bool artnet_data = false;
 bool change_vals = true;
 bool button_pressed = false;
@@ -57,6 +67,7 @@ bool button_long_pressed = false;
 bool long_press_triggered = false;
 bool button_double_pressed = false;
 
+// --- Globals: Objects ---
 C_HSV hsv_val(STD_HUE, STD_SAT, STD_VAL);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
 rgb_dmx dmx_val;
@@ -71,7 +82,7 @@ settings_menu option_menu;
 fan_control fan;
 #endif
 
-void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data) {
+void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
   uint16_t current_universe = artnet_var.get_start_universe();
   if (universe == current_universe) {
     artnet_var.set_current_universe(data);
@@ -174,252 +185,112 @@ void loop() {
   }
 
   if (button_pressed) {
-    switch (current_deepness) {
-      case MAIN_MENU:
-        display_menu(display, main_state);
-        break;
-
-      case SUB_MENU:
-        switch (main_sw.get_current()) {
-          case HSV_PAGE:
-            hsv_val.next();
-            hsv_display_update(display, hsv_val);
-            break;
-
-          case RGB_PAGE:
-            rgb_val.next();
-            rgb_display_update(display, rgb_val);
-            break;
-
-          case DMX_PAGE:
-            dmx_display_update(display, dmx_val);
-            break;
-
-          case ARTNET_REC:
-            artnet_var.next_selection();
-            display_artnet_rec(display, artnet_var, main_state);
-            break;
-
-          case SETTINGS_PAGE:
-            option_menu.deeper();
-            settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
-            break;
-        }
-        break;
-    }
-    set_press_state(false);
+    handle_button_click();
   }
 
   if (button_long_pressed) {
-    main_sw.deeper();
-    current_deepness = main_sw.get_deepness();
-    switch (current_deepness) {
-      case MAIN_MENU:
-        fan_run_on_time = STD_FAN_RUN_ON_TIME;
-        switch (artnet_state) {
-          case CONNECTING:
-            artnet_var.set_current_fsm(MENU);
-          case ARTNET_PAGE:
-            artnet_var.stop_artnet();
-            artnet_var.set_current_fsm(MENU);
-            artnet_state = artnet_var.get_current_fsm();
-            break;
-        }
-        break;
+    handle_long_press();
+  }
 
-      case SUB_MENU:
-        fan_run_on_time = 0;
-        switch (main_state) {
-          case ARTNET_REC:
-            switch (artnet_state) {
-              case MENU:
-                artnet_var.connect_wifi();
-                artnet_var.set_current_fsm(CONNECTING);
-                display_artnet_rec(display, artnet_var, main_state);
-                artnet_state = artnet_var.get_current_fsm();
-                last_added_dot = millis();
-                break;
-            }
-            break;
-        }
-        break;
-    }
-    set_event_status(true);
-    button_long_pressed = false;
+  if (button_double_pressed) {
+    handle_double_press();
   }
 
   // handle everything on event
   if (change_vals) {
-    switch (current_deepness) {
-      case MAIN_MENU:
-        if (encoder_val != 0) {
-          main_sw.add_current(encoder_val);
-          main_state = main_sw.get_current();
-        }
-        display_menu(display, main_state);
-        rgb_out(rgb_val.get_rgb(), 0);
-        break;
-
-      case SUB_MENU:
-        switch (main_state) {
-          case HSV_PAGE:
-            // if encoder val is zero, don't jump into functions
-            if (encoder_val != 0) {
-              switch (hsv_val.get_current()) {
-                case HUE:
-                  hsv_val.add_hue(encoder_val);
-                  break;
-                case SAT:
-                  hsv_val.add_sat(encoder_val);
-                  break;
-                case VAL:
-                  hsv_val.add_val(encoder_val);
-                  break;
-              }
-            }
-            hsv_out(hsv_val);
-            hsv_display_update(display, hsv_val);
-#ifdef FAN_USAGE
-            fan.calc_hsv_speed(hsv_val);
-#endif
-            break;
-
-          case RGB_PAGE:
-            // if encoder val is zero, don't jump into functions
-            if (encoder_val != 0) {
-              switch (rgb_val.get_current()) {
-                case RED:
-                  rgb_val.add_red(encoder_val);
-                  break;
-                case GREEN:
-                  rgb_val.add_green(encoder_val);
-                  break;
-                case BLUE:
-                  rgb_val.add_blue(encoder_val);
-                  break;
-              }
-            }
-            rgb_out(rgb_val.get_rgb(), 255);
-            rgb_display_update(display, rgb_val);
-#ifdef FAN_USAGE
-            fan.calc_rgb_speed(rgb_val.get_rgb());
-#endif
-            break;
-
-          case DMX_PAGE:
-            // if encoder val is zero, don't jump into functions
-            if (encoder_val != 0) {
-              dmx_val.add_to_adress(encoder_val);
-            }
-            dmx_display_update(display, dmx_val);
-            break;
-
-          case ARTNET_REC:
-            if (encoder_val != 0) {
-              switch (artnet_var.get_current_sel()) {
-                case UNIVERSE:
-                  artnet_var.add_universe(encoder_val);
-                  break;
-                case CHANNEL:
-                  artnet_var.add_channel(encoder_val);
-                  break;
-              }
-              display_artnet_rec(display, artnet_var, main_state);
-            }
-            break;
-
-          case SETTINGS_PAGE:
-            switch (option_menu.get_deepness()) {
-              case ITEM_SELECTION:
-                option_menu.add_setting(encoder_val);
-                // show segments, even without a change
-                if (option_menu.get_item() == SEGMENTS) {
-                  show_segments(seg.get_num_seg());
-                }
-                break;
-              case VALUE_SELECTION:
-                switch (option_menu.get_item()) {
-                  case SEGMENTS:
-                    // if encoder val is zero, don't jump into functions
-                    if (encoder_val != 0) {
-                      seg.add_seg(encoder_val);
-                    }
-                    show_segments(seg.get_num_seg());
-                    dmx_val.set_number_segments(seg.get_num_seg());
-                    artnet_var.set_number_segments(seg.get_num_seg());
-                    break;
-                  case FIRMWARE:
-                    break;
-                }
-                break;
-            }
-
-            settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
-
-#ifdef FAN_USAGE
-            fan.evaluate_sum(128);
-#endif
-            break;
-        }
-        break;
-    }
-    change_vals = false;
-    encoder_val = 0;
-    set_dspl_standby(false);
-    display_standby_time = STD_STANDBY_TIME;
-    set_event_status(change_vals);
+    handle_encoder_change();
   }
 
   if (millis() - last_hundret_update >= 100) {
-    // animate rainbow if firmware in settings is selected
-    switch (current_deepness) {
-      case SUB_MENU:
-        switch (main_state) {
-          case SETTINGS_PAGE:
-            switch (option_menu.get_item()) {
-              case FIRMWARE:
-                rainbow_fw();
-                break;
-            }
-            break;
-        }
-        break;
-    }
-
-#ifdef FAN_USAGE
-    // let the fan run on for a certain time to cooldown FAN_USAGE
-    // after that turn down to minimun speed
-    if (fan_run_on_time != 0) {
-      fan_run_on_time--;
-      if (fan_run_on_time == 0) {
-        fan.set_target_speed(MIN_SPEED);
-      }
-    }
-
-    // check to update fan speed every 100 ms
-    fan.update();
-
-#endif
-    // no action for 30 secs will set the display in standby mode
-    if (!get_standby_status()) {
-      display_standby_time--;
-      if (display_standby_time == 0) {
-        set_dspl_standby(true);
-        display.clearDisplay();
-        display.display();
-      }
-    }
-
-    last_hundret_update = millis();
+    handle_periodic_tasks();
   }
 
-  // hanlde everthing periodically
+  handle_continuous_tasks();
+}
+
+void handle_button_click() {
+  switch (current_deepness) {
+    case MAIN_MENU:
+      display_menu(display, main_state);
+      break;
+
+    case SUB_MENU:
+      switch (main_sw.get_current()) {
+        case HSV_PAGE:
+          hsv_val.next();
+          hsv_display_update(display, hsv_val);
+          break;
+
+        case RGB_PAGE:
+          rgb_val.next();
+          rgb_display_update(display, rgb_val);
+          break;
+
+        case DMX_PAGE:
+          dmx_display_update(display, dmx_val);
+          break;
+
+        case ARTNET_REC:
+          artnet_var.next_selection();
+          display_artnet_rec(display, artnet_var, main_state);
+          break;
+
+        case SETTINGS_PAGE:
+          option_menu.deeper();
+          settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
+          break;
+      }
+      break;
+  }
+  set_press_state(false);
+}
+
+void handle_long_press() {
+  main_sw.deeper();
+  current_deepness = main_sw.get_deepness();
+  switch (current_deepness) {
+    case MAIN_MENU:
+      fan_run_on_time = STD_FAN_RUN_ON_TIME;
+      switch (artnet_state) {
+        case CONNECTING:
+          artnet_var.set_current_fsm(MENU);
+        case ARTNET_PAGE:
+          artnet_var.stop_artnet();
+          artnet_var.set_current_fsm(MENU);
+          artnet_state = artnet_var.get_current_fsm();
+          break;
+      }
+      break;
+
+    case SUB_MENU:
+      fan_run_on_time = 0;
+      switch (main_state) {
+        case ARTNET_REC:
+          switch (artnet_state) {
+            case MENU:
+              artnet_var.connect_wifi();
+              artnet_var.set_current_fsm(CONNECTING);
+              display_artnet_rec(display, artnet_var, main_state);
+              artnet_state = artnet_var.get_current_fsm();
+              last_added_dot = millis();
+              break;
+          }
+          break;
+      }
+      break;
+  }
+  set_event_status(true);
+  button_long_pressed = false;
+}
+
+void handle_double_press() {
   switch (current_deepness) {
     case MAIN_MENU:
       if (button_double_pressed) {
         set_double_press(false);
       }
       break;
+
     case SUB_MENU:
       // save variables to EEPROM
       if (button_double_pressed) {
@@ -428,37 +299,212 @@ void loop() {
         display_saved_status(display);
         set_saved_screen(true);
       }
+      set_double_press(false);
+      break;
 
+    default:
+      break;
+  }
+}
+
+void handle_encoder_change() {
+  switch (current_deepness) {
+    case MAIN_MENU:
+      if (encoder_val != 0) {
+        main_sw.add_current(encoder_val);
+        main_state = main_sw.get_current();
+      }
+      display_menu(display, main_state);
+      rgb_out(rgb_val.get_rgb(), 0);
+      break;
+
+    case SUB_MENU:
       switch (main_state) {
-        case DMX_PAGE:
-          dmx_val.hanlde_dmx();
-          if (dmx_val.get_rec_status()) {
-            last_rgb_sum = set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
-#ifdef FAN_USAGE
-            fan.evaluate_sum(last_rgb_sum);
-#endif
-            dmx_val.set_rec_status(false);
+        case HSV_PAGE:
+          // if encoder val is zero, don't jump into functions
+          if (encoder_val != 0) {
+            switch (hsv_val.get_current()) {
+              case HUE:
+                hsv_val.add_hue(encoder_val);
+                break;
+              case SAT:
+                hsv_val.add_sat(encoder_val);
+                break;
+              case VAL:
+                hsv_val.add_val(encoder_val);
+                break;
+            }
           }
+          hsv_out(hsv_val);
+          hsv_display_update(display, hsv_val);
+#ifdef FAN_USAGE
+          fan.calc_hsv_speed(hsv_val);
+#endif
+          break;
+
+        case RGB_PAGE:
+          // if encoder val is zero, don't jump into functions
+          if (encoder_val != 0) {
+            switch (rgb_val.get_current()) {
+              case RED:
+                rgb_val.add_red(encoder_val);
+                break;
+              case GREEN:
+                rgb_val.add_green(encoder_val);
+                break;
+              case BLUE:
+                rgb_val.add_blue(encoder_val);
+                break;
+            }
+          }
+          rgb_out(rgb_val.get_rgb(), 255);
+          rgb_display_update(display, rgb_val);
+#ifdef FAN_USAGE
+          fan.calc_rgb_speed(rgb_val.get_rgb());
+#endif
+          break;
+
+        case DMX_PAGE:
+          // if encoder val is zero, don't jump into functions
+          if (encoder_val != 0) {
+            dmx_val.add_to_adress(encoder_val);
+          }
+          dmx_display_update(display, dmx_val);
           break;
 
         case ARTNET_REC:
-          if (artnet_var.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
-            if (millis() - last_scroll_time >= scroll_time) {
+          if (encoder_val != 0) {
+            switch (artnet_var.get_current_sel()) {
+              case UNIVERSE:
+                artnet_var.add_universe(encoder_val);
+                break;
+              case CHANNEL:
+                artnet_var.add_channel(encoder_val);
+                break;
+            }
+            display_artnet_rec(display, artnet_var, main_state);
+          }
+          break;
+
+        case SETTINGS_PAGE:
+          switch (option_menu.get_deepness()) {
+            case ITEM_SELECTION:
+              option_menu.add_setting(encoder_val);
+              // show segments, even without a change
+              if (option_menu.get_item() == SEGMENTS) {
+                show_segments(seg.get_num_seg());
+              }
+              break;
+            case VALUE_SELECTION:
+              switch (option_menu.get_item()) {
+                case SEGMENTS:
+                  // if encoder val is zero, don't jump into functions
+                  if (encoder_val != 0) {
+                    seg.add_seg(encoder_val);
+                  }
+                  show_segments(seg.get_num_seg());
+                  dmx_val.set_number_segments(seg.get_num_seg());
+                  artnet_var.set_number_segments(seg.get_num_seg());
+                  break;
+                case FIRMWARE:
+                  break;
+              }
+              break;
+          }
+
+          settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
+
+#ifdef FAN_USAGE
+          fan.evaluate_sum(128);
+#endif
+          break;
+      }
+      break;
+  }
+  change_vals = false;
+  encoder_val = 0;
+  set_dspl_standby(false);
+  display_standby_time = STD_STANDBY_TIME;
+  set_event_status(change_vals);
+}
+
+void handle_periodic_tasks() {
+  // animate rainbow if firmware in settings is selected
+  switch (current_deepness) {
+    case SUB_MENU:
+      switch (main_state) {
+        case SETTINGS_PAGE:
+          switch (option_menu.get_item()) {
+            case FIRMWARE:
+              rainbow_fw();
+              break;
+          }
+          break;
+      }
+      break;
+  }
+
+#ifdef FAN_USAGE
+  // let the fan run on for a certain time to cooldown FAN_USAGE
+  // after that turn down to minimun speed
+  if (fan_run_on_time != 0) {
+    fan_run_on_time--;
+    if (fan_run_on_time == 0) {
+      fan.set_target_speed(FAN_MIN_SPEED);
+    }
+  }
+
+  // check to update fan speed every 100 ms
+  fan.update();
+
+#endif
+  // no action for 30 secs will set the display in standby mode
+  if (!get_standby_status()) {
+    display_standby_time--;
+    if (display_standby_time == 0) {
+      set_dspl_standby(true);
+      display.clearDisplay();
+      display.display();
+    }
+  }
+
+  last_hundret_update = millis();
+}
+
+void handle_continuous_tasks() {
+  if (SUB_MENU == current_deepness) {
+    switch (main_state) {
+      case DMX_PAGE:
+        dmx_val.handle_dmx();
+        if (dmx_val.get_rec_status()) {
+          last_rgb_sum = set_pixel(dmx_val.get_start(), dmx_val.get_dimmer_address(), seg.get_num_seg(), dmx_val.get_universe());
+#ifdef FAN_USAGE
+          fan.evaluate_sum(last_rgb_sum);
+#endif
+          dmx_val.set_rec_status(false);
+        }
+        break;
+
+      case ARTNET_REC:
+        if (artnet_var.get_current_sel() == IP_ADDRESS && !get_standby_status()) {
+          if (millis() - last_scroll_time >= scroll_time) {
+            if (!get_saved_screen_state()) {
               scroll();
               display_artnet_rec(display, artnet_var, main_state);
-              last_scroll_time = millis();
             }
+            last_scroll_time = millis();
           }
-          // on connection loss, jump to connecting state
-          switch (artnet_state) {
-            case CONNECTING:
-              if (!get_standby_status()) {
-                if (millis() - last_added_dot >= add_dot_time) {
-                  // display_connecting_artnet(display, artnet_var);
-                  display_artnet_rec(display, artnet_var, main_state);
-                  artnet_var.add_dot();
-                  last_added_dot = millis();
-                }
+        }
+        // on connection loss, jump to connecting state
+        switch (artnet_state) {
+          case CONNECTING:
+            if (!get_standby_status() && !get_saved_screen_state()) {
+              if (millis() - last_added_dot >= add_dot_time) {
+                // display_connecting_artnet(display, artnet_var);
+                display_artnet_rec(display, artnet_var, main_state);
+                artnet_var.add_dot();
+
+                last_added_dot = millis();
               }
               if (artnet_var.get_wifi_status()) {
                 artnet_var.set_current_fsm(ARTNET_PAGE);
@@ -466,27 +512,27 @@ void loop() {
                 display_artnet_rec(display, artnet_var, main_state);
                 artnet_var.begin_artnet();
               }
-              break;
+            }
+            break;
 
-            case ARTNET_PAGE:
-              // check connection is still available
-              if (!artnet_var.get_wifi_status()) {
-                artnet_var.set_current_fsm(CONNECTING);
-              }
+          case ARTNET_PAGE:
+            // check connection is still available
+            if (!artnet_var.get_wifi_status()) {
+              artnet_var.set_current_fsm(CONNECTING);
+            }
 
-              artnet_var.artnet_parse();
-              if (artnet_data) {
-                last_rgb_sum = output_artnet(artnet_var);
+            artnet_var.artnet_parse();
+            if (artnet_data) {
+              last_rgb_sum = output_artnet(artnet_var);
 #ifdef FAN_USAGE
-                fan.evaluate_sum(last_rgb_sum);
+              fan.evaluate_sum(last_rgb_sum);
 #endif
-                artnet_data = false;
-              }
+              artnet_data = false;
+            }
 
-              break;
-          }
-          break;
-      }
-      break;
+            break;
+        }
+        break;
+    }
   }
 }
