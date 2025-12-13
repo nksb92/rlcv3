@@ -1,10 +1,10 @@
 #include "leds.h"
 
-CRGB red_segment(128, 0, 0);
-CRGB blue_segment(0, 0, 128);
+CRGB red_segment(255, 0, 0);
+CRGB blue_segment(0, 0, 200);
 
 // rainbow variables
-CHSV hsv_value(0, 255, 128);
+CHSV hsv_value(0, 255, 255);
 CHSV temp_val(0, 0, 0);
 CRGB rgb_rainbow;
 
@@ -119,7 +119,7 @@ void ramp_up_rgb(CRGB rgb_val) {
   }
 }
 
-uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t *data) {
+uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
   uint16_t data_index = 1;
   uint16_t led_index = 0;
   uint16_t sum = 0;
@@ -183,8 +183,8 @@ uint16_t output_artnet(rlc_artnet artnet_var) {
   uint16_t data_index = 1;
   uint16_t led_index = 0;
   uint16_t sum = 0;
-  uint8_t *current_universe = artnet_var.get_current_data();
-  uint8_t *next_universe = artnet_var.get_next_data();
+  uint8_t* current_universe = artnet_var.get_current_data();
+  uint8_t* next_universe = artnet_var.get_next_data();
   uint8_t dimmer_factor = current_universe[end];
   CRGB color(0, 0, 0);
 
@@ -207,8 +207,7 @@ uint16_t output_artnet(rlc_artnet artnet_var) {
   return sum;
 }
 
-uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB &color, uint16_t &data_index, uint16_t &led_index, uint8_t *data, uint16_t sum = 0) {
-
+uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum = 0) {
   uint8_t remainder = 0;
   uint16_t temp_sum = 0;
   for (int i = start_index; i < end_index; i++) {
@@ -224,7 +223,6 @@ uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_f
         color.b = data[i];
         color.nscale8_video(dimmer_factor);
         for (int j = 0; j < pixel_per_section; j++) {
-
           temp_sum += color.r + color.g + color.b;
 
           if (temp_sum > sum) {
@@ -254,8 +252,23 @@ void rainbow_fw() {
   temp_val = hsv_value;
   for (int i = 0; i < NUM_PIXEL; i++) {
     hsv2rgb_rainbow(temp_val, rgb_rainbow);
+
+#ifdef LED_OUT_RGBIC
     pixels.setPixelColor(i, pixels.Color(rgb_rainbow.r, rgb_rainbow.g, rgb_rainbow.b));
+#endif
+
+#ifdef LED_OUT_MOSFET
+    rgb_out(rgb_rainbow, 255);
+#endif
+
+#ifdef LED_OUT_I2C
+    send_data_i2c(rgb_rainbow, SLAVE_ADR_STRT + i);
+#endif
+
     temp_val.hue += 5;
   }
+
+#ifdef LED_OUT_RGBIC
   pixels.show();
+#endif
 }
