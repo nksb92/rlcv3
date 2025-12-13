@@ -18,6 +18,11 @@
 #define OLED_RESET -1
 #define SCREEN_ADDRESS 0x3C
 
+#define ROTATION_0 0
+#define ROTATION_90 1
+#define ROTATION_180 2
+#define ROTATION_270 3
+
 /**
  * Initializes the OLED display with the specified parameters.
  *

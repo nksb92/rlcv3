@@ -12,6 +12,7 @@ int min_x = 0;
 
 void init_display(Adafruit_SSD1306 &dp) {
   dp.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
+  dp.setRotation(ROTATION_180);
   dp.clearDisplay();
   dp.setTextSize(1);
   dp.setTextColor(WHITE);
