@@ -1,11 +1,14 @@
 #include "dmx.h"
 
+#include "soc/system_struct.h"
+#include "soc/uart_struct.h"
+#include "hal/uart_ll.h"
 /*
 Pins for the communication with the RS-485 IC
-@param TRANSMIT_PIN: pin for sending data
-@param RECEIVE_PIN: pin for receiving data
-@param ENABLE_PIN: pin to pull RS-485 IC high or low; high for sending data, low
-for receiving data
+@param TRANSMIT_PIN: pin for sending dmx_data
+@param RECEIVE_PIN: pin for receiving dmx_data
+@param ENABLE_PIN: pin to pull RS-485 IC high or low; high for sending dmx_data, low
+for receiving dmx_data
 */
 #define TRANSMIT_PIN D6
 #define RECEIVE_PIN D7
@@ -25,10 +28,37 @@ void rgb_dmx::install_dmx() {
 }
 
 void rgb_dmx::reset() {
-  dmx_driver_delete(dmxPort);
-  install_dmx();
-  memset(data, 0, UNIVERSE_SIZE);
+  dmx_driver_disable(dmxPort);
+
+  uart_dev_t* hw = (dmxPort == 1) ? &UART1 : &UART0;
+
+  // Reset FIFOs
+  hw->conf0.txfifo_rst = 1;
+  hw->conf0.txfifo_rst = 0;
+  hw->conf0.rxfifo_rst = 1;
+  hw->conf0.rxfifo_rst = 0;
+
+  // Clear Interrupt Flags
+  hw->int_clr.val = 0xFFFFFFFF;
+
+  memset(dmx_data, 0, UNIVERSE_SIZE);
+
+  dmx_driver_enable(dmxPort);
+
   data_received = false;
+  delay(10);
+}
+
+void rgb_dmx::disable() {
+  if (dmx_driver_is_enabled(dmxPort)) {
+    dmx_driver_disable(dmxPort);
+  }
+}
+
+void rgb_dmx::enable() {
+  if (!dmx_driver_is_enabled(dmxPort)) {
+    dmx_driver_enable(dmxPort);
+  }
 }
 
 uint16_t rgb_dmx::get_start() {
@@ -71,9 +101,13 @@ void rgb_dmx::handle_dmx() {
       // handle error cases
       switch (packet.err) {
         case DMX_ERR_UART_OVERFLOW:
-        case DMX_ERR_IMPROPER_SLOT:
-          reset();
+          reset();  // Overflow needs a reset to clear buffer
           break;
+
+        case DMX_ERR_IMPROPER_SLOT:
+          // Do nothing! Let the driver re-sync on the next frame.
+          break;
+
         default:
           break;
       }
@@ -90,7 +124,7 @@ uint16_t rgb_dmx::get_dimmer_address() {
 }
 
 uint8_t* rgb_dmx::get_universe() {
-  return data;
+  return dmx_data;
 }
 
 void rgb_dmx::set_rec_status(bool status) {
@@ -105,10 +139,10 @@ void rgb_dmx::set_number_segments(uint16_t num_segs) {
 }
 
 void rgb_dmx::set_universe(uint8_t* _data) {
-  memcpy(data, _data, UNIVERSE_SIZE);
+  memcpy(dmx_data, _data, UNIVERSE_SIZE);
 }
 
 void rgb_dmx::send_universe() {
-  dmx_write(dmxPort, data, UNIVERSE_SIZE);
+  dmx_write(dmxPort, dmx_data, UNIVERSE_SIZE);
   dmx_send(dmxPort);
 }

@@ -6,8 +6,6 @@
 
 #include "common.h"
 
-#define ERROR_LIMIT_BEFORE_RESET 10
-
 // class to handle dmx messages
 class rgb_dmx {
   volatile uint16_t start_address = STD_START_ADDRESS;  // The current start address
@@ -18,7 +16,7 @@ class rgb_dmx {
   bool data_received = false;
   dmx_port_t dmxPort = 0;  // Dmx port for the esp_dmx libarary
   dmx_config_t config = DMX_CONFIG_DEFAULT;
-  uint8_t data[UNIVERSE_SIZE] = {};  // Array to receive the dmx data in
+  uint8_t dmx_data[UNIVERSE_SIZE] = {};  // Array to receive the dmx data in
 
  public:
   /**
@@ -38,6 +36,16 @@ class rgb_dmx {
    * Initializes the DMX driver afterwards.
    */
   void reset();
+
+  /**
+   * Disables the DMX driver.
+   */
+  void disable();
+
+  /**
+   * Enables the DMX driver.
+   */
+  void enable();
 
   /**
    * Gets the start address of the DMX data.

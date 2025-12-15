@@ -11,7 +11,7 @@
   Make sure, to have these library versions installed,
   otherwise it may break this code!
 
-  esp core:             version 3.20.0
+  esp core:             version 3.30.3
 
   Adafruit GFX Library: version 1.12.1
   Adafruit NeoPixel:    version 1.13.0
@@ -96,30 +96,41 @@ void setup() {
   // init fan instantly
 #ifdef FAN_USAGE
   fan.init_fan();
-  Serial.println("FAN INIT DONE");
+  DEBUG_PRINTLN("FAN INIT DONE");
 #endif
 
   delay(2000);
-  Serial.begin(115200);
-  Serial.println("Startup");
 
+#ifdef DEBUGGING_ENABLED
+  Serial.begin(115200);
+#endif
+
+  DEBUG_PRINTLN("Startup");
   // init all classes and functions
+
   main_sw.init();
-  Serial.println("MAIN INIT DONE");
+  DEBUG_PRINTLN("MAIN INIT DONE");
+
   init_eeprom();
-  Serial.println("EEPROM INIT DONE");
+  DEBUG_PRINTLN("EEPROM INIT DONE");
+
   init_display(display);
-  Serial.println("DISPLAY INIT DONE");
+  DEBUG_PRINTLN("DISPLAY INIT DONE");
+
   init_led();
-  Serial.println("LED INIT DONE");
+  DEBUG_PRINTLN("LED INIT DONE");
+
   init_encoder(enc_button);
-  Serial.println("ENCODER INIT DONE");
+  DEBUG_PRINTLN("ENCODER INIT DONE");
+
   dmx_val.install_dmx();
-  Serial.println("DMX INIT DONE");
+  DEBUG_PRINTLN("DMX INIT DONE");
+
   seg.init_segments();
-  Serial.println("SEGMENT INIT DONE");
+  DEBUG_PRINTLN("SEGMENT INIT DONE");
+
   artnet_var.init(on_artnet_frame);
-  Serial.println("ARTNET INIT DONE");
+  DEBUG_PRINTLN("ARTNET INIT DONE");
 
   // read non volatile memory and set variables accordingly
   read_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
@@ -152,7 +163,7 @@ void setup() {
       break;
   }
 
-  Serial.println("Startup complete.");
+  DEBUG_PRINTLN("Startup complete.");
   set_event_status(true);
 }
 
@@ -250,10 +261,10 @@ void handle_long_press() {
   current_deepness = main_sw.get_deepness();
   switch (current_deepness) {
     case MAIN_MENU:
+      dmx_val.disable();
       fan_run_on_time = STD_FAN_RUN_ON_TIME;
       switch (artnet_state) {
         case CONNECTING:
-          artnet_var.set_current_fsm(MENU);
         case ARTNET_PAGE:
           artnet_var.stop_artnet();
           artnet_var.set_current_fsm(MENU);
@@ -275,6 +286,10 @@ void handle_long_press() {
               last_added_dot = millis();
               break;
           }
+          break;
+        case DMX_PAGE:
+          dmx_val.enable();
+          dmx_val.reset();
           break;
       }
       break;
