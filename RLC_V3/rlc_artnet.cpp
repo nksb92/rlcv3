@@ -17,6 +17,7 @@ void rlc_artnet::init(void (*fptr)(uint16_t universe, uint16_t length, uint8_t s
   artnet.setArtDmxCallback(fptr);
   add_universe(0);
   add_channel(0);
+  stop_artnet();
 }
 
 void rlc_artnet::begin_artnet() {
@@ -30,8 +31,8 @@ void rlc_artnet::stop_artnet() {
   // https://github.com/rstephan/ArtnetWifi/blob/master/src/ArtnetWifi.cpp
   // artnet.stop();
 
-  // disabling the wifi also stops artnet due to no wifi connection ^^
   disconnect_wifi();
+  WiFi.mode(WIFI_OFF);
 }
 
 void rlc_artnet::connect_wifi() {
