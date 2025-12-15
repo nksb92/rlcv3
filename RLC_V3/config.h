@@ -3,7 +3,21 @@
 
 // first digit:  increment if breaking change occures
 // last digit:   increment before each pull request for new feature or bug fix to main branch
-#define RLCV3_FIRMWARE_VERSION "1.0"
+#define RLCV3_FIRMWARE_VERSION "1.1"
+
+// Comment out this line to disable all debug output
+// #define DEBUGGING_ENABLED
+
+#ifdef DEBUGGING_ENABLED
+#define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
+#define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
+#define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+#else
+// If disabled, these macros are replaced with nothing
+#define DEBUG_PRINT(...)
+#define DEBUG_PRINTLN(...)
+#define DEBUG_PRINTF(...)
+#endif
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -60,7 +74,7 @@
 #define FAN_USAGE
 #define PWM_PIN D8
 #define FAN_MAX_SPEED 225
-#define FAN_MIN_SPEED 50
+#define FAN_MIN_SPEED 60
 #define FAN_ZERO_RPM false
 
 #define NUM_PIXEL 5
