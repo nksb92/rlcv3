@@ -18,7 +18,7 @@ void segments::calc_segments() {
     }
   }
 
-  uint16_t *possible_segments = new uint16_t(inc);
+  uint16_t* possible_segments = new uint16_t(inc);
   last_segment = inc;
 }
 
@@ -30,9 +30,8 @@ uint8_t segments::get_current_seg() {
   return current_segment;
 }
 
-void segments::set_current_segment(uint8_t _current)
-{
-  current_segment =_current;
+void segments::set_current_segment(uint8_t _current) {
+  current_segment = _current;
   add_seg(0);
 }
 
@@ -41,9 +40,6 @@ void segments::set_segments(uint8_t pos) {
 }
 
 void segments::add_seg(int value) {
-  // Serial.print(current_segment);
-  // Serial.print("; ");
-  // Serial.println(value);
   if (value != 0) {
     if (value < 0) {
       if (current_segment - 1 >= 0) {
@@ -59,8 +55,6 @@ void segments::add_seg(int value) {
       }
     }
   }
-  // Serial.print(current_segment);
-  // Serial.print(";");
-  // Serial.println(possible_segments[current_segment]);
+
   set_segments(current_segment);
 }

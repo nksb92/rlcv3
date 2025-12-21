@@ -4,16 +4,15 @@
 #include "common.h"
 
 class segments {
-private:
+ private:
   uint16_t number_segments = 0;
   uint8_t current_segment = 0;
   uint16_t last_segment = 0;
   uint16_t possible_segments[NUM_PIXEL];
 
   void calc_segments();
-  
 
-public:
+ public:
   segments();
   void init_segments();
   uint16_t get_num_seg();

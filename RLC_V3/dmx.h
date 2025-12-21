@@ -128,3 +128,5 @@ class rgb_dmx {
   void send_universe();
 };
 #endif
+
+extern rgb_dmx dmx_val;

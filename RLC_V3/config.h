@@ -6,7 +6,7 @@
 #define RLCV3_FIRMWARE_VERSION "1.1"
 
 // Comment out this line to disable all debug output
-// #define DEBUGGING_ENABLED
+#define DEBUGGING_ENABLED
 
 #ifdef DEBUGGING_ENABLED
 #define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
