@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "display.h"
 #include "bitmaps.h"
+#include "display_manager.h"
 
 uint8_t offset = 5;
 uint8_t offset_y = 26;
