@@ -181,7 +181,7 @@ void display_saved_status(Adafruit_SSD1306& dp) {
 void display_startup(Adafruit_SSD1306& dp) {
   int16_t x1, y1;
   uint16_t w, h;
-  String buf = String("RLV3");
+  String buf = String("RLCV3");
   dp.setTextColor(WHITE);
   dp.clearDisplay();
   dp.getTextBounds(buf, 0, 0, &x1, &y1, &w, &h);  // calc width of new string

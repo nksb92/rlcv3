@@ -8,9 +8,6 @@
 #include "common.h"
 #include "segments.h"
 
-#define RED_PIN 10
-#define GREEN_PIN 9
-#define BLUE_PIN 8
 #define RED_CHANNEL 0
 #define GREEN_CHANNEL 1
 #define BLUE_CHANNEL 2

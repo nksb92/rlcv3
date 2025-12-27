@@ -114,6 +114,7 @@ void process_event(const event_t* event) {
                 artnet_var.connect_wifi();
                 artnet_var.set_current_fsm(CONNECTING);
                 TimerManager.start(TIMER_CONNECTING_DOTS);
+                TimerManager.start(TIMER_SCROLL_TEXT);
               }
               break;
             case SETTINGS_PAGE:
