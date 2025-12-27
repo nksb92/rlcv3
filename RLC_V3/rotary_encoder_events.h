@@ -3,6 +3,7 @@
 
 // https://github.com/Stutchbury/EncoderButton Encoder Libary
 #include <EncoderButton.h>
+
 #include "event_manager.h"
 
 // The pin number for the switch pin of the rotary encoder

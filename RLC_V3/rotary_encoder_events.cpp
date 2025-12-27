@@ -1,7 +1,7 @@
 #include "rotary_encoder_events.h"
 
-#include "std_defines.h"
 #include "display_manager.h"
+#include "std_defines.h"
 
 EncoderButton enc_button(DT_PIN, CLK_PIN, SW_PIN);
 

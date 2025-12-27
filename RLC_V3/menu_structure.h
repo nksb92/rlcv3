@@ -11,7 +11,7 @@ enum {
   DMX_PAGE,
   ARTNET_PAGE,
   SETTINGS_PAGE,
-  MAIN_LAST
+  MENU_LAST_PAGE
 };
 
 enum {
@@ -24,7 +24,7 @@ class menu_structure {
  private:
   uint8_t current = HSV_PAGE;
   uint8_t deepness = MAIN_MENU;
-  uint8_t last_menu = MAIN_LAST;
+  uint8_t last_menu = MENU_LAST_PAGE;
 
  public:
   menu_structure(/* args */);
