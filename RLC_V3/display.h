@@ -24,6 +24,9 @@
 #define ROTATION_180 2
 #define ROTATION_270 3
 
+#define FRAME_DELAY 20
+#define STARTUP_TIME 1500
+
 /**
  * Initializes the OLED display with the specified parameters.
  *
