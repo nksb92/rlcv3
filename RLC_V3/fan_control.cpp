@@ -1,5 +1,8 @@
 #include "fan_control.h"
 
+#define STEP_UP 5    // Ramp Up Time:   255 * 150 ms / 5 = 7,65 s
+#define STEP_DOWN 1  // Ramp Down Time: 255 * 150 ms / 1 = 38,25 s
+
 fan_control::fan_control() {
 }
 
@@ -34,12 +37,20 @@ void fan_control::set_target_speed(uint8_t _target) {
 
 void fan_control::update() {
   if (current_speed < target_speed) {
-    current_speed++;
+    if (target_speed - current_speed < STEP_UP) {
+      current_speed = target_speed;
+    } else {
+      current_speed += STEP_UP;
+    }
     set_speed(current_speed);
   }
 
   if (current_speed > target_speed) {
-    current_speed--;
+    if (current_speed - target_speed < STEP_DOWN) {
+      current_speed = target_speed;
+    } else {
+      current_speed -= STEP_DOWN;
+    }
     set_speed(current_speed);
   }
 }
@@ -79,7 +90,7 @@ void fan_control::evaluate_sum(uint16_t _sum) {
   // set fan target to values between 0 and FAN_MAX_SPEED
   // FAN_MIN_SPEED is not used to check for FAN_ZERO_RPM mode
   // in function set_speed()
-  fan_speed = map(_sum, 0, 765, 0, FAN_MAX_SPEED);
+  fan_speed = map(_sum, 0, 765, FAN_MIN_SPEED, FAN_MAX_SPEED);
 
   set_target_speed(fan_speed);
 }

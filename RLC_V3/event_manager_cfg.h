@@ -19,6 +19,7 @@ typedef enum {
   EVT_SCROLL_TICK,
   EVT_CONNECTING_DOTS_TICK,
   EVT_RAINBOW_TICK,
+  EVT_UPDATE_FAN,
   
   // System events
   EVT_SAVE_TO_NVM,

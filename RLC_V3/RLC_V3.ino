@@ -115,17 +115,18 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
 }
 
 void setup() {
-  // init fan instantly
+// init fan instantly
+#ifdef DEBUGGING_ENABLED
+  Serial.begin(115200);
+#endif
+
 #ifdef FAN_USAGE
   fan.init_fan();
   DEBUG_PRINTLN("FAN INIT DONE");
 #endif
 
-  delay(2000);
-
-#ifdef DEBUGGING_ENABLED
-  Serial.begin(115200);
-#endif
+  // sanity delay
+  delay(500);
 
   DEBUG_PRINTLN("Startup");
 
@@ -170,6 +171,17 @@ void setup() {
   event_manager.post(EVT_DISPLAY_WAKE);
   TimerManager.start(TIMER_DISPLAY_STANDBY);
 
+#ifdef FAN_USAGE
+  TimerManager.start(TIMER_UPDATE_FAN);
+  if (main_sw.get_deepness() == SUB_MENU) {
+    if (main_sw.get_current() == HSV_PAGE) {
+      fan.calc_hsv_speed(hsv_val);
+    } else if (main_sw.get_current() == RGB_PAGE) {
+      fan.calc_rgb_speed(rgb_val.get_rgb());
+    }
+  }
+#endif
+
   DEBUG_PRINTLN("Startup complete.");
 }
 
@@ -186,8 +198,4 @@ void loop() {
 
   // Handle continuous tasks (DMX, Artnet - NOT event driven)
   handle_continuous_tasks();
-
-#ifdef FAN_USAGE
-  fan.update();
-#endif
 }

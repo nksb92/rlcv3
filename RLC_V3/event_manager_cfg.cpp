@@ -17,6 +17,7 @@ const event_cfg_t event_config[] = {
     {EVT_SCROLL_TICK, "ScrollTick", EVT_PRIORITY_LOW, false},
     {EVT_CONNECTING_DOTS_TICK, "ConnectingDots", EVT_PRIORITY_LOW, false},
     {EVT_RAINBOW_TICK, "RainbowTick", EVT_PRIORITY_LOW, false},
+    {EVT_UPDATE_FAN, "UpdateFan", EVT_PRIORITY_LOW, false},
 
     // System events
     {EVT_SAVE_TO_NVM, "SaveToNvm", EVT_PRIORITY_NORMAL, false},

@@ -227,7 +227,7 @@ void process_event(const event_t* event) {
                   break;
               }
 #ifdef FAN_USAGE
-              fan.evaluate_sum(128);
+              fan.evaluate_sum(510);
 #endif
               break;
           }
@@ -246,6 +246,12 @@ void process_event(const event_t* event) {
     case EVT_FAN_COOLDOWN:
 #ifdef FAN_USAGE
       fan.set_target_speed(FAN_MIN_SPEED);
+#endif
+      break;
+
+    case EVT_UPDATE_FAN:
+#ifdef FAN_USAGE
+      fan.update();
 #endif
       break;
 

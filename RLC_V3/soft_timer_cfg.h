@@ -13,6 +13,7 @@ typedef enum {
   TIMER_SCROLL_TEXT,
   TIMER_CONNECTING_DOTS,
   TIMER_RAINBOW_ANIM,
+  TIMER_UPDATE_FAN,
   TIMER_COUNT  // Must be last
 } timer_id_t;
 
