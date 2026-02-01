@@ -1,6 +1,6 @@
-PWD f:\Programme\Artnet-RGB-LED-Controller\Tex\includes
+PWD f:\Programme\rlcv3\LaTeX\includes
 INPUT C:\Users\kassu\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT f:\Programme\Artnet-RGB-LED-Controller\Tex\includes\includes.tex
+INPUT f:\Programme\rlcv3\LaTeX\includes\includes.tex
 OUTPUT includes.log
 INPUT D:\Program Files\MiKTeX\tex\latex\base\article.cls
 INPUT D:\Program Files\MiKTeX\tex\latex\base\article.cls
@@ -198,6 +198,8 @@ INPUT D:\Program Files\MiKTeX\tex\latex\environ\environ.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\environ\environ.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\trimspaces\trimspaces.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\trimspaces\trimspaces.sty
+INPUT D:\Program Files\MiKTeX\tex\latex\fancyhdr\fancyhdr.sty
+INPUT D:\Program Files\MiKTeX\tex\latex\fancyhdr\fancyhdr.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\geometry\geometry.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\geometry\geometry.sty
 INPUT D:\Program Files\MiKTeX\tex\generic\iftex\ifvtex.sty
@@ -290,3 +292,5 @@ INPUT D:\Program Files\MiKTeX\tex\latex\bigfoot\suffix.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\bigfoot\suffix.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\enumitem\enumitem.sty
 INPUT D:\Program Files\MiKTeX\tex\latex\enumitem\enumitem.sty
+INPUT D:\Program Files\MiKTeX\tex\latex\tools\multicol.sty
+INPUT D:\Program Files\MiKTeX\tex\latex\tools\multicol.sty
