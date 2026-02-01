@@ -9,3 +9,4 @@
 LaTeX/body.pdf
 *.gz
 *.toc
+LaTeX/_minted-body/**

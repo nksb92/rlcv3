@@ -1,9 +1,324 @@
 \section{Software Development}
 \label{sec:software_development}
 \subsection{Development Environment and Tools}
+The primary \ac{IDE} employed for the development of the firmware is the Arduino \ac{IDE} \cite{inet:arduino_ide}.
+This choice provides a user-friendly \ac{GUI} and a simplified framework for programming embedded systems, managing the underlying complexities of the build process, including the compiler toolchain (e.g., xtensa-esp32-elf-gcc for ESP32-based targets).
+Development is conducted using the C++ programming language, tailored with Arduino-specific functions and structures.
+The Arduino \ac{IDE} facilitates the installation of necessary board support packages, such as the ESP32 core, through its integrated Board Manager, enabling compilation and code deployment for the target \ac{MCU}.
+The specific microcontroller board used in this project is the Seeed Studio XIAO ESP32-C3 \cite{inet:seeed_xiao_esp32c3}.
+This board is based on the ESP32-C3 chip, which features a 32-bit RISC-V single-core processor and supports the necessary Wi-Fi connectivity for Art-Net communication. \\
+
+A significant aspect of development within the Arduino ecosystem is the extensive use of libraries.
+These include standard Arduino libraries, as well as third-party libraries for specific components like the Adafruit SSD1306 library \cite{inet:ssd1306} for the \ac{OLED} display, and custom-written code modules.
+Physical connection to the development boards for programming and data communication is established via a \ac{USB} Type-C interface.
+This connection is also utilized for debugging purposes, primarily through the Serial Monitor feature integrated into the Arduino \ac{IDE}, which allows for real-time output of logging messages and variable states from the firmware. \\
+
+To manage code revisions, track changes, and facilitate collaboration, Git is utilized as the \ac{VCS}.
+The code repository is hosted on GitHub, allowing for distributed development workflows and maintaining a comprehensive history of the firmware's evolution.
+
 \subsection{Hardware Configuration Management in Software}
-\subsection{LED Control Implementation for Different Products}
-\subsection{Core Functionality Implementation}
-\subsection{Communication Protocol Implementation}
+
+The \texttt{config.h} file serves as a centralized compile-time configuration header for the RLCV3 firmware, identified by the \texttt{RLCV3\_FIRMWARE\_VERSION} macro, currently set to "2.0".
+Its primary purpose is to adapt the firmware to various hardware targets by defining a specific set of parameters based on a single selected hardware profile.
+This is achieved extensively through C preprocessor directives. \\
+
+An important functionality is to toggle debugging information via the serial port.
+The option \texttt{DEBUGGING\_ENABLED} toggles between sending information or not.
+Different macro definitions are implemented to wrap around the serial print functions.
+With this approach, it is not necessary to use a \texttt{\#ifdef} pragma before every serial print call.
+The defines for this macro can be seen in source code section \ref{pc:debugging_enabled}.\\
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos=true, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=2, xleftmargin=10pt, breaklines, fontsize=\small, baselinestretch=1.0, escapeinside=!!]{c}
+		// #define DEBUGGING_ENABLED
+		#ifdef DEBUGGING_ENABLED
+		#define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
+		#define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
+		#define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+		#else
+		// If disabled, these macros are replaced with nothing
+		#define DEBUG_PRINT(...)
+		#define DEBUG_PRINTLN(...)
+		#define DEBUG_PRINTF(...)
+		#endif
+	\end{minted}
+	\caption{Macro defines for toggling debugging}
+	\label{pc:debugging_enabled}
+\end{listing}
+
+A core feature is the selection of one out of four mutually exclusive hardware profiles:
+\begin{enumerate}
+	\item \texttt{RGB\_IC\_TUBE}: For hardware using addressable \ac{RGB} \ac{LED} strips like WS2815 or WS2811.
+	\item \texttt{RGB\_TUBE}: For hardware using non-addressable \ac{RGB} \ac{LED} strips controlled by \ac{MOSFET}s via \ac{PWM}.
+	\item \texttt{PANEL}: For hardware configurations involving slave devices controlled via \ac{I2C} and requiring a cooling fan.
+	\item \texttt{SPOT}: For hardware utilizing a single \ac{COB} \ac{RGB} \ac{LED} with \ac{MOSFET} control and a cooling fan.
+\end{enumerate}
+A preprocessor check ensures that exactly one of these hardware profiles is uncommented and thus active; otherwise, a compilation error is triggered.\\
+
+Based on the selected hardware profile, a subsequent section defines specific operational parameters.
+These parameters include:
+\begin{itemize}
+	\item \texttt{LED\_OUT\_TYPE}: Specifies the \ac{LED} output control method.
+	Possible values are \texttt{LED\_OUT\_RGBIC} for addressable \ac{LED}s, \texttt{LED\_OUT\_MOSFET} for \ac{PWM}-driven \ac{MOSFET} control, or \texttt{LED\_OUT\_I2C} for sending \ac{RGB} and dimmer values to slave devices.
+	\item \texttt{NUM\_PIXEL}: Defines the number of individually controllable pixels or segments.
+	For non-addressable strips (\texttt{RGB\_TUBE}, \texttt{SPOT}), this is set to 1.
+	For addressable strips or panel segments, it is set according to the hardware (e.g., 24 for \texttt{RGB\_IC\_TUBE}, 5 for \texttt{PANEL}).
+	The file mandates this value to be between 1 and 170, inclusive.
+	\item Pin Definitions: For \texttt{LED\_OUT\_MOSFET} configurations, specific \ac{MCU} pins for Red, Green, and Blue channels (e.g., \texttt{RED\_PIN}, \texttt{GREEN\_PIN}, \texttt{BLUE\_PIN}) are defined.
+	\item Fan Control: If a hardware profile requires a fan (indicated by \texttt{FAN\_USAGE}), parameters such as the \ac{PWM} control pin (\texttt{PWM\_PIN}), maximum speed (\texttt{FAN\_MAX\_SPEED}), minimum speed (\texttt{FAN\_MIN\_SPEED}), and zero \ac{RPM} behavior (\texttt{FAN\_ZERO\_RPM}) are defined.
+	\texttt{FAN\_ZERO\_RPM} being \texttt{true} allows the fan to turn off below minimum speed, while \texttt{false} clamps it to the minimum speed.
+	If \texttt{NO\_FAN} is defined (as in \texttt{RGB\_IC\_TUBE} and \texttt{RGB\_TUBE}), default non-operational fan parameters are set.
+\end{itemize}
+
+For instance, if \texttt{SPOT} is selected, \texttt{LED\_OUT\_MOSFET} is defined, along with specific pins for \ac{RGB} control (\texttt{D10}, \texttt{D8}, \texttt{D9}), fan usage is enabled with its control pin set to \texttt{D3}, a speed range from 75 to 255, and \texttt{FAN\_ZERO\_RPM} set to \texttt{true}.
+\texttt{NUM\_PIXEL} is set to 1.
+
+The file also incorporates several compile-time checks to validate the configuration:
+\begin{itemize}
+	\item Verification that \texttt{NUM\_PIXEL} is defined and within the range of 1 to 170.
+	\item If \texttt{FAN\_USAGE} is defined, it checks that \texttt{PWM\_PIN}, \texttt{FAN\_MAX\_SPEED}, \texttt{FAN\_MIN\_SPEED}, and \texttt{FAN\_ZERO\_RPM} are all defined.
+	\item If \texttt{LED\_OUT\_MOSFET} is defined, it ensures that \texttt{RED\_PIN}, \texttt{GREEN\_PIN}, and \texttt{BLUE\_PIN} are defined.
+\end{itemize}
+These checks help prevent runtime errors due to incomplete or inconsistent hardware configurations.
+
+In summary, \texttt{config.h} provides a flexible and robust mechanism for managing firmware configurations across different hardware variations from a single codebase, leveraging C preprocessor directives for conditional compilation and validation.
+
+\subsection{Core Application Architecture}
+The firmware's logic is driven by a custom-built, cooperative multitasking architecture centered around an event-driven state machine, supplemented by continuous polling for high-frequency tasks.
+This hybrid approach ensures both a responsive user interface and efficient handling of real-time data streams like Art-Net.
+
+\subsubsection{Event Handling}
+The event system is the backbone of the application and consists of two primary components: the \texttt{event\_manager} and the \texttt{event\_handler}.
+\begin{description}[style=nextline]
+    \item[\texttt{event\_manager}] This module acts as a centralized \ac{FIFO} queue for all system events.
+								   Events can be generated from multiple sources: user interaction (e.g., \texttt{EVT\_ENCODER\_CHANGED} from the rotary encoder), software timers (e.g., \texttt{EVT\_DISPLAY\_SLEEP}), or even from within other event processing routines.
+								   The manager ensures that events are stored and processed in the order they are received, with an optional priority system.
+    \item[\texttt{event\_handler}] This is the core state machine of the entire application.
+								   In the main loop, the \texttt{event\_handler} continuously dequeues events from the \texttt{event\_manager} via its \texttt{process\_event} function.
+								   It contains a large switch-case statement that directs program flow based on the current event and the system's state (e.g., the active menu).
+								   It is responsible for delegating tasks to the appropriate modules, such as updating the display, saving settings, or changing LED values.
+\end{description}
+
+\subsubsection{Menu and State Management}
+The user interface's state is managed by a two-tiered state machine system, which provides a clear separation between the main navigation and the detailed settings menu.
+\begin{description}[style=nextline]
+    \item[\texttt{menu\_structure}] This class manages the top-level navigation state.
+									It tracks which main page is currently active (e.g., HSV, RGB, DMX, Art-Net, Settings) and handles the horizontal scrolling between these pages.
+									It determines what is shown on the display and how rotary encoder events are interpreted at this top level.
+    \item[\texttt{settings\_menu}] When the user enters the "Settings" page, control is handed over to this secondary state machine.
+								   The \texttt{settings\_menu} class exclusively manages navigation and value changes within the various sub-options of the settings screen, such as changing the Art-Net universe or DMX address.
+								   This specialized handler simplifies the main menu logic.
+\end{description}
+
+\subsubsection{Continuous Tasks}
+For operations that require constant, high-frequency updates and cannot wait for the event queue, a set of continuous tasks are executed on every iteration of the main \texttt{loop()}.
+These tasks, managed in the \texttt{continuous\_tasks.cpp} file, are primarily responsible for handling the incoming stream of Art-Net or DMX data, ensuring that the LED output is updated in real-time without perceptible latency.
+
+\subsection{Software Modules}
+The firmware is divided into several distinct modules, each with a specific responsibility.
+These modules are largely decoupled and are controlled by the \texttt{event\_handler}, which dispatches events to them.
+
+\begin{description}[style=nextline]
+    \item[\texttt{leds}] This module is an abstraction layer for controlling the \ac{LED}s.
+	It exposes simple functions to set colors or segments.
+	Internally, it handles the specific output protocol based on the hardware configuration in \texttt{config.h} - whether it's driving addressable \ac{LED} strips (like WS2812B), using \ac{PWM} for non-addressable \ac{RGB} \ac{LED}s, or sending data over \ac{I2C}.
+    \item[\texttt{dmx}] Manages all DMX512 communication.
+	It can act as a DMX receiver to control the LEDs from an external lighting desk.
+	The module is responsible for initializing the DMX port and reading the incoming data.
+    \item[\texttt{rlc\_artnet}] Implements the Art-Net protocol \cite{inet:artnet_spec}, allowing the device to receive DMX data over a Wi-Fi network.
+	It handles the network connection, subscribing to the correct Art-Net universe, and parsing the incoming packets.
+    \item[\texttt{nvm}] The Non-Volatile Memory module is responsible for persisting settings across reboots.
+	It provides functions to save and load all user-configurable parameters (e.g., HSV values, DMX address, Art-Net settings) to and from the ESP32's flash memory.
+    \item[\texttt{fan\_control}] A simple module to manage the speed of the cooling fan via \ac{PWM}, based on the settings defined in \texttt{config.h}.
+    \item[\texttt{segments}] This module implements the logic for dividing an \ac{LED} strip into multiple virtual segments.
+	It allows the user to control different parts of a single strip as if they were independent fixtures.
+    \item[\texttt{c\_hsv} \texttt{and} \texttt{c\_rgb}] These are data-centric classes that manage the state for the HSV and RGB control modes, respectively.
+	They hold the current color values and handle the logic for how user inputs modify these values.
+\end{description}
+
 \subsection{User Interface Implementation}
+\subsubsection{Library for the OLED Display}
+For interfacing with and controlling the \ac{OLED} display, the project leverages the well-established Adafruit SSD1306 library \cite{inet:ssd1306}.
+This library is a popular choice within the maker and embedded development communities due to its robustness, comprehensive feature set, and broad compatibility, particularly with Arduino-based environments and \ac{MCU}s like the ESP32-C3. \\
+
+The Adafruit SSD1306 library significantly simplifies the development process by abstracting the low-level I2C communication protocol required to interact with the SSD1306 display controller, which is common in monochrome \ac{OLED} modules with resolutions such as 128x32.
+It provides a convenient \ac{API} for tasks essential to updating the display, including initializing the screen, clearing the display area, drawing pixels, rendering text in various fonts and sizes, and displaying basic geometric shapes.
+By utilizing this library, developers can efficiently implement the necessary visual feedback for the human-machine interface, such as displaying status information, menu options, or parameter values, without needing to delve into the intricate details of the display's command set.
+This allows for a quicker and more focused development of the user interface aspects of the embedded system.
+
+\subsubsection{Creating Bitmaps and Aligning Text}
+The creation of graphical assets for the \ac{OLED} display, primarily static bitmaps for icons or user interface elements, and the alignment of both these bitmaps and dynamic text are performed through a multi-stage process involving graphic design tools and code integration. \\
+
+The initial design of graphical elements is carried out using Photopea, a web-based image editing tool that serves as an alternative to Adobe Photoshop \cite{inet:photopea}.
+Within Photopea, new documents are created with dimensions matching the native resolution of the target \ac{OLED} display (e.g., 128x32 pixels).
+Black and white images are then drawn, typically using the pencil tool to create sharp, pixel-perfect shapes suitable for monochrome displays.
+Display content is often broken down into logical sections or screens, such as individual main menu items or status icons.
+These distinct graphical elements are typically organized on separate layers.
+For efficient export, layers intended for conversion can be marked with a specific suffix (e.g., \texttt{-e-}), enabling bulk export as individual \ac{PNG} image files. \\
+
+Once the \ac{PNG} images are prepared, they are converted into C-style byte arrays using the online utility \texttt{image2cpp} \cite{inet:image2cpp}.
+Specific settings are applied during this conversion to ensure compatibility with the embedded system and display library: the background color is set to black, with other general settings often left at their default values.
+The code output format is selected as \textit{Arduino Code}.
+Crucially, the draw mode is configured to \texttt{horizontal - 1 bit per pixel}, which is optimal for monochrome displays where pixel data is packed efficiently.
+Additionally, the option to swap bits within a byte is disabled.
+The resulting bitmap arrays are then collated and included in a dedicated header file, named \texttt{bitmaps.h}, within the firmware project.
+The methods for drawing these bitmaps onto the display are detailed in a subsequent chapter. \\
+
+For dynamic textual information, such as \ac{RGB} values that change during runtime, rendering is handled directly by calling functions from the display \ac{API}.
+This allows for text to be updated on-the-fly.
+The process of positioning text elements accurately on the display is often iterative.
+An initial visual layout is designed in Photopea to get a preliminary feel for placement.
+However, final adjustments to coordinates and alignment are typically made within the firmware code, recompiling and testing until the elements fit precisely as intended on the physical screen.
+The positions of the bitmaps can be read directly within Photopea.
+
+\subsubsection{Handling Text and Drawing Bitmaps}
+Bitmaps are drawn on the display via the \textit{drawBitmap} method.
+This method needs 6 inputs.
+First, the x- and y-positions as the starting point.
+Then the address of the Bitmap itself.
+Also, the width and height need to be defined and passed.
+Finally, the color of the display needs to be set. \\
+
+To simplify the call of this method, some helper constructs are defined.
+First, two enumerations are defined for the index of the width and height as well as the x- and y-coordinates.
+The number of items contained in one array for the information also needs to be defined.
+A two-dimensional array for the actual x- and y-coordinates and width and height makes it easy to change values if needed.
+All helper functions as well as the bitmap defines can be seen in sourcecode section \ref{pc:helper_enums}.
+In this example the code for the main menu items is shown.
+To keep the example short, only the first three elements are described.
+More details can be seen in the actual sourcecode header file \textit{bitmaps.h}.
+\begin{listing}[H]
+	\begin{minted}[autogobble, linenos=true, numberblanklines=true, frame=leftline, framesep=5pt, numbersep=5pt, style=vs, tabsize=2, xleftmargin=10pt, breaklines, fontsize=\small, baselinestretch=1.0, escapeinside=!!]{c}
+		// defintion of the bitmaps
+		const unsigned char BITMAP_LEFT_END_MENU[] PROGMEM = { ... }
+		const unsigned char BITMAP_ARTNET_REC_MENU[] PROGMEM = { ... }	
+		const unsigned char BITMAP_DMX_MENU[] PROGMEM = { ... }
+		// enumeration for addressing in array
+		enum {
+			LEFT_END_MENU,
+			ARTNET_REC_MENU,
+			DMX_MENU,
+		};
+		// enumeration for width and height
+		enum {
+			WIDTH,
+			HEIGHT
+		};
+		// enumeration for x- and y-alignment
+		enum {
+			x,
+			y
+		};
+		// define number of bitmaps for array
+		#define BITMAP_MAIN_MENU_LEN 3
+		// real width and height values
+		int W_H_MATRIX_MAIN_MENU[BITMAP_MAIN_MENU_LEN][2] = {
+			{ 12, 21 }, // Left end menu
+			{ 23, 19 }, // artnet_rec menu
+			{ 35, 12 }, // DMX menu
+		};
+		// real x- and y- coordinates
+		int X_Y_MATRIX_MAIN_MENU[BITMAP_MAIN_MENU_LEN][2] = {
+			{ 58, 2 },	// Left end menu
+			{ 53, 3 },	// artnet_rec menu
+			{ 47, 6 },	// DMX menu
+		};
+		// bitmaps as a array 
+		const unsigned char *BITMAP_MAIN_MENU_ARRAY[BITMAP_MAIN_MENU_LEN] = {
+			BITMAP_LEFT_END_MENU,
+			BITMAP_ARTNET_REC_MENU,
+			BITMAP_DMX_MENU,
+		};
+	\end{minted}
+\caption{Helper constructs for drawing bitmaps}
+\label{pc:helper_enums}
+\end{listing}
+These defines and enumerations don't do anything on their own.
+In order to display a bitmap on the screen, the information needs to be passed to the \textit{drawBitmap} method.
+
+\subsubsection{Main Menu Item Selection}
+Within the main menu, there are always three submenu page options shown.
+The first and last ones indicate the start and end of the selection.
+These items are not selectable, as they are only indicators.
+Figure \ref{fig:menuitemselection} shows the abstract build of the menu structure.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{graphics/menu_item_selection}
+	\caption{Arrangement of the Main Menu Items}
+	\label{fig:menuitemselection}
+\end{figure}
+The selection frame always stays in the same place.
+If the user switches the currently selected menu item, the displayed items will be replaced.
+Also the menu navigation indicator on the bottom switches to the next selection.
+More on this topic in chapter \ref{sec:menu_navigation_indicator} \nameref{sec:menu_navigation_indicator}.
+Within the figure the indicator shows the selection of the first menu item.
+Switching to the second menu item will shift all previously shown menu items by one to the left.
+Therefore, the left menu item will be 1, the middle 2, and the right 3. \\
+
+Scrolling over the edge of the menu is not possible.
+If the user reaches the end of the menu and continues switching, nothing will happen.
+This means, the user can only switch to the previous item in this instance.
+The same occurs with the first item, except the direction changes.
+
+\subsubsection{Menu Navigation Indicator}\label{sec:menu_navigation_indicator}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\linewidth]{graphics/menu_navigation_indicator}
+	\caption{Position indicator for Menu navigation}
+	\label{fig:menunavigationindicator}
+\end{figure}
+Counting the used radii and gaps for each number $n$ results in the list below.
+From there, a generalized equation can be formulated.
+\begin{align*}
+	n = 3  \quad 1.5 \text{ gaps}  \quad 3 \cdot r \\
+	n = 4  \quad 2.0 \text{ gaps}  \quad 4 \cdot r \\
+	n = 5  \quad 2.5 \text{ gaps}  \quad 5 \cdot r 
+\end{align*}
+With this listing of possible numbers $n$ one can see, the summed distance on one side of the center of the display is always $n \cdot r$.
+The distance with the gaps behaves similarly.
+Here is the total distance on one side of the center line $\frac{n}{2} \cdot d_{gap}$.
+The following equation to calculate the start x-position can thus be generalized with the radius $r$, the distance of the gap $d_{gap}$, the number of circles to be drawn $n$, and the center display position $x_{center} = 128 / 2$.
+
+\begin{align*}
+	 x_{start} = x_{center} - \left( \left(n \cdot r\right) + \left(\frac{n}{2} \cdot d_{gap}\right)\right)
+\end{align*}
+The start position can therefore be calculated.
+From there, a for loop generates the empty circles.
+If the index of the current menu item selection is reached, the circle is completely filled.
+This is done to symbolize the current position in the menu.
+The following are some examples with different numbers of circles.
+\begin{align*}
+	n & = 3 \quad r = 2 \quad d_{gap} = 5\\
+	x_{start_3} &= 64 - \left(\left(3 \cdot 2 \right) + \left(\frac{3}{2} \cdot 5 \right) + 0 \right) = 50.5 \approx 50 \\
+	n & = 4 \quad r = 2 \quad d_{gap} = 5\\
+	x_{start_4} &= 46 \\
+	n & = 5 \quad r = 2 \quad d_{gap} = 5\\
+	x_{start_5} &= 41,5 \approx 41
+\end{align*}
+During testing, it was observed that a correction of one pixel shift to the right improves the result.
+This was observed with $n=5$ circles.
+For different numbers this might not be needed.
+With the correction, the equation \ref{eq:final_calc_dots} can be used in the source code.
+\begin{align}\label{eq:final_calc_dots}
+	x_{start} = x_{center} - \left( \left(n \cdot r\right) + \left(\frac{n}{2} \cdot d_{gap}\right)\right) + 1
+\end{align}
+
 \subsection{Library Version Management}
+To ensure stability and prevent compatibility issues that could break the firmware's functionality, it is crucial to use specific versions of the external libraries upon which the project depends.
+The firmware has been developed and tested with the following library versions, and adherence to these versions is recommended for compilation and deployment:
+
+\begin{multicols*}{2}	
+	\begin{description}[style=nextline]
+		\item[ESP Core:] Version 3.30.3
+		\item[Adafruit GFX Library:] Version 1.12.1 \cite{inet:adafruit_gfx}
+		\item[Adafruit NeoPixel:] Version 1.13.0 \cite{inet:adafruit_neopixel}
+		\item[Adafruit SSD1306:] Version 2.5.14 \cite{inet:ssd1306}
+		\item[ArtnetWifi:] Version 1.6.1 \cite{inet:artnetwifi}
+		\item[EncoderButton:] Version 1.0.6 \cite{inet:encoderbutton}
+		\item[FastLED:] Version 3.9.16 \cite{inet:fastled}
+		\item[esp\_dmx:] Version 4.1.0 \cite{inet:esp_dmx}. It is important to note that this version may require a specific fix as detailed in the following GitHub issue discussion: \url{https://github.com/someweisguy/esp_dmx/issues/181#issuecomment-2619261884}.
+	\end{description}
+\end{multicols*}
+
+Using versions different from those listed above may lead to unexpected behavior or compilation errors due to changes in library \ac{API}s or internal functionality.
+It is advised to manage these library versions carefully within the development environment.

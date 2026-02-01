@@ -42,7 +42,7 @@
 % for angular corners, Argument: arc is angular
 \BeforeBeginEnvironment{minted}{\begin{tcolorbox}[colback=white, colframe=border, boxrule=0.4mm, arc=15px]}
 \AfterEndEnvironment{minted}{\end{tcolorbox}}
-
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
 %\setminted{style=abap}
 \setminted{style=arduino}
 \usepackage{fancyhdr}
@@ -111,6 +111,7 @@
 \usepackage[printonlyused]{acronym}
 \usepackage{booktabs}
 \usepackage{enumitem}
+\usepackage{multicol}
 
 \renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
 

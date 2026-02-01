@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2024.1.13)  27 OCT 2024 21:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2024.1.13)  19 JAN 2026 13:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**f:/Programme/Artnet-RGB-LED-Controller/Tex/includes/includes.tex
-(f:/Programme/Artnet-RGB-LED-Controller/Tex/includes/includes.tex
+**f:/Programme/rlcv3/LaTeX/includes/includes.tex
+(f:/Programme/rlcv3/LaTeX/includes/includes.tex
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-08-29>
 (D:\Program Files\MiKTeX\tex/latex/base\article.cls
@@ -316,7 +316,7 @@ runsystem(if not exist _minted-includes mkdir _minted-includes)...disabled (rest
 
 
 
-f:/Programme/Artnet-RGB-LED-Controller/Tex/includes/includes.tex:35: Package minted Error: You must invoke LaTeX with the -shell-escape flag.
+f:/Programme/rlcv3/LaTeX/includes/includes.tex:35: Package minted Error: You must invoke LaTeX with the -shell-escape flag.
 
 See the minted package documentation for explanation.
 Type  H <return>  for immediate help.
@@ -521,6 +521,23 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 \tcb@temp=\box74
 \tcb@temp=\box75
 \tcb@temp=\box76
+) (D:\Program Files\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty
+Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
+\f@nch@headwidth=\skip55
+\f@nch@offset@elh=\skip56
+\f@nch@offset@erh=\skip57
+\f@nch@offset@olh=\skip58
+\f@nch@offset@orh=\skip59
+\f@nch@offset@elf=\skip60
+\f@nch@offset@erf=\skip61
+\f@nch@offset@olf=\skip62
+\f@nch@offset@orf=\skip63
+\f@nch@height=\skip64
+\f@nch@footalignment=\skip65
+\f@nch@widthL=\skip66
+\f@nch@widthC=\skip67
+\f@nch@widthR=\skip68
+\@temptokenb=\toks41
 ) (D:\Program Files\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
  (D:\Program Files\MiKTeX\tex/generic/iftex\ifvtex.sty
@@ -537,7 +554,7 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutheight=\dimen276
 \Gm@layouthoffset=\dimen277
 \Gm@layoutvoffset=\dimen278
-\Gm@dimlist=\toks41
+\Gm@dimlist=\toks42
  (D:\Program Files\MiKTeX\tex/latex/geometry\geometry.cfg)) (D:\Program Files\MiKTeX\tex/latex/setspace\setspace.sty
 Package: setspace 2022/12/04 v6.7b set line spacing
 ) (D:\Program Files\MiKTeX\tex/latex/tools\tabularx.sty
@@ -547,9 +564,9 @@ Package: array 2022/09/04 v2.5g Tabular extension package (FMi)
 \col@sep=\dimen279
 \ar@mcellbox=\box77
 \extrarowheight=\dimen280
-\NC@list=\toks42
-\extratabsurround=\skip55
-\backup@length=\skip56
+\NC@list=\toks43
+\extratabsurround=\skip69
+\backup@length=\skip70
 \ar@cellbox=\box78
 )
 \TX@col@width=\dimen281
@@ -558,13 +575,13 @@ Package: array 2022/09/04 v2.5g Tabular extension package (FMi)
 \TX@target=\dimen284
 \TX@delta=\dimen285
 \TX@cols=\count328
-\TX@ftn=\toks43
+\TX@ftn=\toks44
 ) (D:\Program Files\MiKTeX\tex/latex/tools\longtable.sty
 Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
-\LTleft=\skip57
-\LTright=\skip58
-\LTpre=\skip59
-\LTpost=\skip60
+\LTleft=\skip71
+\LTright=\skip72
+\LTpre=\skip73
+\LTpost=\skip74
 \LTchunksize=\count329
 \LTcapwidth=\dimen286
 \LT@head=\box79
@@ -576,7 +593,7 @@ Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
 \LT@rows=\count331
 \c@LT@tables=\count332
 \c@LT@chunks=\count333
-\LT@p@ftn=\toks44
+\LT@p@ftn=\toks45
 ) (D:\Program Files\MiKTeX\tex/latex/hyperref\hyperref.sty
 Package: hyperref 2023-07-08 v7.01b Hypertext links for LaTeX
  (D:\Program Files\MiKTeX\tex/generic/kvdefinekeys\kvdefinekeys.sty
@@ -668,80 +685,80 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
-\Hy@SectionHShift=\skip61
+\Hy@SectionHShift=\skip75
 ) (D:\Program Files\MiKTeX\tex/latex/natbib\natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
-\bibhang=\skip62
-\bibsep=\skip63
+\bibhang=\skip76
+\bibsep=\skip77
 LaTeX Info: Redefining \cite on input line 694.
 \c@NAT@ctr=\count345
 ) (D:\Program Files\MiKTeX\tex/latex/subfig\subfig.sty
 Package: subfig 2005/06/28 ver: 1.3 subfig package
 \c@KVtest=\count346
-\sf@farskip=\skip64
+\sf@farskip=\skip78
 \sf@captopadj=\dimen291
-\sf@capskip=\skip65
-\sf@nearskip=\skip66
+\sf@capskip=\skip79
+\sf@nearskip=\skip80
 \c@subfigure=\count347
 \c@subfigure@save=\count348
 \c@lofdepth=\count349
 \c@subtable=\count350
 \c@subtable@save=\count351
 \c@lotdepth=\count352
-\sf@top=\skip67
-\sf@bottom=\skip68
+\sf@top=\skip81
+\sf@bottom=\skip82
 ) (D:\Program Files\MiKTeX\tex/latex/tocloft\tocloft.sty
 Package: tocloft 2017/08/31 v2.3i parameterised ToC, etc., typesetting
 Package tocloft Info: The document has section divisions on input line 51.
-\cftparskip=\skip69
-\cftbeforetoctitleskip=\skip70
-\cftaftertoctitleskip=\skip71
-\cftbeforepartskip=\skip72
-\cftpartnumwidth=\skip73
-\cftpartindent=\skip74
-\cftbeforesecskip=\skip75
-\cftsecindent=\skip76
-\cftsecnumwidth=\skip77
-\cftbeforesubsecskip=\skip78
-\cftsubsecindent=\skip79
-\cftsubsecnumwidth=\skip80
-\cftbeforesubsubsecskip=\skip81
-\cftsubsubsecindent=\skip82
-\cftsubsubsecnumwidth=\skip83
-\cftbeforeparaskip=\skip84
-\cftparaindent=\skip85
-\cftparanumwidth=\skip86
-\cftbeforesubparaskip=\skip87
-\cftsubparaindent=\skip88
-\cftsubparanumwidth=\skip89
-\cftbeforeloftitleskip=\skip90
-\cftafterloftitleskip=\skip91
-\cftbeforefigskip=\skip92
-\cftfigindent=\skip93
-\cftfignumwidth=\skip94
-\cftbeforelottitleskip=\skip95
-\cftafterlottitleskip=\skip96
-\cftbeforetabskip=\skip97
-\cfttabindent=\skip98
-\cfttabnumwidth=\skip99
-\cftbeforesubfigskip=\skip100
-\cftsubfigindent=\skip101
-\cftsubfignumwidth=\skip102
-\cftbeforesubtabskip=\skip103
-\cftsubtabindent=\skip104
-\cftsubtabnumwidth=\skip105
+\cftparskip=\skip83
+\cftbeforetoctitleskip=\skip84
+\cftaftertoctitleskip=\skip85
+\cftbeforepartskip=\skip86
+\cftpartnumwidth=\skip87
+\cftpartindent=\skip88
+\cftbeforesecskip=\skip89
+\cftsecindent=\skip90
+\cftsecnumwidth=\skip91
+\cftbeforesubsecskip=\skip92
+\cftsubsecindent=\skip93
+\cftsubsecnumwidth=\skip94
+\cftbeforesubsubsecskip=\skip95
+\cftsubsubsecindent=\skip96
+\cftsubsubsecnumwidth=\skip97
+\cftbeforeparaskip=\skip98
+\cftparaindent=\skip99
+\cftparanumwidth=\skip100
+\cftbeforesubparaskip=\skip101
+\cftsubparaindent=\skip102
+\cftsubparanumwidth=\skip103
+\cftbeforeloftitleskip=\skip104
+\cftafterloftitleskip=\skip105
+\cftbeforefigskip=\skip106
+\cftfigindent=\skip107
+\cftfignumwidth=\skip108
+\cftbeforelottitleskip=\skip109
+\cftafterlottitleskip=\skip110
+\cftbeforetabskip=\skip111
+\cfttabindent=\skip112
+\cfttabnumwidth=\skip113
+\cftbeforesubfigskip=\skip114
+\cftsubfigindent=\skip115
+\cftsubfignumwidth=\skip116
+\cftbeforesubtabskip=\skip117
+\cftsubtabindent=\skip118
+\cftsubtabnumwidth=\skip119
 ) (D:\Program Files\MiKTeX\tex/latex/graphics\rotating.sty
 Package: rotating 2016/08/11 v2.16d rotated objects in LaTeX
 \c@r@tfl@t=\count353
-\rotFPtop=\skip106
-\rotFPbot=\skip107
+\rotFPtop=\skip120
+\rotFPbot=\skip121
 \rot@float@box=\box84
-\rot@mess@toks=\toks45
+\rot@mess@toks=\toks46
 ) (D:\Program Files\MiKTeX\tex/latex/multirow\multirow.sty
 Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
-\multirow@colwidth=\skip108
+\multirow@colwidth=\skip122
 \multirow@cntb=\count354
-\multirow@dima=\skip109
+\multirow@dima=\skip123
 \bigstrutjot=\dimen292
 ) (D:\Program Files\MiKTeX\tex/latex/siunitx\siunitx.sty
 Package: siunitx 2023-11-14 v3.3.9 A comprehensive (SI) units package
@@ -804,7 +821,7 @@ Package: csquotes 2022-09-14 v5.2n context-sensitive quotations (JAW)
 \csq@qlevel=\count376
 \csq@maxlvl=\count377
 \csq@tshold=\count378
-\csq@ltx@everypar=\toks46
+\csq@ltx@everypar=\toks47
  (D:\Program Files\MiKTeX\tex/latex/csquotes\csquotes.def
 File: csquotes.def 2022-09-14 v5.2n csquotes generic definitions (JAW)
 )
@@ -817,28 +834,97 @@ Package: acronym 2020/04/17 v1.47 Support for acronyms (Tobias Oetiker)
  (D:\Program Files\MiKTeX\tex/latex/bigfoot\suffix.sty
 Package: suffix 2006/07/15 1.5a Variant command support
 )
-\AC@clearlist=\toks47
+\AC@clearlist=\toks48
 ) (D:\Program Files\MiKTeX\tex/latex/enumitem\enumitem.sty
 Package: enumitem 2019/06/20 v3.9 Customized lists
-\labelindent=\skip110
+\labelindent=\skip124
 \enit@outerparindent=\dimen311
-\enit@toks=\toks48
+\enit@toks=\toks49
 \enit@inbox=\box93
 \enit@count@id=\count379
 \enitdp@description=\count380
+) (D:\Program Files\MiKTeX\tex/latex/tools\multicol.sty
+Package: multicol 2023/03/30 v1.9f multicolumn formatting (FMi)
+\c@tracingmulticols=\count381
+\mult@box=\box94
+\multicol@leftmargin=\dimen312
+\c@unbalance=\count382
+\c@collectmore=\count383
+\doublecol@number=\count384
+\multicoltolerance=\count385
+\multicolpretolerance=\count386
+\full@width=\dimen313
+\page@free=\dimen314
+\premulticols=\dimen315
+\postmulticols=\dimen316
+\multicolsep=\skip125
+\multicolbaselineskip=\skip126
+\partial@page=\box95
+\last@line=\box96
+\mc@boxedresult=\box97
+\maxbalancingoverflow=\dimen317
+\mult@rightbox=\box98
+\mult@grightbox=\box99
+\mult@firstbox=\box100
+\mult@gfirstbox=\box101
+\@tempa=\box102
+\@tempa=\box103
+\@tempa=\box104
+\@tempa=\box105
+\@tempa=\box106
+\@tempa=\box107
+\@tempa=\box108
+\@tempa=\box109
+\@tempa=\box110
+\@tempa=\box111
+\@tempa=\box112
+\@tempa=\box113
+\@tempa=\box114
+\@tempa=\box115
+\@tempa=\box116
+\@tempa=\box117
+\@tempa=\box118
+\@tempa=\box119
+\@tempa=\box120
+\@tempa=\box121
+\@tempa=\box122
+\@tempa=\box123
+\@tempa=\box124
+\@tempa=\box125
+\@tempa=\box126
+\@tempa=\box127
+\@tempa=\box128
+\@tempa=\box129
+\@tempa=\box130
+\@tempa=\box131
+\@tempa=\box132
+\@tempa=\box133
+\@tempa=\box134
+\@tempa=\box135
+\@tempa=\box136
+\@tempa=\box137
+\c@minrows=\count387
+\c@columnbadness=\count388
+\c@finalcolumnbadness=\count389
+\last@try=\dimen318
+\multicolovershoot=\dimen319
+\multicolundershoot=\dimen320
+\mult@nat@firstbox=\box138
+\colbreak@box=\box139
+\mc@col@check@num=\count390
 ))
 ! Emergency stop.
-<*> ...GB-LED-Controller/Tex/includes/includes.tex
+<*> f:/Programme/rlcv3/LaTeX/includes/includes.tex
                                                   
 *** (job aborted, no legal \end found)
 
  
 Here is how much of TeX's memory you used:
- 30806 strings out of 475248
- 611409 string characters out of 5767628
+ 31269 strings out of 475248
+ 619280 string characters out of 5767628
  1918785 words of memory out of 5000000
- 51911 multiletter control sequences out of 15000+600000
+ 52367 multiletter control sequences out of 15000+600000
  560011 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 101i,0n,107p,494b,103s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 101i,0n,107p,476b,103s stack positions out of 10000i,1000n,20000p,200000b,200000s
 !  ==> Fatal error occurred, no output PDF file produced!
