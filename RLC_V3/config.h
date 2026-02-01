@@ -3,7 +3,7 @@
 
 // first digit:  increment if breaking change occures
 // last digit:   increment before each pull request for new feature or bug fix to main branch
-#define RLCV3_FIRMWARE_VERSION "1.1"
+#define RLCV3_FIRMWARE_VERSION "2.0"
 
 // Comment out this line to disable all debug output
 // #define DEBUGGING_ENABLED

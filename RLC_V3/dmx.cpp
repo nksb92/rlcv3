@@ -1,8 +1,8 @@
 #include "dmx.h"
 
+#include "hal/uart_ll.h"
 #include "soc/system_struct.h"
 #include "soc/uart_struct.h"
-#include "hal/uart_ll.h"
 /*
 Pins for the communication with the RS-485 IC
 @param TRANSMIT_PIN: pin for sending dmx_data
@@ -13,6 +13,8 @@ for receiving dmx_data
 #define TRANSMIT_PIN D6
 #define RECEIVE_PIN D7
 #define ENABLE_PIN D3
+
+rgb_dmx dmx_val;
 
 rgb_dmx::rgb_dmx() {}
 

@@ -1,9 +1,10 @@
 #ifndef RLC_ARTNET_H
 #define RLC_ARTNET_H
 
-#include "common.h"
 #include <ArtnetWifi.h>
 #include <WiFi.h>
+
+#include "common.h"
 
 #define UNIVERSE_SIZE 513
 #define LAST_DMX_ADDRESS 512
@@ -13,7 +14,7 @@
 enum {
   MENU,
   CONNECTING,
-  ARTNET_PAGE
+  ARTNET_CONNECTED
 };
 
 enum {
@@ -24,7 +25,7 @@ enum {
 };
 
 class rlc_artnet {
-private:
+ private:
   uint16_t current_universe = 0;
   uint16_t last_used_universe = 0;
   uint16_t channel_start = 1;
@@ -38,7 +39,7 @@ private:
   uint8_t data_current_universe[UNIVERSE_SIZE] = {};
   uint8_t data_next_universe[UNIVERSE_SIZE] = {};
 
-public:
+ public:
   rlc_artnet();
   ~rlc_artnet();
   void init(void (*fptr)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data));

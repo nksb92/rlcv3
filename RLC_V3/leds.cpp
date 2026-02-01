@@ -8,6 +8,8 @@ CHSV hsv_value(0, 255, 255);
 CHSV temp_val(0, 0, 0);
 CRGB rgb_rainbow;
 
+uint8_t temp_brightness = 0;
+
 #ifdef LED_OUT_RGBIC
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, COLOR_ORDER + NEO_KHZ800);
 #endif
@@ -94,29 +96,6 @@ void rgb_out(CRGB led_val, uint8_t factor) {
     send_data_i2c(led_val, i);
   }
 #endif
-}
-
-void ramp_up_hsv(C_HSV hsv_val) {
-  uint16_t startup_time = 1500;
-  uint16_t temp_brightness = hsv_val.get_val();
-  uint16_t t_delay = startup_time / temp_brightness;
-
-  for (int i = 0; i <= temp_brightness; i++) {
-    hsv_val.set_val(i);
-    hsv_out(hsv_val);
-    delay(t_delay);
-  }
-}
-
-void ramp_up_rgb(CRGB rgb_val) {
-  uint16_t startup_time = 1500;
-  uint8_t temp_brightness = 255;
-  uint16_t t_delay = startup_time / temp_brightness;
-
-  for (int i = 0; i <= temp_brightness; i++) {
-    rgb_out(rgb_val, i);
-    delay(t_delay);
-  }
 }
 
 uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {

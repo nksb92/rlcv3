@@ -1,10 +1,11 @@
 #ifndef NVM_H
 #define NVM_H
 
+#include <EEPROM.h>
+
 #include "common.h"
 #include "dmx.h"
 #include "segments.h"
-#include <EEPROM.h>
 
 #define EEPROM_ADDRESSES 512
 

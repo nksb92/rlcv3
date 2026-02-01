@@ -1,5 +1,6 @@
-#include "WiFiType.h"
 #include "rlc_artnet.h"
+
+#include "WiFiType.h"
 
 ArtnetWifi artnet;
 int previousDataLength = 0;
@@ -195,7 +196,6 @@ void rlc_artnet::set_current_channel(uint16_t channel) {
   add_channel(channel);
 }
 
-void rlc_artnet::set_dots(uint8_t _dots)
-{
+void rlc_artnet::set_dots(uint8_t _dots) {
   number_dots = _dots;
 }

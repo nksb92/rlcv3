@@ -3,13 +3,12 @@
 
 #include "common.h"
 
-class fan_control
-{
-private:
+class fan_control {
+ private:
   uint8_t current_speed = FAN_MIN_SPEED;
   uint8_t target_speed = FAN_MIN_SPEED;
 
-public:
+ public:
   fan_control();
   ~fan_control();
   void init_fan();

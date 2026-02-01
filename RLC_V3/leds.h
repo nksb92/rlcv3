@@ -2,14 +2,12 @@
 #ifndef LEDS_H
 #define LEDS_H
 
-#include "common.h"
 #include <Adafruit_NeoPixel.h>
-#include "segments.h"
-#include "Wire.h"
 
-#define RED_PIN 10
-#define GREEN_PIN 9
-#define BLUE_PIN 8
+#include "Wire.h"
+#include "common.h"
+#include "segments.h"
+
 #define RED_CHANNEL 0
 #define GREEN_CHANNEL 1
 #define BLUE_CHANNEL 2
@@ -22,7 +20,6 @@
 // #define COLOR_ORDER COLOR_ORDER_WS2815
 // #define COLOR_ORDER COLOR_ORDER_WS2811
 #define COLOR_ORDER COLOR_ORDER_COB_RGBIC
-
 
 /**
  * Initializes the LED pins as outputs.
@@ -37,12 +34,6 @@ void init_led();
 void hsv_out(C_HSV hsv_val);
 
 void rgb_out(CRGB led_val, uint8_t factor);
-
-void ramp_up_hsv(C_HSV hsv_val);
-
-void drive_pixel(CRGB rgb_val, uint8_t factor);
-
-void ramp_up_rgb(CRGB rgb_val);
 
 uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data);
 

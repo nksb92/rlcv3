@@ -10,23 +10,16 @@ uint8_t crcTable[256];
 
 // crc code from website: https://barrgroup.com/embedded-systems/how-to/crc-calculation-c-code
 // explaination can be found there
-void crcInit()
-{
+void crcInit() {
   uint8_t remainder;
 
-  for (int dividend = 0; dividend < 256; ++dividend)
-  {
-
+  for (int dividend = 0; dividend < 256; ++dividend) {
     remainder = dividend << (WIDTH - 8);
 
-    for (uint8_t bit = 8; bit > 0; --bit)
-    {
-      if (remainder & TOPBIT)
-      {
+    for (uint8_t bit = 8; bit > 0; --bit) {
+      if (remainder & TOPBIT) {
         remainder = (remainder << 1) ^ POLYNOMIAL;
-      }
-      else
-      {
+      } else {
         remainder = (remainder << 1);
       }
     }
@@ -34,14 +27,12 @@ void crcInit()
   }
 }
 
-uint8_t crcFast(int message[])
-{
+uint8_t crcFast(int message[]) {
   uint8_t data;
   uint8_t remainder = 0;
   int nBytes = sizeof(message);
 
-  for (int byte = 0; byte < nBytes; ++byte)
-  {
+  for (int byte = 0; byte < nBytes; ++byte) {
     data = message[byte] ^ (remainder >> (WIDTH - 8));
     remainder = crcTable[data] ^ (remainder << 8);
   }
@@ -49,14 +40,12 @@ uint8_t crcFast(int message[])
   return (remainder);
 }
 
-void init_eeprom()
-{
+void init_eeprom() {
   EEPROM.begin(EEPROM_ADDRESSES);
   crcInit();
 }
 
-void read_eeprom(C_HSV &hsv_val, C_RGB &rgb_val, rgb_dmx &dmx_val, menu_structure &main_sw, rlc_artnet &artnet_var, segments &segment_var)
-{
+void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
@@ -149,8 +138,7 @@ void read_eeprom(C_HSV &hsv_val, C_RGB &rgb_val, rgb_dmx &dmx_val, menu_structur
 
   // checking if the saved crc matches the calculated
   // and sets the corresponding variables on success
-  if (crc == crcFast(crc_values))
-  {
+  if (crc == crcFast(crc_values)) {
     hsv_val.set_hue_byte(hue);
     hsv_val.set_sat(sat);
     hsv_val.set_val(val);
@@ -175,8 +163,7 @@ void read_eeprom(C_HSV &hsv_val, C_RGB &rgb_val, rgb_dmx &dmx_val, menu_structur
   }
 }
 
-void write_eeprom(C_HSV &hsv_val, C_RGB &rgb_val, rgb_dmx &dmx_val, menu_structure &main_sw, rlc_artnet &artnet_var, segments &segment_var)
-{
+void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
