@@ -1,0 +1,34 @@
+Name on PCB,Package,Value,Name,Vender,Part Nbr.,Link,Price One 2025-04-17,Quantity,Total,n,Quantity n,Price for,Available,Need to buy
+"C1, C2, C4, C6, C8",C1206,100n,Capacitor,Mouser,C1206C104K5RAC7867,https://www.mouser.de/ProductDetail/80-C1206104K5RAC7867,"0,11305",5,"0,57 €",26,130,"14,70 €",,130
+"C10, C11",C0805,100n,Capacitor,Mouser,08055C104KAT2A,https://www.mouser.de/ProductDetail/581-08055C104K,"0,11305",2,"0,23 €",26,52,"5,88 €",,52
+"C12, (C7)",C0805,1u,Capacitor,Mouser,08055C104KAT2A,https://www.mouser.de/ProductDetail/581-08055C104K,"0,11305",1,"0,11 €",26,26,"2,94 €",,26
+C3,C0805,10u,Capacitor,Mouser,C0805C106K8PACTU,https://www.mouser.de/ProductDetail/80-C0805C106K8P,"0,12495",1,"0,12 €",26,26,"3,25 €",,26
+C9,C0805,"4,7u",Capacitor,Mouser,GRM21BZ7YA475KE15K,https://www.mouser.de/ProductDetail/81-GRM21BZ7YA475KE5K,"0,3094",1,"0,31 €",26,26,"8,04 €",,26
+D1,SM71202HTG,,RS485 Protection,Mouser,SM712-02HTG,https://www.mouser.de/ProductDetail/Littelfuse/SM712-02HTG?qs=aGgfWYEhH7lQgBVBPCUDkw%3D%3D,"0,64498",1,"0,64 €",26,26,"16,77 €",,26
+"D2, D3",DO-214AC,SK 14,Diode,Mouser,SK14,https://www.mouser.de/ProductDetail/637-SK14,"0,17017",2,"0,34 €",26,52,"8,85 €",,52
+EN1,PEC11L-4220F-S0015,,Rotary Encoder,Mouser,PEC11L-4220F-S0015,https://www.mouser.de/ProductDetail/652-PEC11L4220FS0015,"2,4514",1,"2,45 €",26,26,"63,74 €",,26
+"H1, H2","3,2 mm",M3,Spacer,Mouser,971080354,https://www.mouser.de/ProductDetail/710-971080354,"0,71281",2,"1,43 €",26,52,"37,07 €",,52
+IC1,SN75176BDR,RS485,RS485 Interface,Mouser,SN75176BDR,https://www.mouser.de/ProductDetail/595-SN75176BDR,"1,07457",1,"1,07 €",26,26,"27,94 €",,26
+IC2,SOP65P490X110-8N,,I2C level shifter,Mouser,TCA9517ADGKR,https://www.mouser.de/ProductDetail/Texas-Instruments/TCA9517ADGKR?qs=%252BrH4t%252BeVZ2M4pVnwXR4oNA%3D%3D,"0,94962",0,"0,00 €",26,0,"0,00 €",,0
+J1,PJ-044A,DC-Jack,Connector,Mouser,PJ-044A,https://www.mouser.de/ProductDetail/490-PJ-044A,"0,6902",1,"0,69 €",26,26,"17,95 €",,26
+"J1, J3",PJ-044A,RJ45,Connector,Mouser,SS-90000-013,https://www.mouser.de/ProductDetail/530-SS-90000-013,"1,7612",2,"3,52 €",26,52,"91,58 €",,52
+JP2,1X04,OLED,Connector,Amazon,Pin Header,https://www.amazon.de/dp/B09NJMBBLX?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_3&th=1,"0,1402",1,"0,14 €",26,26,"3,65 €",,26
+JP2,1X04,OLED,Display,Amazon,OLED Display,https://www.amazon.de/dp/B09J7T5SCL?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_4,"2,831666667",1,"2,83 €",26,26,"73,62 €",,26
+L1,SRN6045,15uH,Inductor 15uH,Mouser,NRS6045T150MMGK,https://www.mouser.de/ProductDetail/963-NRS6045T150MMGK,"0,29393",1,"0,29 €",26,26,"7,64 €",,26
+"R1, R4, R5, R6, R13",R1206,10k,Resistor,Mouser,CRG1206F10K,https://www.mouser.de/ProductDetail/279-CRG1206F10K,"0,11305",5,"0,57 €",26,130,"14,70 €",,130
+R2,R1206,120,Resistor,Mouser,RT0805FRE13120RL,https://www.mouser.de/ProductDetail/603-RT0805FRE13120RL,"0,11305",1,"0,11 €",26,26,"2,94 €",,26
+R3,R1206,20k,Resistor,Mouser,RC1206FR-0720KL,https://www.mouser.de/ProductDetail/603-RC1206FR-0720KL,"0,11305",1,"0,11 €",26,26,"2,94 €",,26
+R7,R1206,"22,1k",Resistor,Mouser,RMCF0805FT22K1,https://www.mouser.de/ProductDetail/708-RMCF0805FT22K1,"0,11305",1,"0,11 €",26,26,"2,94 €",,26
+R8,R0805,115k,Resistor,Mouser,CR0805-FX-1153ELF,https://www.mouser.de/ProductDetail/652-CR0805FX-1153ELF,"0,11305",1,"0,11 €",26,26,"2,94 €",,26
+"R9, R10, R11, R12",R0805,4k7,Resistor,Mouser,RK73H2ATTDD4701F,https://www.mouser.de/ProductDetail/660-RK73H2ATTDD4701F,"0,12019",0,"0,00 €",26,0,"0,00 €",,0
+S1,TL3XYO,,Switch,Mouser,OS102011MA1QN1,https://www.mouser.de/ProductDetail/611-OS102011MA1QN1,"0,62237",1,"0,62 €",26,26,"16,18 €",,26
+U1,XIAO-ESP32C3,XIAO-ESP32C3,Microcontroller,Mouser,113991054,https://www.mouser.de/ProductDetail/713-113991054,"5,6406",1,"5,64 €",26,26,"146,66 €",,26
+U2,SOT23-6,,Buck converter,Mouser,LMR54406FDBVR,https://www.mouser.de/ProductDetail/595-LMR54406FDBVR,"1,09718",1,"1,10 €",26,26,"28,53 €",,26
+,,,LED Profile,Amazon,LED Profile,https://www.amazon.de/dp/B07548TMKN?psc=1&ref=ppx_yo2ov_dt_b_product_details,"11,95 €",1,"11,95 €",26,26,"310,70 €",,26
+,,,PCB,JLCPCB,,,"0,54 €",1,"0,54 €",26,26,"14,04 €",,26
+,,,LED Strip,Ali Express,COB LED Strip,https://de.aliexpress.com/item/1005005648644241.html?spm=a2g0o.order_list.order_list_main.11.21ef5c5f3RMfAO&gatewayAdapt=glo2deu,"5,038",1,"5,04 €",26,26,"130,99 €",,26
+,,,3D Druck Filament,Bambu Lab,PLA Basic,https://eu.store.bambulab.com/de/products/pla-basic-filament-de?variant=43923829129435,"1,65 €",1,"1,65 €",26,26,"42,82 €",,26
+,,,Threaded Inserts,Amazon,M3S Gewindeeinsatz,https://www.amazon.de/dp/B09ZHSGHXD?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_5&th=1,"0,0899",20,"1,80 €",26,520,"46,75 €",,520
+,,,Screw,Amazon,M3x10,https://www.amazon.de/gp/product/B01MY4VXCS/ref=ox_sc_act_title_2?smid=AQ1IBDB6G2RRD&psc=1,"0,1099",4,"0,44 €",26,104,"11,43 €",,104
+,,,Screw,Amazon,M3x8,https://www.amazon.de/gp/product/B08K8FQWCZ/ref=ox_sc_act_image_1?smid=A1KGD9U4C0ZGWS&th=1,"0,119",8,"0,95 €",26,208,"24,75 €",,208
+,,,Screw,Amazon,M3x6,https://www.amazon.de/gp/product/B08K8F4FL6/ref=ox_sc_act_image_3?smid=A1KGD9U4C0ZGWS&th=1,"0,1046",2,"0,21 €",26,52,"5,44 €",,52
