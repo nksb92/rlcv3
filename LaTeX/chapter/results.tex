@@ -1,14 +1,63 @@
 \section{Results}
 \label{sec:results}
 \subsection{Hardware Performance}
+\label{subsec:hardware_performance}
+
+\subsubsection{Thermal Analysis}
+\label{subsec:thermal_analysis}
+The Light Tube V3 and Spotlight variants maintain safe operating temperatures.
+The aluminum profile of the Tube acts as an effective passive heatsink, while the Spotlight's active cooling is sufficient.
+No critical heat buildup occurs at maximum brightness.
+The Panel variant overheats.
+Direct active cooling of the PCB is insufficient without a dedicated heatsink.
+Future designs require a heatsink and fan.
+The five addressable sections provide limited utility.
+Replacing them with a single section of high-power, MOSFET-controlled LEDs is recommended to eliminate the quiescent current draw of addressable ICs.
+
+\subsubsection{Power Stability}
+\label{subsec:power_stability}
+The 5V rail remains stable under full logic load (Art-Net and Display active).
+LED strip brightness does not affect the 5V rail.
+Addressable strips (WS2815) draw power from the 12V/24V input, bypassing the 5V buck converter.
+MOSFET gate switching current is negligible.
+
 \subsection{Software Performance}
+\label{subsec:software_performance}
+\subsubsection{Responsiveness}
+\label{subsec:responsiveness}
+Art-Net over Wi-Fi exhibits visible latency.
+It is unsuitable for live music synchronization.
+Wired DMX512 shows no perceptible latency and is validated for live performance.
+The DMX driver occasionally fails upon bus connection, requiring a microcontroller reset.
+Post-reset operation is stable.
+
 \subsection{Overall System Functionality for Each Product}
+\label{subsec:overall_system_functionality}
 \subsubsection{Light Tube V2 (PWM Control)}
+\label{subsubsec:light_tube_v2_results}
+The V2 variant is considered deprecated, mainly due to the enclosure design. 
+Integrating the controller into the end cap meant there were no connection points for building "light sculptures".
+Also, controlling the whole tube as just one segment via MOSFETs felt visually limited.
+
 \subsubsection{Light Tube V3 (RGB IC Control)}
+\label{subsubsec:light_tube_v3_results}
+The V3 is a solid improvement. 
+The addressable LED strips provide much better visuals.
+The "Screw it!" connection design is a highlight, offering the support needed for modular, multi-tube builds.
+
 \subsubsection{Panel Light}
+\label{subsubsec:panel_light_results}
+The Panel functions, but you have to be careful with high brightness levels. 
+The internal logic—sending I2C data to control addressable LEDs—ended up being overly complex for what it achieves.
+
 \subsubsection{Spot Light}
+\label{subsubsec:spot_light_results}
+The Spotlight works well. The lens focuses the single COB LED effectively, and the 3D-printed diffusion cube blends the colors nicely.
+The aluminum heatsink and fan keep it cool enough, and having just one control segment is exactly what you need for a spot.
+
 \subsection{Enclosure Quality and Durability}
 \label{subsec:enclosure_quality}
-\begin{itemize}
-	\item Present observations and any testing results related to the quality and durability of the 3D printed and aluminum enclosures.
-\end{itemize}
+The 3D-printed components have proven to be robust. 
+They hold up well under normal use and provide good overall stability for the fixtures. 
+The heat-set inserts are a key factor here; they offer enough strength for the "Screw it!" connection system to work reliably without stripping or pulling out. 
+Although the parts haven't been purposely tested to failure, no mechanical failures have occurred during assembly or operation so far.

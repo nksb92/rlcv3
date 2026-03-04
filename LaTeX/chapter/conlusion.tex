@@ -1,7 +1,18 @@
 \section{Conclusion}
 \label{sec:conclusion}
-\subsection{Summary of Work}
+A robust firmware implementation for \ac{RGB} \ac{LED} control was developed, incorporating full \ac{DMX}512 and Art-Net protocol integration. The event-driven and timer-based architecture performs reliably and is structured for straightforward extensibility. On the hardware side, the rotary encoder input, \ac{OLED} display, and RJ45/Ethernet interface all operate as specified. The \ac{DC}-\ac{DC} converter supplying the 5 V rail maintains stable operation without significant thermal dissipation. The 3D-printed enclosure meets mechanical requirements, and the screw-terminal interconnect interface functions as intended. \\
+
+The \ac{RS485} \ac{DMX} driver represents the primary area requiring hardware revision. The snap-fit "click \& hope" mechanical connection system proved insufficient in structural rigidity for permanent installations and should be reserved exclusively for temporary fixture assemblies. The spotlight and tube (v3) fixtures are fully operational; the panel light requires further development as outlined in the future work section.
+
 \subsection{Future Work}
-\begin{itemize}
-	\item Could include potential improvements to the enclosure designs or manufacturing processes.
-\end{itemize}
+\subsubsection{Hardware}
+The \ac{RS485} hardware driver requires a redesign to address instability caused by hot-plugging or removing participants on the bus. The revised driver shall integrate bias resistors and optical isolation to decouple the bus from external circuitry. Replacing the current level-shifting approach with a dedicated 3.3 V \ac{RS485} transceiver IC — such as the SP3485 — would eliminate the need for the existing voltage divider. The power supply architecture should be consolidated to a single 3.3 V rail, removing the dual-rail 5 V/3.3 V configuration. Controller migration to a more capable platform, such as the ESP32-S3 or ESP32-C6, warrants evaluation to determine whether the Art-Net transmission latency is bound by processing throughput. For fan control, an optional 12 V rail should be supplied via a dedicated \ac{DC}-\ac{DC} switching converter rather than an \ac{LDO} regulator to improve power conversion efficiency.
+
+\subsubsection{Panel Light}
+The light panel should be redesigned as a single-segment, high-power \ac{RGB} module incorporating an integrated heatsink for adequate thermal management. Aluminum heatsink solutions already qualified for comparable panels — such as those used with the Samsung QB288 LM281B — should be considered for adoption. \ac{LED} drive control should be migrated from the current \ac{I2C} slave topology to direct \ac{PWM}-based MOSFET switching, reducing complexity and improving dynamic response. Thermal feedback via dedicated temperature sensors should govern fan speed, replacing the current open-loop, value-driven approach. The control \ac{PCB} rework must also resolve existing \ac{DMX}512 compliance issues.
+
+\subsubsection{Software}
+The firmware options menu should expose a function to reset \ac{EEPROM} to factory defaults. A configurable parameter shall allow the user to enable or disable a dedicated dimmer channel for the full tube, including selection of its position within the data frame — either the first or last byte. Color control should be extended to support gradient generation in \ac{HSV} or \ac{RGB} mode, with per-segment individual color assignment and optional interpolation between adjacent segments. Basic generative animations — including rainbow, fire, and candle effects — may be considered for inclusion. The Art-Net implementation requires rework to support more than two universes of data, increasing the addressable segment count for longer \ac{LED} strips. Latency profiling should be conducted to determine whether the issue originates in software or reflects a hardware throughput limitation.
+
+\subsubsection{Hardware Bridge}
+A dedicated hardware bridge should be developed, capable of accepting up to four \ac{DMX} input channels and converting to Art-Net output. The device shall incorporate an onboard effects engine supporting configurable fixture profiles for standalone operation. In standalone mode, the output shall be selectable between Art-Net and \ac{DMX}512. The controller platform should be re-evaluated in favor of the STM32 family to meet the processing and peripheral requirements of the bridge functionality.

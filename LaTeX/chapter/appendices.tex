@@ -1,21 +1,76 @@
 \section{Schematic Diagrams}
-\section{PCB Layout}
-\section{Source Code}
-\section{Bill of Materials (BOM)}
-\section{Datasheets}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\linewidth]{graphics/circuit_drawing}
+	\caption{Circuit Diagram Tube V3}
+	\label{fig:circuitdrawing}
+\end{figure}
+\clearpage
 
-\newpage
+\section{Source Code}
+The complete source code for the firmware, along with the hardware design files and 3D models, is hosted on GitHub.
+The repository can be accessed via the following link: \\
+\url{https://github.com/nksb92/rlcv3}
+\clearpage
+
+\section{Bill of Materials (BOM)}
+\begin{table}[H]
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+			\hline
+			\textbf{Name on PCB} & \textbf{Package} & \textbf{Value} & \textbf{Name} & \textbf{Vender} & \textbf{Part Nbr.} & \textbf{Link} & \textbf{Price One 2025-04-17} & \textbf{Quantity} & \textbf{Total} \\ \hline \hline
+			C1, C2, C4, C6, C8 & C1206 & 100n & Capacitor & Mouser & C1206C104K5RAC7867 & \href{https://www.mouser.de/ProductDetail/80-C1206104K5RAC7867}{\textit{View...}} & 0,11305 & 5 & 0,57 € \\ \hline
+			C10, C11 & C0805 & 100n & Capacitor & Mouser & 08055C104KAT2A & \href{https://www.mouser.de/ProductDetail/581-08055C104K}{\textit{View...}} & 0,11305 & 2 & 0,23 € \\ \hline
+			C12, (C7) & C0805 & 1u & Capacitor & Mouser & 08055C104KAT2A & \href{https://www.mouser.de/ProductDetail/581-08055C104K}{\textit{View...}} & 0,11305 & 1 & 0,11 € \\ \hline
+			C3 & C0805 & 10u & Capacitor & Mouser & C0805C106K8PACTU & \href{https://www.mouser.de/ProductDetail/80-C0805C106K8P}{\textit{View...}} & 0,12495 & 1 & 0,12 € \\ \hline
+			C9 & C0805 & 4,7u & Capacitor & Mouser & GRM21BZ7YA475KE15K & \href{https://www.mouser.de/ProductDetail/81-GRM21BZ7YA475KE5K}{\textit{View...}} & 0,3094 & 1 & 0,31 € \\ \hline
+			D1 & SM71202HTG &  & RS485 Protection & Mouser & SM712-02HTG & \href{https://www.mouser.de/ProductDetail/Littelfuse/SM712-02HTG?qs=aGgfWYEhH7lQgBVBPCUDkw\%3D\%3D}{\textit{View...}} & 0,64498 & 1 & 0,64 € \\ \hline
+			D2, D3 & DO-214AC & SK 14 & Diode & Mouser & SK14 & \href{https://www.mouser.de/ProductDetail/637-SK14}{\textit{View...}} & 0,17017 & 2 & 0,34 € \\ \hline
+			EN1 & PEC11L-4220F-S0015 &  & Rotary Encoder & Mouser & PEC11L-4220F-S0015 & \href{https://www.mouser.de/ProductDetail/652-PEC11L4220FS0015}{\textit{View...}} & 2,4514 & 1 & 2,45 € \\ \hline
+			H1, H2 & 3,2 mm & M3 & Standoff & Mouser & 971080354 & \href{https://www.mouser.de/ProductDetail/710-971080354}{\textit{View...}} & 0,71281 & 2 & 1,43 € \\ \hline
+			IC1 & SN75176BDR & RS485 & RS485 Interface & Mouser & SN75176BDR & \href{https://www.mouser.de/ProductDetail/595-SN75176BDR}{\textit{View...}} & 1,07457 & 1 & 1,07 € \\ \hline
+			IC2 & SOP65P490X110-8N &  & I2C level shifter & Mouser & TCA9517ADGKR & \href{https://www.mouser.de/ProductDetail/Texas-Instruments/TCA9517ADGKR?qs=\%252BrH4t\%252BeVZ2M4pVnwXR4oNA\%3D\%3D}{\textit{View...}} & 0,94962 & 0 & 0,00 € \\ \hline
+			J1 & PJ-044A & DC-Jack & Connector & Mouser & PJ-044A & \href{https://www.mouser.de/ProductDetail/490-PJ-044A}{\textit{View...}} & 0,6902 & 1 & 0,69 € \\ \hline
+			J1, J3 & PJ-044A & RJ45 & Connector & Mouser & SS-90000-013 & \href{https://www.mouser.de/ProductDetail/530-SS-90000-013}{\textit{View...}} & 1,7612 & 2 & 3,52 € \\ \hline
+			JP2 & 1X04 & OLED & Connector & Amazon & Pin Header & \href{https://www.amazon.de/dp/B09NJMBBLX?ref\_=ppx\_hzsearch\_conn\_dt\_b\_fed\_asin\_title\_3\&th=1}{\textit{View...}} & 0,1402 & 1 & 0,14 € \\ \hline
+			JP2 & 1X04 & OLED & Display & Amazon & OLED Display & \href{https://www.amazon.de/dp/B09J7T5SCL?ref\_=ppx\_hzsearch\_conn\_dt\_b\_fed\_asin\_title\_4}{\textit{View...}} & 2,831666667 & 1 & 2,83 € \\ \hline
+			L1 & SRN6045 & 15uH & Inductor 15uH & Mouser & NRS6045T150MMGK & \href{https://www.mouser.de/ProductDetail/963-NRS6045T150MMGK}{\textit{View...}} & 0,29393 & 1 & 0,29 € \\ \hline
+			R1, R4, R5, R6, R13 & R1206 & 10k & Resistor & Mouser & CRG1206F10K & \href{https://www.mouser.de/ProductDetail/279-CRG1206F10K}{\textit{View...}} & 0,11305 & 5 & 0,57 € \\ \hline
+			R2 & R1206 & 120 & Resistor & Mouser & RT0805FRE13120RL & \href{https://www.mouser.de/ProductDetail/603-RT0805FRE13120RL}{\textit{View...}} & 0,11305 & 1 & 0,11 € \\ \hline
+			R3 & R1206 & 20k & Resistor & Mouser & RC1206FR-0720KL & \href{https://www.mouser.de/ProductDetail/603-RC1206FR-0720KL}{\textit{View...}} & 0,11305 & 1 & 0,11 € \\ \hline
+			R7 & R1206 & 22,1k & Resistor & Mouser & RMCF0805FT22K1 & \href{https://www.mouser.de/ProductDetail/708-RMCF0805FT22K1}{\textit{View...}} & 0,11305 & 1 & 0,11 € \\ \hline
+			R8 & R0805 & 115k & Resistor & Mouser & CR0805-FX-1153ELF & \href{https://www.mouser.de/ProductDetail/652-CR0805FX-1153ELF}{\textit{View...}} & 0,11305 & 1 & 0,11 € \\ \hline
+			R9, R10, R11, R12 & R0805 & 4k7 & Resistor & Mouser & RK73H2ATTDD4701F & \href{https://www.mouser.de/ProductDetail/660-RK73H2ATTDD4701F}{\textit{View...}} & 0,12019 & 0 & 0,00 € \\ \hline
+			S1 & TL3XYO &  & Switch & Mouser & OS102011MA1QN1 & \href{https://www.mouser.de/ProductDetail/611-OS102011MA1QN1}{\textit{View...}} & 0,62237 & 1 & 0,62 € \\ \hline
+			U1 & XIAO-ESP32C3 & XIAO-ESP32C3 & Microcontroller & Mouser & 113991054 & \href{https://www.mouser.de/ProductDetail/713-113991054}{\textit{View...}} & 5,6406 & 1 & 5,64 € \\ \hline
+			U2 & SOT23-6 &  & Buck converter & Mouser & LMR54406FDBVR & \href{https://www.mouser.de/ProductDetail/595-LMR54406FDBVR}{\textit{View...}} & 1,09718 & 1 & 1,10 € \\ \hline
+			&  &  & LED Profile & Amazon & LED Profile & \href{https://www.amazon.de/dp/B07548TMKN?psc=1\&ref=ppx\_yo2ov\_dt\_b\_product\_details}{\textit{View...}} & 11,95 € & 1 & 11,95 € \\ \hline
+			&  &  & PCB & JLCPCB &  &  & 0,54 € & 1 & 0,54 € \\ \hline
+			&  &  & LED Strip &BTF-Lighting &FCOB SPI RGB IC WS2811 864 & \href{https://www.btf-lighting.com/en-intl/products/fcob-spi-rgb-ic-ws2811-864leds-12v-24v-cob-lights-ra90?variant=46161432772834}{\textit{View...}} & 5,038 & 1 & 5,04 € \\ \hline
+			&  &  & 3D Druck Filament & Bambu Lab & PLA Basic & \href{https://eu.store.bambulab.com/de/products/pla-basic-filament-de?variant=43923829129435}{\textit{View...}} & 1,65 € & 1 & 1,65 € \\ \hline
+			&  &  & Threaded Inserts & Amazon & M3S Gewindeeinsatz & \href{https://www.amazon.de/dp/B09ZHSGHXD?ref\_=ppx\_hzsearch\_conn\_dt\_b\_fed\_asin\_title\_5\&th=1}{\textit{View...}} & 0,0899 & 20 & 1,80 € \\ \hline
+			&  &  & Screw & Amazon & M3x10 & \href{https://www.amazon.de/gp/product/B01MY4VXCS/ref=ox\_sc\_act\_title\_2?smid=AQ1IBDB6G2RRD\&psc=1}{\textit{View...}} & 0,1099 & 4 & 0,44 € \\ \hline
+			&  &  & Screw & Amazon & M3x8 & \href{https://www.amazon.de/gp/product/B08K8FQWCZ/ref=ox\_sc\_act\_image\_1?smid=A1KGD9U4C0ZGWS\&th=1}{\textit{View...}} & 0,119 & 8 & 0,95 € \\ \hline
+			&  &  & Screw & Amazon & M3x6 & \href{https://www.amazon.de/gp/product/B08K8F4FL6/ref=ox\_sc\_act\_image\_3?smid=A1KGD9U4C0ZGWS\&th=1}{\textit{View...}} & 0,1046 & 2 & 0,21 € \\ \hline
+		\end{tabular}
+	}
+	\caption[Bill of Materials]{Bill of Materials (Prices from 17.04.2025)}
+	\label{tab:bom}
+\end{table}
+\clearpage
+
 \section{Connection Interfaces}\label{sec:cad_models}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\linewidth]{graphics/connector_interface_tech_drawing}
+	\includegraphics[width=0.85\linewidth]{graphics/connector_interface_tech_drawing}
 	\caption{Diagram of the connection interface.}
 	\label{fig:connectorinterfacetechdrawing}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\linewidth]{graphics/clamp_interface_tech_drawing}
+	\includegraphics[width=0.85\linewidth]{graphics/clamp_interface_tech_drawing}
 	\caption{Diagram of the clamp interface.}
 	\label{fig:clampinterfacetechdrawing}
 \end{figure}
