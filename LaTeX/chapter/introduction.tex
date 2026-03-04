@@ -1,6 +1,36 @@
 \section{Introduction}
 \label{sec:introduction}
+
 \subsection{Motivation}
+The effective use of lighting is paramount in creating immersive environments for stage performances, film production, and artistic installations.
+The rapid advancement of \ac{LED} technology and embedded systems has democratized access to high-quality lighting tools.
+However, a gap often remains between rigid, high-cost professional equipment and fragile, feature-limited hobbyist solutions.
+The RLCV3 (\ac{RGB} \ac{LED} Controller Version 3) project was initiated to address this specific niche.
+It stems from the need for a highly customizable, robust, and modular lighting ecosystem capable of integrating seamlessly into professional workflows via standard protocols, while remaining accessible and adaptable for custom "light sculpture" configurations.
+Building upon the lessons learned from previous iterations, specifically the limitations in mechanical modularity and control resolution encountered in Version 2, this project aims to deliver a professional-grade solution suitable for \ac{DIY} fabrication.
+
 \subsection{Problem Statement and Objectives}
+The primary challenge addressed by this work is the development of a unified control architecture capable of driving distinct lighting form factors—specifically linear tubes, flat panels, and spotlights—without requiring disparate hardware designs.
+Existing solutions often lack the flexibility to switch between wired \ac{DMX} and wireless Art-Net control within a compact form factor.
+Furthermore, mechanical integration in custom builds is frequently overlooked, leading to thermal issues or structural instability.
+
+The specific objectives of this project are:
+\begin{itemize}
+	\item To design a versatile embedded controller based on the ESP32-C3 \ac{MCU} that supports both wired DMX512 and wireless Art-Net communication.
+	\item To develop firmware that adapts to multiple hardware profiles (Addressable \ac{RGB} strips, \ac{PWM} \ac{MOSFET} control, and \ac{I2C}-driven panels) through a centralized configuration mechanism.
+	\item To engineer a robust mechanical enclosure system utilizing \ac{FDM} 3D printing and aluminum profiles that facilitates modular interconnection (the "Screw it!" system) and ensures effective thermal management.
+	\item To implement a responsive local user interface using an \ac{OLED} display and rotary encoder for standalone configuration.
+	\item To validate the system's performance in terms of thermal stability, power reliability, and software responsiveness suitable for live environments.
+\end{itemize}
+
 \subsection{Structure of the Article}
-\textit{(These subsections remain largely the same)}
+The remainder of this document is organized as follows:
+\begin{itemize}
+	\item \textit{Section \ref{sec:theoretical_background} \nameref{sec:theoretical_background}} provides the theoretical underpinnings, covering embedded systems, \ac{LED} technology, and communication protocols.
+	\item \textit{Section \ref{sec:system_architecture} \nameref{sec:system_architecture}} presents the high-level hardware and software design, including the block diagrams and menu structures.
+	\item \textit{Section \ref{sec:hardware_development} \nameref{sec:hardware_development}} details the electronic circuit design, \ac{PCB} fabrication, and component selection.
+	\item \textit{Section \ref{sec:mechanical_design} \nameref{sec:mechanical_design}} describes the mechanical engineering aspects, focusing on the enclosure design, 3D printing materials, and the modular connection system.
+	\item \textit{Section \ref{sec:software_development} \nameref{sec:software_development}} discusses the firmware implementation, including the event-driven architecture, library management, and user interface logic.
+	\item \textit{Section \ref{sec:device_assebly} \nameref{sec:device_assebly}} outlines the practical steps for assembling the devices and flashing the firmware.
+	\item Finally, \textit{Section \ref{sec:results} \nameref{sec:results}} analyzes the performance of the developed hardware and software, evaluating thermal behavior and overall system functionality.
+\end{itemize}

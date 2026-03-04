@@ -1,6 +1,6 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2024.1.13)  19 JAN 2026 13:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2024.1.13)  27 FEB 2026 14:22
 entering extended mode
- restricted \write18 enabled.
+ \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
 **f:/Programme/rlcv3/LaTeX/includes/includes.tex
@@ -260,7 +260,7 @@ LaTeX Info: Redefining \\ on input line 3180.
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 ) (D:\Program Files\MiKTeX\tex/latex/tools\shellesc.sty
 Package: shellesc 2023/04/15 v1.0d unified shell escape interface for LaTeX
-Package shellesc Info: Restricted shell escape enabled on input line 77.
+Package shellesc Info: Unrestricted shell escape enabled on input line 75.
 ) (D:\Program Files\MiKTeX\tex/latex/ifplatform\ifplatform.sty
 Package: ifplatform 2017/10/13 v0.4a Testing for the operating system
  (D:\Program Files\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.sty
@@ -279,12 +279,7 @@ Package: catchfile 2019/12/09 v1.8 Catch the contents of a file (HO)
 Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )) (D:\Program Files\MiKTeX\tex/generic/iftex\ifluatex.sty
 Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
-)
-
-Package ifplatform Warning: 
-    shell escape is disabled, so I can only detect \ifwindows.
-
-) (D:\Program Files\MiKTeX\tex/latex/xstring\xstring.sty (D:\Program Files\MiKTeX\tex/generic/xstring\xstring.tex
+)) (D:\Program Files\MiKTeX\tex/latex/xstring\xstring.sty (D:\Program Files\MiKTeX\tex/generic/xstring\xstring.tex
 \xs_counta=\count304
 \xs_countb=\count305
 )
@@ -312,21 +307,9 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@every@listing=\toks28
 \c@listing=\count309
 )
-runsystem(if not exist _minted-includes mkdir _minted-includes)...disabled (restricted).
+runsystem(if not exist _minted-includes mkdir _minted-includes)...executed.
 
-
-
-f:/Programme/rlcv3/LaTeX/includes/includes.tex:35: Package minted Error: You must invoke LaTeX with the -shell-escape flag.
-
-See the minted package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.35 \usepackage
-                {helvet}
-Pass the -shell-escape flag to LaTeX. Refer to the minted.sty documentation for more information.
-
-(D:\Program Files\MiKTeX\tex/latex/psnfss\helvet.sty
+ (D:\Program Files\MiKTeX\tex/latex/psnfss\helvet.sty
 Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
 ) (D:\Program Files\MiKTeX\tex/latex/xcolor\xcolor.sty
 Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
