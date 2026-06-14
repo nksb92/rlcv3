@@ -9,7 +9,7 @@
 uint8_t offset = 5;
 uint8_t offset_y = 26;
 uint8_t last_menu_index = BITMAP_MAIN_MENU_LEN;
-uint8_t MENU_ORDER[] = {LEFT_END_MENU, HSV_MENU, RGB_MENU, DMX_MENU, ARTNET_REC_MENU, SETTINGS_MENU, RIGHT_END_MENU};
+uint8_t MENU_ORDER[] = {LEFT_END_MENU, HSV_MENU, RGB_MENU, CCT_MENU, DMX_MENU, ARTNET_REC_MENU, SETTINGS_MENU, RIGHT_END_MENU};
 uint8_t current_frame = 0;
 int x_scroll = 0;
 int min_x = 0;
@@ -86,6 +86,33 @@ void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val) {
   dp.display();
 }
 
+void cct_display_update(Adafruit_SSD1306& dp, c_cct cct_val) {
+  uint16_t kelvin = cct_val.get_kelvin();
+  uint8_t brightness = cct_val.get_brightness();
+  uint8_t current_state = cct_val.get_current();
+  uint8_t spacing = 64;
+
+  dp.setTextColor(WHITE);
+  dp.clearDisplay();
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_CCT_PAGE][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_CCT_PAGE][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_CCT_PAGE],
+                W_H_MATRIX_SUB_MENU[NMBR_CCT_PAGE][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_CCT_PAGE][HEIGHT],
+                1);
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][x] + spacing * current_state,
+                X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_SELECTION_BAR_SUB],
+                W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][HEIGHT],
+                1);
+  dp.setCursor(offset, offset_y);
+  dp.print(kelvin);
+  dp.setCursor(spacing + offset, offset_y);
+  dp.print(brightness);
+  dp.display();
+}
+
 void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   uint16_t start = dmx_val.get_start();
   uint16_t used = dmx_val.get_used_nbr();
@@ -145,6 +172,24 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
       dp.setCursor(82, 15);
       dp.print(RLCV3_FIRMWARE_VERSION);
       break;
+    case DIMMER_OPTION:
+      dp.setCursor(5, 15);
+      dp.print("DIM MODE");
+      dp.setCursor(82, 15);
+      if (seg.get_dimmer_mode() == DIMMER_RGB) dp.print("D+RGB");
+      else if (seg.get_dimmer_mode() == RGB_DIMMER) dp.print("RGB+D");
+      else dp.print("RGB");
+      break;
+
+    case WHITE_OPTION:
+      dp.setCursor(5, 15);
+      dp.print("WHT MODE");
+      dp.setCursor(82, 15);
+      if (seg.get_white_mode() == WHITE_DISABLE) dp.print("OFF");
+      else if (seg.get_white_mode() == WHITE_ONE_CH) dp.print("1CH");
+      else dp.print("2CH");
+      break;
+
     default:
       break;
   }

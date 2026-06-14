@@ -6,6 +6,7 @@
 extern Adafruit_SSD1306 display;
 extern C_HSV hsv_val;
 extern C_RGB rgb_val;
+extern c_cct cct_val;
 extern rgb_dmx dmx_val;
 extern menu_structure main_sw;
 extern rlc_artnet artnet_var;
@@ -36,6 +37,9 @@ void display_show_submenu() {
       break;
     case RGB_PAGE:
       rgb_display_update(display, rgb_val);
+      break;
+    case CCT_PAGE:
+      cct_display_update(display, cct_val);
       break;
     case DMX_PAGE:
       dmx_display_update(display, dmx_val);

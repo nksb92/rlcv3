@@ -12,6 +12,7 @@
 #include "common.h"
 #include "dmx.h"
 #include "segments.h"
+#include "c_cct.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
@@ -49,6 +50,14 @@ void hsv_display_update(Adafruit_SSD1306& dp, C_HSV out_val);
  * @param rgb_val: the C_RGB object containing the current RGB values
  */
 void rgb_display_update(Adafruit_SSD1306& dp, C_RGB rgb_val);
+
+/**
+ * Updates the OLED display with the current CCT values.
+ *
+ * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
+ * @param cct_val: the c_cct object containing the current CCT values
+ */
+void cct_display_update(Adafruit_SSD1306& dp, c_cct cct_val);
 
 /**
  * Updates the OLED display with the current DMX values.
