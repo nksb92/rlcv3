@@ -58,3 +58,52 @@ void segments::add_seg(int value) {
 
   set_segments(current_segment);
 }
+
+uint8_t segments::get_dimmer_mode() {
+  return dimmer_mode;
+}
+
+void segments::set_dimmer_mode(uint8_t mode) {
+  dimmer_mode = mode;
+}
+
+void segments::add_dimmer_mode(int value) {
+  if (value > 0) {
+    dimmer_mode = (dimmer_mode + 1) > RGB_ONLY ? DIMMER_RGB : (dimmer_mode + 1);
+  } else if (value < 0) {
+    dimmer_mode = (dimmer_mode == 0) ? RGB_ONLY : (dimmer_mode - 1);
+  }
+}
+
+uint8_t segments::get_white_mode() {
+  return white_mode;
+}
+
+void segments::set_white_mode(uint8_t mode) {
+  white_mode = mode;
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGB
+  white_mode = WHITE_DISABLE;
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBW
+  if (white_mode > WHITE_ONE_CH) white_mode = WHITE_DISABLE;
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  if (white_mode > WHITE_TWO_CH) white_mode = WHITE_DISABLE;
+#endif
+}
+
+void segments::add_white_mode(int value) {
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGB
+  white_mode = WHITE_DISABLE;
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBW
+  if (value > 0) {
+    white_mode = (white_mode + 1) > WHITE_ONE_CH ? WHITE_DISABLE : (white_mode + 1);
+  } else if (value < 0) {
+    white_mode = (white_mode == 0) ? WHITE_ONE_CH : (white_mode - 1);
+  }
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  if (value > 0) {
+    white_mode = (white_mode + 1) > WHITE_TWO_CH ? WHITE_DISABLE : (white_mode + 1);
+  } else if (value < 0) {
+    white_mode = (white_mode == 0) ? WHITE_TWO_CH : (white_mode - 1);
+  }
+#endif
+}

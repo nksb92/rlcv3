@@ -1,6 +1,6 @@
 #include "nvm.h"
 
-#define COUNT_STORED_VALUES 14
+#define COUNT_STORED_VALUES 18
 #define POLYNOMIAL 0xD8
 #define WIDTH (8 * sizeof(uint8_t))
 #define TOPBIT (1 << (WIDTH - 1))
@@ -45,7 +45,7 @@ void init_eeprom() {
   crcInit();
 }
 
-void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
+void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
@@ -88,11 +88,36 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structur
   crc_values[crc_index] = blue;
   crc_index++;
 
+  // get all variables from the cct page
+  uint16_t kelvin = (CCT_MIN_KELVIN + (((CCT_MAX_KELVIN - CCT_MIN_KELVIN) / 2) / CCT_STEP_SIZE) * CCT_STEP_SIZE);
+  EEPROM.get(eeprom_address, kelvin);
+  eeprom_address += sizeof(kelvin);
+  crc_values[crc_index] = kelvin;
+  crc_index++;
+
+  uint8_t brightness = 255;
+  EEPROM.get(eeprom_address, brightness);
+  eeprom_address += sizeof(brightness);
+  crc_values[crc_index] = brightness;
+  crc_index++;
+
   // get all variables from the segment page
   uint8_t segment_pos = STD_SEGMENTS;
   EEPROM.get(eeprom_address, segment_pos);
   eeprom_address += sizeof(segment_pos);
   crc_values[crc_index] = segment_pos;
+  crc_index++;
+
+  uint8_t dimmer_mode = RGB_DIMMER;
+  EEPROM.get(eeprom_address, dimmer_mode);
+  eeprom_address += sizeof(dimmer_mode);
+  crc_values[crc_index] = dimmer_mode;
+  crc_index++;
+
+  uint8_t white_mode = WHITE_DISABLE;
+  EEPROM.get(eeprom_address, white_mode);
+  eeprom_address += sizeof(white_mode);
+  crc_values[crc_index] = white_mode;
   crc_index++;
 
   // get all variables from the dmx page
@@ -147,10 +172,15 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structur
     rgb_val.set_green(green);
     rgb_val.set_blue(blue);
 
-    segment_var.set_current_segment(segment_pos);
+    cct_val.set_kelvin(kelvin);
+    cct_val.set_brightness(brightness);
 
-    dmx_val.set_number_segments(segment_var.get_num_seg());
-    artnet_var.set_number_segments(segment_var.get_num_seg());
+    segment_var.set_current_segment(segment_pos);
+    segment_var.set_dimmer_mode(dimmer_mode);
+    segment_var.set_white_mode(white_mode);
+
+    dmx_val.set_number_segments(segment_var.get_num_seg(), segment_var.get_dimmer_mode(), segment_var.get_white_mode());
+    artnet_var.set_number_segments(segment_var.get_num_seg(), segment_var.get_dimmer_mode(), segment_var.get_white_mode());
 
     dmx_val.set_start_address(start_address);
 
@@ -163,7 +193,7 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structur
   }
 }
 
-void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
+void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
@@ -206,11 +236,36 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, rgb_dmx& dmx_val, menu_structu
   crc_values[crc_index] = blue;
   crc_index++;
 
+  // set all variables from the cct page
+  uint16_t kelvin = cct_val.get_kelvin();
+  EEPROM.put(eeprom_address, kelvin);
+  eeprom_address += sizeof(kelvin);
+  crc_values[crc_index] = kelvin;
+  crc_index++;
+
+  uint8_t brightness = cct_val.get_brightness();
+  EEPROM.put(eeprom_address, brightness);
+  eeprom_address += sizeof(brightness);
+  crc_values[crc_index] = brightness;
+  crc_index++;
+
   // set all variables from the segment page
   uint8_t segment_pos = segment_var.get_current_seg();
   EEPROM.put(eeprom_address, segment_pos);
   eeprom_address += sizeof(segment_pos);
   crc_values[crc_index] = segment_pos;
+  crc_index++;
+
+  uint8_t dimmer_mode = segment_var.get_dimmer_mode();
+  EEPROM.put(eeprom_address, dimmer_mode);
+  eeprom_address += sizeof(dimmer_mode);
+  crc_values[crc_index] = dimmer_mode;
+  crc_index++;
+
+  uint8_t white_mode = segment_var.get_white_mode();
+  EEPROM.put(eeprom_address, white_mode);
+  eeprom_address += sizeof(white_mode);
+  crc_values[crc_index] = white_mode;
   crc_index++;
 
   // set all variables from the dmx page

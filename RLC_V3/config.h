@@ -1,5 +1,5 @@
-#if !defined(CONFIG_H)
-#define CONFIG_H
+#if !defined(RLCV3_CONFIG_H)
+#define RLCV3_CONFIG_H
 
 // first digit:  increment if breaking change occures
 // last digit:   increment before each pull request for new feature or bug fix to main branch
@@ -43,6 +43,10 @@
 //    -> LED_OUT_RGBIC: addressable led strip
 //    -> LED_OUT_MOSFET: rgb control with mosfets/transitors via 8 bit PWM
 //    -> LED_OUT_I2C: rgb + dimmer values are sent via I2C to slave devices
+// -> led color type, dependend on the connected led strip / hardware
+//    -> LED_COLOR_TYPE_RGB: standard rgb
+//    -> LED_COLOR_TYPE_RGBW: rgb + white
+//    -> LED_COLOR_TYPE_RGBCCT: rgb + warm white + cold white
 // -> NUM_PIXEL: number of the pixels of the LED strip: integer value >= 1 >= 170
 //    (170 ~= (512 - 1) / 3) (170 ~= (DMX_UNIVERSE - DIMMER_CHANNEL) / RGB)
 //    for rgb non addressable strip NUM_PIXEL of 1 is needed
@@ -53,6 +57,19 @@
 //    -> ZERO_PWM:  required if FAN_USAGE is defined -> true: values below FAN_MIN_SPEED turnes the fan off;
 //                                                      false: values below FAN_MIN_SPEED are clamped to FAN_MIN_SPEED value
 // ----------------------------------------------------------------------------------------------------------------------------------------
+
+#define LED_COLOR_TYPE_RGB 0
+#define LED_COLOR_TYPE_RGBW 1
+#define LED_COLOR_TYPE_RGBCCT 2
+
+// set default to RGBCCT
+#define LED_COLOR_TYPE LED_COLOR_TYPE_RGBCCT
+
+// CCT Settings (used when LED_COLOR_TYPE is LED_COLOR_TYPE_RGBCCT)
+#define CCT_MIN_KELVIN 3000
+#define CCT_MAX_KELVIN 6500
+#define CCT_STEP_SIZE  50
+
 #ifdef RGB_IC_TUBE
 #define NO_FAN
 #define LED_OUT_RGBIC
@@ -116,4 +133,9 @@
 #if defined(LED_OUT_MOSFET) && (!defined(RED_PIN) || !defined(GREEN_PIN) || !defined(BLUE_PIN))
 #error "With LED_OUT_MOSFET active, red, green and blue pins have to be defined."
 #endif
-#endif  // CONFIG_H
+
+// check if rgbcct config is correct
+#if (LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT) && (!defined(CCT_MIN_KELVIN) || !defined(CCT_MAX_KELVIN) || !defined(CCT_STEP_SIZE))
+#error "With LED_COLOR_TYPE_RGBCCT active, CCT_MIN_KELVIN, CCT_MAX_KELVIN, and CCT_STEP_SIZE have to be defined."
+#endif
+#endif  // RLCV3_CONFIG_H

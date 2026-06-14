@@ -2,6 +2,9 @@
 #define C_RGB_H
 
 #include <Arduino.h>
+
+#define FASTLED_RMT_BUILTIN 0
+#define FASTLED_ESP32_I2S 1
 #include <FastLED.h>
 
 enum {

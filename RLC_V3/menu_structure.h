@@ -8,6 +8,7 @@
 enum {
   HSV_PAGE,
   RGB_PAGE,
+  CCT_PAGE,
   DMX_PAGE,
   ARTNET_PAGE,
   SETTINGS_PAGE,
