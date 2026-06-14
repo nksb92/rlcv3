@@ -1,4 +1,8 @@
 #include "c_hsv.h"
+#include "segments.h"
+
+extern segments seg;
+#define MAX_VALUE_SAT_VAL (seg.get_value_mode() == VALUE_PERCENTAGE ? 100 : 255)
 
 C_HSV::C_HSV(uint8_t _hue, uint8_t _sat, uint8_t _val) {
   hue = _hue;

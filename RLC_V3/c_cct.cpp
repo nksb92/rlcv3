@@ -1,4 +1,8 @@
 #include "c_cct.h"
+#include "segments.h"
+
+extern segments seg;
+#define MAX_VALUE_SAT_VAL (seg.get_value_mode() == VALUE_PERCENTAGE ? 100 : 255)
 
 c_cct::c_cct(uint16_t _kelvin, uint8_t _brightness) {
   kelvin = _kelvin;
@@ -21,8 +25,8 @@ void c_cct::add_kelvin(int amount) {
 
 void c_cct::add_brightness(int amount) {
   int32_t temp = brightness + amount;
-  if (temp > 255) {
-    brightness = 255;
+  if (temp > MAX_VALUE_SAT_VAL) {
+    brightness = MAX_VALUE_SAT_VAL;
   } else if (temp < 0) {
     brightness = 0;
   } else {
@@ -34,7 +38,10 @@ uint16_t c_cct::get_kelvin() { return kelvin; }
 uint8_t c_cct::get_brightness() { return brightness; }
 
 void c_cct::set_kelvin(uint16_t _kelvin) { kelvin = _kelvin; }
-void c_cct::set_brightness(uint8_t _brightness) { brightness = _brightness; }
+void c_cct::set_brightness(uint8_t _brightness) {
+  brightness = 0;
+  add_brightness(_brightness);
+}
 
 uint8_t c_cct::get_current() { return current; }
 

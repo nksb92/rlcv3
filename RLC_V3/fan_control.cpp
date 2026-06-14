@@ -1,7 +1,10 @@
 #include "fan_control.h"
+#include "segments.h"
 
 #define STEP_UP 5    // Ramp Up Time:   255 * 150 ms / 5 = 7,65 s
 #define STEP_DOWN 1  // Ramp Down Time: 255 * 150 ms / 1 = 38,25 s
+
+extern segments seg;
 
 fan_control::fan_control() {
 }
@@ -62,15 +65,13 @@ void fan_control::calc_hsv_speed(C_HSV color) {
 
   hue = color.get_hue();
 
-#if defined(PERCENTAGE)
-  sat = map(color.get_sat(), 0, 100, 0, 255);
-  val = map(color.get_val(), 0, 100, 0, 255);
-#endif
-
-#if defined(FULL_RANGE)
-  sat = color.get_sat();
-  val = color.get_val();
-#endif
+  if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+    sat = map(color.get_sat(), 0, 100, 0, 255);
+    val = map(color.get_val(), 0, 100, 0, 255);
+  } else {
+    sat = color.get_sat();
+    val = color.get_val();
+  }
   CHSV temp_hsv(hue, sat, val);
   CRGB temp_rgb;
   hsv2rgb_rainbow(temp_hsv, temp_rgb);

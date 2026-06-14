@@ -17,7 +17,7 @@ class c_cct {
   uint8_t current;
 
  public:
-  c_cct(uint16_t _kelvin = (CCT_MIN_KELVIN + (((CCT_MAX_KELVIN - CCT_MIN_KELVIN) / 2) / CCT_STEP_SIZE) * CCT_STEP_SIZE), uint8_t _brightness = 255);
+  c_cct(uint16_t _kelvin = (CCT_MIN_KELVIN + (((CCT_MAX_KELVIN - CCT_MIN_KELVIN) / 2) / CCT_STEP_SIZE) * CCT_STEP_SIZE), uint8_t _brightness = 100);
   ~c_cct();
 
   void add_kelvin(int amount);

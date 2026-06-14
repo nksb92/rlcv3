@@ -3,20 +3,8 @@
 
 #include <Arduino.h>
 
-// #define PERCENTAGE
-#define FULL_RANGE
 
-#if (defined(PERCENTAGE) + defined(FULL_RANGE)) != 1
-#error "Only one config has to be defined for HSV value and saturation limitation."
-#endif
 
-#if defined(PERCENTAGE)
-#define MAX_VALUE_SAT_VAL 100
-#endif
-
-#if defined(FULL_RANGE)
-#define MAX_VALUE_SAT_VAL 255
-#endif
 
 /**
  * An enum to define the possible hsv modes.

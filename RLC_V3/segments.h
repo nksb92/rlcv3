@@ -15,6 +15,11 @@ enum WhiteMode {
   WHITE_TWO_CH
 };
 
+enum ValueMode {
+  VALUE_PERCENTAGE,
+  VALUE_FULL_RANGE
+};
+
 class segments {
  private:
   uint16_t number_segments = 0;
@@ -24,6 +29,7 @@ class segments {
 
   uint8_t dimmer_mode = RGB_DIMMER;
   uint8_t white_mode = WHITE_DISABLE;
+  uint8_t value_mode = VALUE_PERCENTAGE;
 
   void calc_segments();
 
@@ -43,6 +49,10 @@ class segments {
   uint8_t get_white_mode();
   void set_white_mode(uint8_t mode);
   void add_white_mode(int value);
+
+  uint8_t get_value_mode();
+  void set_value_mode(uint8_t mode);
+  void add_value_mode(int value);
 };
 
 #endif

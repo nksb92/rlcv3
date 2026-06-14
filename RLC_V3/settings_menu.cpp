@@ -38,3 +38,19 @@ uint8_t settings_menu::get_deepness() {
 uint8_t settings_menu::get_item() {
   return current_menu_item;
 }
+
+uint8_t settings_menu::get_reset_confirm() {
+  return reset_confirm;
+}
+
+void settings_menu::add_reset_confirm(int value) {
+  if (value > 0) {
+    reset_confirm = (reset_confirm == 0) ? 1 : 0;
+  } else if (value < 0) {
+    reset_confirm = (reset_confirm == 0) ? 1 : 0;
+  }
+}
+
+void settings_menu::clear_reset_confirm() {
+  reset_confirm = 0;
+}

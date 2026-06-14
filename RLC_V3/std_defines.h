@@ -1,15 +1,8 @@
 #if !defined(STD_DEFINES_H)
 #define STD_DEFINES_H
 
-#if defined(PERCENTAGE)
 #define STD_SAT 100
 #define STD_VAL 100
-#endif
-
-#if defined(FULL_RANGE)
-#define STD_SAT 255
-#define STD_VAL 255
-#endif
 
 #define STD_HUE 0
 

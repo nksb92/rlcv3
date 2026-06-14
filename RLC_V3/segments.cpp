@@ -107,3 +107,21 @@ void segments::add_white_mode(int value) {
   }
 #endif
 }
+
+uint8_t segments::get_value_mode() {
+  return value_mode;
+}
+
+void segments::set_value_mode(uint8_t mode) {
+  if (mode <= VALUE_FULL_RANGE) {
+    value_mode = mode;
+  }
+}
+
+void segments::add_value_mode(int value) {
+  if (value > 0) {
+    value_mode = (value_mode + 1) > VALUE_FULL_RANGE ? VALUE_PERCENTAGE : (value_mode + 1);
+  } else if (value < 0) {
+    value_mode = (value_mode == 0) ? VALUE_FULL_RANGE : (value_mode - 1);
+  }
+}

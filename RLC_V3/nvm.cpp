@@ -1,6 +1,6 @@
 #include "nvm.h"
 
-#define COUNT_STORED_VALUES 18
+#define COUNT_STORED_VALUES 25
 #define POLYNOMIAL 0xD8
 #define WIDTH (8 * sizeof(uint8_t))
 #define TOPBIT (1 << (WIDTH - 1))
@@ -45,7 +45,16 @@ void init_eeprom() {
   crcInit();
 }
 
-void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
+void factory_reset() {
+  EEPROM.begin(EEPROM_ADDRESSES);
+  for (int i = 0; i < EEPROM_ADDRESSES; i++) {
+    EEPROM.write(i, 255);
+  }
+  EEPROM.commit();
+  ESP.restart();
+}
+
+void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var, C_GRAD& grad_val) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
@@ -95,7 +104,7 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
   crc_values[crc_index] = kelvin;
   crc_index++;
 
-  uint8_t brightness = 255;
+  uint8_t brightness = 100;
   EEPROM.get(eeprom_address, brightness);
   eeprom_address += sizeof(brightness);
   crc_values[crc_index] = brightness;
@@ -118,6 +127,12 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
   EEPROM.get(eeprom_address, white_mode);
   eeprom_address += sizeof(white_mode);
   crc_values[crc_index] = white_mode;
+  crc_index++;
+
+  uint8_t value_mode = VALUE_PERCENTAGE;
+  EEPROM.get(eeprom_address, value_mode);
+  eeprom_address += sizeof(value_mode);
+  crc_values[crc_index] = value_mode;
   crc_index++;
 
   // get all variables from the dmx page
@@ -157,6 +172,16 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
   EEPROM.get(eeprom_address, artnet_fsm);
   eeprom_address += sizeof(artnet_fsm);
   crc_values[crc_index] = artnet_fsm;
+  crc_index++;
+
+  // get all variables from grad page
+  uint8_t g_sh = 0, g_ss = 100, g_sv = 100, g_eh = 160, g_es = 100, g_ev = 100;
+  EEPROM.get(eeprom_address, g_sh); eeprom_address += sizeof(g_sh); crc_values[crc_index++] = g_sh;
+  EEPROM.get(eeprom_address, g_ss); eeprom_address += sizeof(g_ss); crc_values[crc_index++] = g_ss;
+  EEPROM.get(eeprom_address, g_sv); eeprom_address += sizeof(g_sv); crc_values[crc_index++] = g_sv;
+  EEPROM.get(eeprom_address, g_eh); eeprom_address += sizeof(g_eh); crc_values[crc_index++] = g_eh;
+  EEPROM.get(eeprom_address, g_es); eeprom_address += sizeof(g_es); crc_values[crc_index++] = g_es;
+  EEPROM.get(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index] = g_ev;
 
   uint8_t crc = 0;
   EEPROM.get(eeprom_address, crc);
@@ -164,6 +189,8 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
   // checking if the saved crc matches the calculated
   // and sets the corresponding variables on success
   if (crc == crcFast(crc_values)) {
+    segment_var.set_value_mode(value_mode);
+
     hsv_val.set_hue_byte(hue);
     hsv_val.set_sat(sat);
     hsv_val.set_val(val);
@@ -190,10 +217,17 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
     artnet_var.set_current_universe_nmbr(artnet_universe);
     artnet_var.set_current_channel(artnet_start);
     artnet_var.set_current_fsm(artnet_fsm);
+
+    grad_val.set_start_hue(g_sh);
+    grad_val.set_start_sat(g_ss);
+    grad_val.set_start_val(g_sv);
+    grad_val.set_end_hue(g_eh);
+    grad_val.set_end_sat(g_es);
+    grad_val.set_end_val(g_ev);
   }
 }
 
-void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var) {
+void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_val, menu_structure& main_sw, rlc_artnet& artnet_var, segments& segment_var, C_GRAD& grad_val) {
   uint16_t eeprom_address = 0;
   int crc_values[COUNT_STORED_VALUES] = {};
   uint8_t crc_index = 0;
@@ -268,6 +302,12 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_v
   crc_values[crc_index] = white_mode;
   crc_index++;
 
+  uint8_t value_mode = segment_var.get_value_mode();
+  EEPROM.put(eeprom_address, value_mode);
+  eeprom_address += sizeof(value_mode);
+  crc_values[crc_index] = value_mode;
+  crc_index++;
+
   // set all variables from the dmx page
   uint16_t start_address = dmx_val.get_start();
   EEPROM.put(eeprom_address, start_address);
@@ -305,6 +345,21 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_v
   EEPROM.put(eeprom_address, artnet_fsm);
   eeprom_address += sizeof(artnet_fsm);
   crc_values[crc_index] = artnet_fsm;
+  crc_index++;
+
+  // set grad variables
+  uint8_t g_sh = grad_val.get_start_hue();
+  EEPROM.put(eeprom_address, g_sh); eeprom_address += sizeof(g_sh); crc_values[crc_index++] = g_sh;
+  uint8_t g_ss = grad_val.get_start_sat();
+  EEPROM.put(eeprom_address, g_ss); eeprom_address += sizeof(g_ss); crc_values[crc_index++] = g_ss;
+  uint8_t g_sv = grad_val.get_start_val();
+  EEPROM.put(eeprom_address, g_sv); eeprom_address += sizeof(g_sv); crc_values[crc_index++] = g_sv;
+  uint8_t g_eh = grad_val.get_end_hue();
+  EEPROM.put(eeprom_address, g_eh); eeprom_address += sizeof(g_eh); crc_values[crc_index++] = g_eh;
+  uint8_t g_es = grad_val.get_end_sat();
+  EEPROM.put(eeprom_address, g_es); eeprom_address += sizeof(g_es); crc_values[crc_index++] = g_es;
+  uint8_t g_ev = grad_val.get_end_val();
+  EEPROM.put(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index] = g_ev;
 
   // calculate the crc and saving it in the eeprom
   EEPROM.put(eeprom_address, crcFast(crc_values));
