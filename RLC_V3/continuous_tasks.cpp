@@ -34,8 +34,10 @@ void handle_continuous_tasks() {
       if (dmx_val.get_rec_status()) {
         uint16_t last_rgb_sum = set_pixel(
             dmx_val.get_start(),
-            dmx_val.get_dimmer_address(),
+            dmx_val.get_used_nbr(),
             seg.get_num_seg(),
+            seg.get_dimmer_mode(),
+            seg.get_white_mode(),
             dmx_val.get_universe());
 #ifdef FAN_USAGE
         fan.evaluate_sum(last_rgb_sum);
@@ -60,7 +62,7 @@ void handle_continuous_tasks() {
 
           artnet_var.artnet_parse();
           if (artnet_data) {
-            uint16_t last_rgb_sum = output_artnet(artnet_var);
+            uint16_t last_rgb_sum = output_artnet(artnet_var, seg.get_dimmer_mode(), seg.get_white_mode());
 #ifdef FAN_USAGE
             fan.evaluate_sum(last_rgb_sum);
 #endif

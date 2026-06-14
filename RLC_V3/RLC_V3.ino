@@ -44,6 +44,7 @@
 #include "rotary_encoder_events.h"
 #include "segments.h"
 #include "soft_timer.h"
+#include "c_cct.h"
 
 #ifdef FAN_USAGE
 #include "fan_control.h"
@@ -57,6 +58,7 @@ bool artnet_data = false;
 // --- Globals: Objects ---
 C_HSV hsv_val(STD_HUE, STD_SAT, STD_VAL);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
+c_cct cct_val;
 rlc_artnet artnet_var;
 menu_structure main_sw;
 segments seg;
@@ -157,13 +159,15 @@ void setup() {
   DEBUG_PRINTLN("DMX INIT DONE");
 
   seg.init_segments();
+  dmx_val.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+  artnet_var.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
   DEBUG_PRINTLN("SEGMENT INIT DONE");
 
   artnet_var.init(on_artnet_frame);
   DEBUG_PRINTLN("ARTNET INIT DONE");
 
   // read non volatile memory and set variables accordingly
-  read_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
+  read_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg);
 
   startup_wrapper();
 

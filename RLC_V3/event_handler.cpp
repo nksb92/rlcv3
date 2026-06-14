@@ -16,6 +16,7 @@
 extern Adafruit_SSD1306 display;
 extern C_HSV hsv_val;
 extern C_RGB rgb_val;
+extern c_cct cct_val;
 extern rgb_dmx dmx_val;
 extern menu_structure main_sw;
 extern segments seg;
@@ -50,6 +51,9 @@ void process_event(const event_t* event) {
               break;
             case RGB_PAGE:
               rgb_val.next();
+              break;
+            case CCT_PAGE:
+              cct_val.next();
               break;
             case DMX_PAGE:
               break;
@@ -105,6 +109,12 @@ void process_event(const event_t* event) {
               fan.calc_rgb_speed(rgb_val.get_rgb());
 #endif
               break;
+            case CCT_PAGE:
+              cct_out(cct_val);
+#ifdef FAN_USAGE
+              fan.calc_hsv_speed(hsv_val); // Fallback to HSV speed logic for fan when in CCT, or omit if not desired
+#endif
+              break;
             case DMX_PAGE:
               dmx_val.enable();
               dmx_val.reset();
@@ -120,8 +130,11 @@ void process_event(const event_t* event) {
             case SETTINGS_PAGE:
               if (option_menu.get_item() == FIRMWARE) {
                 TimerManager.start(TIMER_RAINBOW_ANIM);
+              } else if (option_menu.get_item() == SEGMENTS) {
+                show_segments(seg.get_num_seg());
+              } else {
+                rgb_out(rgb_val.get_rgb(), 0);
               }
-              show_segments(seg.get_num_seg());
               break;
           }
           display_show_submenu();
@@ -188,6 +201,21 @@ void process_event(const event_t* event) {
 #endif
               break;
 
+            case CCT_PAGE:
+              switch (cct_val.get_current()) {
+                case CCT_KELVIN:
+                  cct_val.add_kelvin(delta_value);
+                  break;
+                case CCT_BRIGHTNESS:
+                  cct_val.add_brightness(delta_value);
+                  break;
+              }
+              cct_out(cct_val);
+#ifdef FAN_USAGE
+              fan.calc_hsv_speed(hsv_val);
+#endif
+              break;
+
             case DMX_PAGE:
               dmx_val.add_to_adress(delta_value);
 
@@ -210,19 +238,27 @@ void process_event(const event_t* event) {
                   option_menu.add_setting(delta_value);
                   if (option_menu.get_item() == SEGMENTS) {
                     show_segments(seg.get_num_seg());
-                  }
-                  if (option_menu.get_item() == FIRMWARE) {
+                  } else if (option_menu.get_item() == FIRMWARE) {
                     TimerManager.start(TIMER_RAINBOW_ANIM);
                   } else {
                     TimerManager.stop(TIMER_RAINBOW_ANIM);
+                    rgb_out(rgb_val.get_rgb(), 0);
                   }
                   break;
                 case VALUE_SELECTION:
                   if (option_menu.get_item() == SEGMENTS) {
                     seg.add_seg(delta_value);
                     show_segments(seg.get_num_seg());
-                    dmx_val.set_number_segments(seg.get_num_seg());
-                    artnet_var.set_number_segments(seg.get_num_seg());
+                    dmx_val.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                    artnet_var.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                  } else if (option_menu.get_item() == DIMMER_OPTION) {
+                    seg.add_dimmer_mode(delta_value);
+                    dmx_val.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                    artnet_var.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                  } else if (option_menu.get_item() == WHITE_OPTION) {
+                    seg.add_white_mode(delta_value);
+                    dmx_val.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                    artnet_var.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
                   }
                   break;
               }
@@ -306,7 +342,7 @@ void process_event(const event_t* event) {
 
     case EVT_SAVE_TO_NVM:
       DEBUG_PRINTLN("SAVE TO NVM");
-      write_eeprom(hsv_val, rgb_val, dmx_val, main_sw, artnet_var, seg);
+      write_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg);
       display_saved_status(display);
       display_enter_saved_screen();
       break;
