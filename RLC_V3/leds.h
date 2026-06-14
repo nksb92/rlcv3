@@ -12,6 +12,7 @@
 #include "common.h"
 #include "segments.h"
 #include "c_cct.h"
+#include "c_grad.h"
 
 #define RED_CHANNEL 0
 #define GREEN_CHANNEL 1
@@ -41,6 +42,8 @@ void hsv_out(C_HSV hsv_val);
 void rgb_out(CRGB led_val, uint8_t factor);
 
 void cct_out(c_cct cct_val);
+
+void grad_out(C_GRAD grad_val);
 
 uint16_t set_pixel(uint16_t start, uint16_t used_addresses, uint16_t pixel_per_section, uint8_t dimmer_mode, uint8_t white_mode, uint8_t* data);
 

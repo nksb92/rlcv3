@@ -3,6 +3,8 @@
 CRGB red_segment(255, 0, 0);
 CRGB blue_segment(0, 0, 200);
 
+extern segments seg;
+
 // rainbow variables
 CHSV hsv_value(0, 255, 255);
 CHSV temp_val(0, 0, 0);
@@ -57,15 +59,13 @@ void hsv_out(C_HSV hsv_val) {
 
   hue = hsv_val.get_hue();
 
-#if defined(PERCENTAGE)
-  sat = map(hsv_val.get_sat(), 0, 100, 0, 255);
-  val = map(hsv_val.get_val(), 0, 100, 0, 255);
-#endif
-
-#if defined(FULL_RANGE)
-  sat = hsv_val.get_sat();
-  val = hsv_val.get_val();
-#endif
+  if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+    sat = map(hsv_val.get_sat(), 0, 100, 0, 255);
+    val = map(hsv_val.get_val(), 0, 100, 0, 255);
+  } else {
+    sat = hsv_val.get_sat();
+    val = hsv_val.get_val();
+  }
 
   CHSV temp_hsv(hue, sat, val);
   CRGB temp_rgb;
@@ -354,9 +354,69 @@ void rainbow_fw() {
 #endif
 }
 
+void grad_out(C_GRAD grad_val) {
+  uint8_t sh = grad_val.get_start_hue();
+  uint8_t ss = grad_val.get_start_sat();
+  uint8_t sv = grad_val.get_start_val();
+  
+  uint8_t eh = grad_val.get_end_hue();
+  uint8_t es = grad_val.get_end_sat();
+  uint8_t ev = grad_val.get_end_val();
+
+  if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+    ss = map(ss, 0, 100, 0, 255);
+    sv = map(sv, 0, 100, 0, 255);
+    es = map(es, 0, 100, 0, 255);
+    ev = map(ev, 0, 100, 0, 255);
+  }
+
+  // calculate distance always counting upwards
+  uint16_t h_dist = (uint8_t)(eh - sh);
+
+  for (int i = 0; i < NUM_PIXEL; i++) {
+    float fraction = (NUM_PIXEL > 1) ? ((float)i / (float)(NUM_PIXEL - 1)) : 0;
+    
+    uint8_t curr_h = sh + (uint8_t)(h_dist * fraction);
+    uint8_t curr_s = ss + (int16_t)((es - ss) * fraction);
+    uint8_t curr_v = sv + (int16_t)((ev - sv) * fraction);
+
+    CHSV temp_hsv(curr_h, curr_s, curr_v);
+    CRGB temp_rgb;
+    hsv2rgb_rainbow(temp_hsv, temp_rgb);
+
+#ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+    strip.SetPixelColor(i, RgbwwColor(temp_rgb.g, temp_rgb.r, temp_rgb.b, 0, 0));
+#else
+    pixels.setPixelColor(i, pixels.Color(temp_rgb.r, temp_rgb.g, temp_rgb.b));
+#endif
+#endif
+
+#ifdef LED_OUT_MOSFET
+    if (i == NUM_PIXEL / 2) rgb_out(temp_rgb, 255); // Output middle color for MOSFET
+#endif
+
+#ifdef LED_OUT_I2C
+    send_data_i2c(temp_rgb, SLAVE_ADR_STRT + i);
+#endif
+  }
+
+#ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Show();
+#else
+  pixels.show();
+#endif
+#endif
+}
+
 void cct_out(c_cct cct_val) {
   uint16_t kelvin = cct_val.get_kelvin();
   uint8_t brightness = cct_val.get_brightness();
+
+  if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+    brightness = map(brightness, 0, 100, 0, 255);
+  }
 
   uint8_t ww = 0;
   uint8_t cw = 0;
