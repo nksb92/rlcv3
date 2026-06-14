@@ -11,13 +11,22 @@ CRGB rgb_rainbow;
 uint8_t temp_brightness = 0;
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+NeoPixelBus<NeoRgbwwFeature, NeoEsp32BitBangWs2805Method> strip(NUM_PIXEL, DATA_OUT);
+#else
 Adafruit_NeoPixel pixels(NUM_PIXEL, DATA_OUT, COLOR_ORDER + NEO_KHZ800);
+#endif
 #endif
 
 void init_led() {
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Begin();
+  strip.Show();
+#else
   pixels.begin();
   rgb_out(red_segment, 0);
+#endif
 #endif
 
 #ifdef LED_OUT_MOSFET
@@ -76,10 +85,17 @@ void rgb_out(CRGB led_val, uint8_t factor) {
   led_val.nscale8_video(factor);
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  for (int i = 0; i < NUM_PIXEL; i++) {
+    strip.SetPixelColor(i, RgbwwColor(led_val.g, led_val.r, led_val.b, 0, 0));
+  }
+  strip.Show();
+#else
   for (int i = 0; i < NUM_PIXEL; i++) {
     pixels.setPixelColor(i, pixels.Color(led_val.r, led_val.g, led_val.b));
   }
   pixels.show();
+#endif
 #endif
 
 #ifdef LED_OUT_MOSFET
@@ -98,18 +114,33 @@ void rgb_out(CRGB led_val, uint8_t factor) {
 #endif
 }
 
-uint16_t set_pixel(uint16_t start, uint16_t dimmer_channel, uint16_t pixel_per_section, uint8_t* data) {
+uint16_t set_pixel(uint16_t start, uint16_t used_addresses, uint16_t pixel_per_section, uint8_t dimmer_mode, uint8_t white_mode, uint8_t* data) {
   uint16_t data_index = 1;
   uint16_t led_index = 0;
   uint16_t sum = 0;
-  int dim_factor = data[dimmer_channel];
+  
+  uint16_t start_data = start;
+  uint16_t end_data = start + used_addresses;
+  uint8_t dim_factor = 255;
+
+  if (dimmer_mode == DIMMER_RGB) {
+    dim_factor = data[start];
+    start_data = start + 1;
+  } else if (dimmer_mode == RGB_DIMMER) {
+    dim_factor = data[start + used_addresses - 1];
+    end_data = start + used_addresses - 1;
+  }
 
   CRGB color(0, 0, 0);
 
-  sum = universe_out(start, dimmer_channel, dim_factor, NUM_PIXEL / pixel_per_section, color, data_index, led_index, data, sum);
+  sum = universe_out(start_data, end_data, dim_factor, NUM_PIXEL / pixel_per_section, color, data_index, led_index, data, sum, white_mode);
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Show();
+#else
   pixels.show();
+#endif
 #endif
   return sum;
 }
@@ -128,10 +159,17 @@ void show_segments(uint16_t segs) {
     }
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+    for (int j = 0; j < pixel_per_seg; j++) {
+      strip.SetPixelColor(count, RgbwwColor(color.g, color.r, color.b, 0, 0));
+      count++;
+    }
+#else
     for (int j = 0; j < pixel_per_seg; j++) {
       pixels.setPixelColor(count, pixels.Color(color.r, color.g, color.b));
       count++;
     }
+#endif
 #endif
 
 #ifdef LED_OUT_MOSFET
@@ -148,11 +186,15 @@ void show_segments(uint16_t segs) {
     col_sel++;
   }
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Show();
+#else
   pixels.show();
+#endif
 #endif
 }
 
-uint16_t output_artnet(rlc_artnet artnet_var) {
+uint16_t output_artnet(rlc_artnet artnet_var, uint8_t dimmer_mode, uint8_t white_mode) {
   uint16_t sections = artnet_var.get_section_number();
   uint16_t pixel_per_section = NUM_PIXEL / sections;
   uint16_t start = artnet_var.get_start_channel() - 1;  // minus one: start artnet data at index 0, smallest address 1
@@ -164,62 +206,114 @@ uint16_t output_artnet(rlc_artnet artnet_var) {
   uint16_t sum = 0;
   uint8_t* current_universe = artnet_var.get_current_data();
   uint8_t* next_universe = artnet_var.get_next_data();
-  uint8_t dimmer_factor = current_universe[end];
+  
+  uint8_t dimmer_factor = 255;
+  uint16_t start_data = start;
+  uint16_t end_data = end + 1; // normally processes up to end_data (exclusive)
+  
+  if (dimmer_mode == DIMMER_RGB) {
+    dimmer_factor = current_universe[start];
+    start_data = start + 1;
+    if (start_data >= UNIVERSE_SIZE) {
+      start_data = 0;
+      current_universe = next_universe;
+    }
+  } else if (dimmer_mode == RGB_DIMMER) {
+    if (end < start) {
+      dimmer_factor = next_universe[end];
+    } else {
+      dimmer_factor = current_universe[end];
+    }
+    end_data = end;
+  }
+  // For RGB_ONLY, dimmer remains 255 and end_data is end + 1
+
   CRGB color(0, 0, 0);
 
-  if (end < start) {
-    end_next = end;
-    end = UNIVERSE_SIZE;
+  // If there's wrap-around
+  if (end_data < start_data) {
+    end_next = end_data;
+    end_data = UNIVERSE_SIZE;
     start_next = 0;
-    dimmer_factor = next_universe[end_next];
-  }
-
-  sum = universe_out(start, end, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe, sum);
-  if (start_next != end_next) {
-    data_index--;
-    sum = universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe, sum);
+    
+    sum = universe_out(start_data, end_data, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe, sum, white_mode);
+    if (start_next != end_next) {
+      data_index--;
+      sum = universe_out(start_next, end_next, dimmer_factor, pixel_per_section, color, data_index, led_index, next_universe, sum, white_mode);
+    }
+  } else {
+    sum = universe_out(start_data, end_data, dimmer_factor, pixel_per_section, color, data_index, led_index, current_universe, sum, white_mode);
   }
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Show();
+#else
   pixels.show();
+#endif
 #endif
   return sum;
 }
 
-uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum = 0) {
-  uint8_t remainder = 0;
+uint16_t universe_out(uint16_t start_index, uint16_t end_index, uint8_t dimmer_factor, uint16_t pixel_per_section, CRGB& color, uint16_t& data_index, uint16_t& led_index, uint8_t* data, uint16_t sum, uint8_t white_mode) {
   uint16_t temp_sum = 0;
-  for (int i = start_index; i < end_index; i++) {
-    remainder = data_index % 3;
-    switch (remainder) {
-      case 1:
-        color.r = data[i];
-        break;
-      case 2:
-        color.g = data[i];
-        break;
-      case 0:
-        color.b = data[i];
-        color.nscale8_video(dimmer_factor);
-        for (int j = 0; j < pixel_per_section; j++) {
-          temp_sum += color.r + color.g + color.b;
 
-          if (temp_sum > sum) {
-            sum = temp_sum;
-          }
+  uint8_t channels_per_seg = 3;
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBW
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+  else if (white_mode == 2) channels_per_seg = 5; // WHITE_TWO_CH
+#endif
+
+  uint8_t r = 0, g = 0, b = 0, cw = 0, ww = 0;
+
+  for (int i = start_index; i < end_index; i++) {
+    uint8_t remainder = data_index % channels_per_seg;
+    if (remainder == 1) r = data[i];
+    else if (remainder == 2) g = data[i];
+    else if (remainder == 3 && channels_per_seg > 3) b = data[i];
+    else if (remainder == 4 && channels_per_seg > 4) cw = data[i];
+    
+    if (remainder == 0) {
+      if (channels_per_seg == 3) {
+        b = data[i];
+        cw = 0; ww = 0;
+      } else if (channels_per_seg == 4) {
+        ww = data[i];
+        cw = 0;
+      } else if (channels_per_seg == 5) {
+        ww = data[i];
+      }
+
+      r = (r * dimmer_factor) / 255;
+      g = (g * dimmer_factor) / 255;
+      b = (b * dimmer_factor) / 255;
+      cw = (cw * dimmer_factor) / 255;
+      ww = (ww * dimmer_factor) / 255;
+
+      for (int j = 0; j < pixel_per_section; j++) {
+        temp_sum += r + g + b + cw + ww;
+        if (temp_sum > sum) sum = temp_sum;
 
 #ifdef LED_OUT_RGBIC
-          pixels.setPixelColor(led_index, pixels.Color(color.r, color.g, color.b));
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+        strip.SetPixelColor(led_index, RgbwwColor(g, r, b, ww, cw));
+#else
+        pixels.setPixelColor(led_index, pixels.Color(r, g, b));
 #endif
+#endif
+
 #ifdef LED_OUT_MOSFET
-          rgb_out(color, 255);
+        color.r = r; color.g = g; color.b = b;
+        rgb_out(color, 255);
 #endif
 #ifdef LED_OUT_I2C
-          send_data_i2c(color, SLAVE_ADR_STRT + led_index);
+        color.r = r; color.g = g; color.b = b;
+        send_data_i2c(color, SLAVE_ADR_STRT + led_index);
 #endif
-          led_index++;
-        }
-        break;
+        led_index++;
+      }
     }
     data_index++;
   }
@@ -233,7 +327,11 @@ void rainbow_fw() {
     hsv2rgb_rainbow(temp_val, rgb_rainbow);
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+    strip.SetPixelColor(i, RgbwwColor(rgb_rainbow.g, rgb_rainbow.r, rgb_rainbow.b, 0, 0));
+#else
     pixels.setPixelColor(i, pixels.Color(rgb_rainbow.r, rgb_rainbow.g, rgb_rainbow.b));
+#endif
 #endif
 
 #ifdef LED_OUT_MOSFET
@@ -248,6 +346,50 @@ void rainbow_fw() {
   }
 
 #ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  strip.Show();
+#else
   pixels.show();
+#endif
+#endif
+}
+
+void cct_out(c_cct cct_val) {
+  uint16_t kelvin = cct_val.get_kelvin();
+  uint8_t brightness = cct_val.get_brightness();
+
+  uint8_t ww = 0;
+  uint8_t cw = 0;
+
+  if (kelvin <= CCT_MIN_KELVIN) {
+    ww = 255;
+    cw = 0;
+  } else if (kelvin >= CCT_MAX_KELVIN) {
+    ww = 0;
+    cw = 255;
+  } else {
+    float cw_percent = (float)(kelvin - CCT_MIN_KELVIN) / (float)(CCT_MAX_KELVIN - CCT_MIN_KELVIN);
+    cw = cw_percent * 255;
+    ww = 255 - cw;
+  }
+
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGB
+  uint8_t r = 255;
+  uint8_t g = (cw * 255 + ww * 197) / 255;
+  uint8_t b = (cw * 255 + ww * 143) / 255;
+  CRGB color(r, g, b);
+  rgb_out(color, brightness);
+#endif
+
+  ww = (ww * brightness) / 255;
+  cw = (cw * brightness) / 255;
+
+#ifdef LED_OUT_RGBIC
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  for (int i = 0; i < NUM_PIXEL; i++) {
+    strip.SetPixelColor(i, RgbwwColor(0, 0, 0, ww, cw));
+  }
+  strip.Show();
+#endif
 #endif
 }
