@@ -45,6 +45,7 @@
 #include "segments.h"
 #include "soft_timer.h"
 #include "c_cct.h"
+#include "c_grad.h"
 
 #ifdef FAN_USAGE
 #include "fan_control.h"
@@ -59,6 +60,7 @@ bool artnet_data = false;
 C_HSV hsv_val(STD_HUE, STD_SAT, STD_VAL);
 C_RGB rgb_val(STD_RED, STD_GREEN, STD_BLUE);
 c_cct cct_val;
+C_GRAD grad_val(0, 100, 100, 160, 100, 100);
 rlc_artnet artnet_var;
 menu_structure main_sw;
 segments seg;
@@ -90,6 +92,18 @@ void startup_wrapper() {
       } else if (RGB_PAGE == main_state) {
         int factor = map(i, 0, steps, 0, 255);
         rgb_out(rgb_val.get_rgb(), factor);
+      } else if (CCT_PAGE == main_state) {
+        c_cct temp_cct = cct_val;
+        int br = map(i, 0, steps, 0, cct_val.get_brightness());
+        temp_cct.set_brightness(br);
+        cct_out(temp_cct);
+      } else if (GRAD_PAGE == main_state) {
+        C_GRAD temp_grad = grad_val;
+        int s_v = map(i, 0, steps, 0, grad_val.get_start_val());
+        int e_v = map(i, 0, steps, 0, grad_val.get_end_val());
+        temp_grad.set_start_val(s_v);
+        temp_grad.set_end_val(e_v);
+        grad_out(temp_grad);
       }
       delay(FRAME_DELAY);
     }
@@ -167,7 +181,7 @@ void setup() {
   DEBUG_PRINTLN("ARTNET INIT DONE");
 
   // read non volatile memory and set variables accordingly
-  read_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg);
+  read_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg, grad_val);
 
   startup_wrapper();
 

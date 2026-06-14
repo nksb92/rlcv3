@@ -4,12 +4,17 @@
 #include <sys/_stdint.h>
 
 #include "bitmaps.h"
+#include "config.h"
 #include "display_manager.h"
 
 uint8_t offset = 5;
 uint8_t offset_y = 26;
 uint8_t last_menu_index = BITMAP_MAIN_MENU_LEN;
+#if NUM_PIXEL > 1
+uint8_t MENU_ORDER[] = {LEFT_END_MENU, HSV_MENU, RGB_MENU, CCT_MENU, DMX_MENU, ARTNET_REC_MENU, GRAD_MENU, SETTINGS_MENU, RIGHT_END_MENU};
+#else
 uint8_t MENU_ORDER[] = {LEFT_END_MENU, HSV_MENU, RGB_MENU, CCT_MENU, DMX_MENU, ARTNET_REC_MENU, SETTINGS_MENU, RIGHT_END_MENU};
+#endif
 uint8_t current_frame = 0;
 int x_scroll = 0;
 int min_x = 0;
@@ -100,12 +105,21 @@ void cct_display_update(Adafruit_SSD1306& dp, c_cct cct_val) {
                 W_H_MATRIX_SUB_MENU[NMBR_CCT_PAGE][WIDTH],
                 W_H_MATRIX_SUB_MENU[NMBR_CCT_PAGE][HEIGHT],
                 1);
-  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][x] + spacing * current_state,
-                X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][y],
-                BITMAP_SUB_MENU_ARRAY[NMBR_SELECTION_BAR_SUB],
-                W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][WIDTH],
-                W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][HEIGHT],
-                1);
+  if (current_state == CCT_KELVIN) {
+    dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_CCT][x],
+                  X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_CCT][y],
+                  BITMAP_SUB_MENU_ARRAY[NMBR_SELECTION_BAR_CCT],
+                  W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_CCT][WIDTH],
+                  W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_CCT][HEIGHT],
+                  1);
+  } else {
+    dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][x] + spacing * current_state,
+                  X_Y_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][y],
+                  BITMAP_SUB_MENU_ARRAY[NMBR_SELECTION_BAR_SUB],
+                  W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][WIDTH],
+                  W_H_MATRIX_SUB_MENU[NMBR_SELECTION_BAR_SUB][HEIGHT],
+                  1);
+  }
   dp.setCursor(offset, offset_y);
   dp.print(kelvin);
   dp.setCursor(spacing + offset, offset_y);
@@ -138,7 +152,7 @@ void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val) {
   dp.display();
 }
 
-void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting_index, uint8_t current_deepness) {
+void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting_index, uint8_t current_deepness, uint8_t reset_confirm) {
   uint16_t number_seg = seg.get_num_seg();
   dp.clearDisplay();
   dp.setTextColor(WHITE);
@@ -174,20 +188,54 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
       break;
     case DIMMER_OPTION:
       dp.setCursor(5, 15);
-      dp.print("DIM MODE");
-      dp.setCursor(82, 15);
+      dp.print("DIMMER");
+      dp.setFont();
+      dp.setCursor(82, 6);
       if (seg.get_dimmer_mode() == DIMMER_RGB) dp.print("D+RGB");
       else if (seg.get_dimmer_mode() == RGB_DIMMER) dp.print("RGB+D");
       else dp.print("RGB");
+      dp.setFont(&FreeMonoBold9pt7b);
       break;
 
     case WHITE_OPTION:
-      dp.setCursor(5, 15);
-      dp.print("WHT MODE");
+      dp.drawBitmap(X_Y_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][x],
+                    X_Y_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][y],
+                    BITMAP_SETTINGS_ARRAY[NMBR_WHITEMODE_OPTION],
+                    W_H_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][WIDTH],
+                    W_H_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][HEIGHT],
+                    1);
       dp.setCursor(82, 15);
       if (seg.get_white_mode() == WHITE_DISABLE) dp.print("OFF");
       else if (seg.get_white_mode() == WHITE_ONE_CH) dp.print("1CH");
       else dp.print("2CH");
+      break;
+
+    case VALUE_MODE_OPTION:
+      dp.drawBitmap(X_Y_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][x],
+                    X_Y_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][y],
+                    BITMAP_SETTINGS_ARRAY[NMBR_VALUE_MODE_OPTION],
+                    W_H_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][WIDTH],
+                    W_H_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][HEIGHT],
+                    1);
+      dp.setFont();
+      dp.setCursor(82, 6);
+      if (seg.get_value_mode() == VALUE_PERCENTAGE) dp.print("PCRT");
+      else dp.print("8-Bit");
+      dp.setFont(&FreeMonoBold9pt7b);
+      break;
+
+    case RESET_OPTION:
+      dp.drawBitmap(X_Y_MATRIX_SETTINGS[NMBR_RESET_OPTION][x],
+                    X_Y_MATRIX_SETTINGS[NMBR_RESET_OPTION][y],
+                    BITMAP_SETTINGS_ARRAY[NMBR_RESET_OPTION],
+                    W_H_MATRIX_SETTINGS[NMBR_RESET_OPTION][WIDTH],
+                    W_H_MATRIX_SETTINGS[NMBR_RESET_OPTION][HEIGHT],
+                    1);
+      if (current_deepness == VALUE_SELECTION) {
+        dp.setCursor(82, 15);
+        if (reset_confirm == 1) dp.print("YES");
+        else dp.print("NO");
+      }
       break;
 
     default:
@@ -208,6 +256,66 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
 
   // dp.setCursor(62, 28);
   // dp.print(number_seg);
+  dp.display();
+}
+
+void grad_display_update(Adafruit_SSD1306& dp, C_GRAD grad_val) {
+  uint8_t setting_index = grad_val.get_item();
+  uint8_t current_deepness = grad_val.get_deepness();
+
+  dp.clearDisplay();
+  dp.setTextColor(WHITE);
+
+  dp.drawBitmap(X_Y_MATRIX_SUB_MENU[NMBR_COLON][x],
+                X_Y_MATRIX_SUB_MENU[NMBR_COLON][y],
+                BITMAP_SUB_MENU_ARRAY[NMBR_COLON],
+                W_H_MATRIX_SUB_MENU[NMBR_COLON][WIDTH],
+                W_H_MATRIX_SUB_MENU[NMBR_COLON][HEIGHT],
+                1);
+
+  dp.setCursor(25, 15);
+  switch (setting_index) {
+    case GRAD_START_HUE:
+      dp.print("HUE1");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_start_hue());
+      break;
+    case GRAD_START_SAT:
+      dp.print("SAT1");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_start_sat());
+      break;
+    case GRAD_START_VAL:
+      dp.print("VAL1");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_start_val());
+      break;
+    case GRAD_END_HUE:
+      dp.print("HUE2");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_end_hue());
+      break;
+    case GRAD_END_SAT:
+      dp.print("SAT2");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_end_sat());
+      break;
+    case GRAD_END_VAL:
+      dp.print("VAL2");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_end_val());
+      break;
+  }
+
+  switch (current_deepness) {
+    case GRAD_ITEM_SELECTION:
+      draw_circle_menu_orientation(dp, GRAD_LAST, 28, setting_index);
+      break;
+    case GRAD_VALUE_SELECTION:
+      dp.fillRect(81, 21, 47, 2, WHITE);
+      break;
+  }
+
   dp.display();
 }
 

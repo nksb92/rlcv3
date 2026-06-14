@@ -2,6 +2,7 @@
 #define MENU_STRUCTURE_H
 
 #include <Arduino.h>
+#include "config.h"
 /**
  * An enum to define the possible main modes.
  */
@@ -11,6 +12,9 @@ enum {
   CCT_PAGE,
   DMX_PAGE,
   ARTNET_PAGE,
+#if NUM_PIXEL > 1
+  GRAD_PAGE,
+#endif
   SETTINGS_PAGE,
   MENU_LAST_PAGE
 };

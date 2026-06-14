@@ -12,6 +12,8 @@
 #include "fan_control.h"
 #endif
 
+#include "c_grad.h"
+
 // External references
 extern Adafruit_SSD1306 display;
 extern C_HSV hsv_val;
@@ -22,6 +24,7 @@ extern menu_structure main_sw;
 extern segments seg;
 extern rlc_artnet artnet_var;
 extern settings_menu option_menu;
+extern C_GRAD grad_val;
 
 int16_t delta_value = 0;
 
@@ -60,8 +63,20 @@ void process_event(const event_t* event) {
             case ARTNET_PAGE:
               artnet_var.next_selection();
               break;
+#if NUM_PIXEL > 1
+            case GRAD_PAGE:
+              grad_val.deeper();
+              break;
+#endif
             case SETTINGS_PAGE:
-              option_menu.deeper();
+              if (option_menu.get_deepness() == VALUE_SELECTION && option_menu.get_item() == RESET_OPTION && option_menu.get_reset_confirm() == 1) {
+                factory_reset();
+              } else {
+                if (option_menu.get_item() == RESET_OPTION) {
+                  option_menu.clear_reset_confirm();
+                }
+                option_menu.deeper();
+              }
               break;
           }
           display_show_submenu();
@@ -127,6 +142,11 @@ void process_event(const event_t* event) {
                 TimerManager.start(TIMER_SCROLL_TEXT);
               }
               break;
+#if NUM_PIXEL > 1
+            case GRAD_PAGE:
+              grad_out(grad_val);
+              break;
+#endif
             case SETTINGS_PAGE:
               if (option_menu.get_item() == FIRMWARE) {
                 TimerManager.start(TIMER_RAINBOW_ANIM);
@@ -232,6 +252,20 @@ void process_event(const event_t* event) {
               }
               break;
 
+#if NUM_PIXEL > 1
+            case GRAD_PAGE:
+              switch (grad_val.get_deepness()) {
+                case GRAD_ITEM_SELECTION:
+                  grad_val.add_setting(delta_value);
+                  break;
+                case GRAD_VALUE_SELECTION:
+                  grad_val.add_value(delta_value);
+                  grad_out(grad_val);
+                  break;
+              }
+              break;
+#endif
+
             case SETTINGS_PAGE:
               switch (option_menu.get_deepness()) {
                 case ITEM_SELECTION:
@@ -259,6 +293,34 @@ void process_event(const event_t* event) {
                     seg.add_white_mode(delta_value);
                     dmx_val.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
                     artnet_var.set_number_segments(seg.get_num_seg(), seg.get_dimmer_mode(), seg.get_white_mode());
+                  } else if (option_menu.get_item() == VALUE_MODE_OPTION) {
+                    uint8_t old_mode = seg.get_value_mode();
+                    seg.add_value_mode(delta_value);
+                    if (old_mode != seg.get_value_mode()) {
+                      if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+                        hsv_val.set_sat(map(hsv_val.get_sat(), 0, 255, 0, 100));
+                        hsv_val.set_val(map(hsv_val.get_val(), 0, 255, 0, 100));
+                        cct_val.set_brightness(map(cct_val.get_brightness(), 0, 255, 0, 100));
+#if NUM_PIXEL > 1
+                        grad_val.set_start_sat(map(grad_val.get_start_sat(), 0, 255, 0, 100));
+                        grad_val.set_start_val(map(grad_val.get_start_val(), 0, 255, 0, 100));
+                        grad_val.set_end_sat(map(grad_val.get_end_sat(), 0, 255, 0, 100));
+                        grad_val.set_end_val(map(grad_val.get_end_val(), 0, 255, 0, 100));
+#endif
+                      } else {
+                        hsv_val.set_sat(map(hsv_val.get_sat(), 0, 100, 0, 255));
+                        hsv_val.set_val(map(hsv_val.get_val(), 0, 100, 0, 255));
+                        cct_val.set_brightness(map(cct_val.get_brightness(), 0, 100, 0, 255));
+#if NUM_PIXEL > 1
+                        grad_val.set_start_sat(map(grad_val.get_start_sat(), 0, 100, 0, 255));
+                        grad_val.set_start_val(map(grad_val.get_start_val(), 0, 100, 0, 255));
+                        grad_val.set_end_sat(map(grad_val.get_end_sat(), 0, 100, 0, 255));
+                        grad_val.set_end_val(map(grad_val.get_end_val(), 0, 100, 0, 255));
+#endif
+                      }
+                    }
+                  } else if (option_menu.get_item() == RESET_OPTION) {
+                    option_menu.add_reset_confirm(delta_value);
                   }
                   break;
               }
@@ -342,7 +404,7 @@ void process_event(const event_t* event) {
 
     case EVT_SAVE_TO_NVM:
       DEBUG_PRINTLN("SAVE TO NVM");
-      write_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg);
+      write_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg, grad_val);
       display_saved_status(display);
       display_enter_saved_screen();
       break;

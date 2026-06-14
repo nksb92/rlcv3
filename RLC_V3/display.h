@@ -13,6 +13,7 @@
 #include "dmx.h"
 #include "segments.h"
 #include "c_cct.h"
+#include "c_grad.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
@@ -67,7 +68,15 @@ void cct_display_update(Adafruit_SSD1306& dp, c_cct cct_val);
  */
 void dmx_display_update(Adafruit_SSD1306& dp, rgb_dmx dmx_val);
 
-void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting_index, uint8_t current_deepness);
+void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting_index, uint8_t current_deepness, uint8_t reset_confirm);
+
+/**
+ * Updates the OLED display with the current GRAD values.
+ *
+ * @param dp: the reference to the Adafruit_SSD1306 object representing the OLED display
+ * @param grad_val: the C_GRAD object containing the current GRAD values
+ */
+void grad_display_update(Adafruit_SSD1306& dp, C_GRAD grad_val);
 
 /**
  * Displays that the EEPROM data has been saved.

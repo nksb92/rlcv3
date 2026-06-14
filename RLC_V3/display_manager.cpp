@@ -12,6 +12,7 @@ extern menu_structure main_sw;
 extern rlc_artnet artnet_var;
 extern segments seg;
 extern settings_menu option_menu;
+extern C_GRAD grad_val;
 
 bool display_is_standby = false;
 bool display_is_saved_screen = false;
@@ -47,8 +48,13 @@ void display_show_submenu() {
     case ARTNET_PAGE:
       display_artnet_rec(display, artnet_var, page);
       break;
+#if NUM_PIXEL > 1
+    case GRAD_PAGE:
+      grad_display_update(display, grad_val);
+      break;
+#endif
     case SETTINGS_PAGE:
-      settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness());
+      settings_display_update(display, seg, option_menu.get_item(), option_menu.get_deepness(), option_menu.get_reset_confirm());
       break;
   }
 }
