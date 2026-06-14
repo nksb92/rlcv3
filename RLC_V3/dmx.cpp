@@ -133,10 +133,18 @@ void rgb_dmx::set_rec_status(bool status) {
   data_received = status;
 }
 
-void rgb_dmx::set_number_segments(uint16_t num_segs) {
+void rgb_dmx::set_number_segments(uint16_t num_segs, uint8_t dimmer_mode, uint8_t white_mode) {
   number_segments = num_segs;
   leds_per_segment = NUM_PIXEL / number_segments;
-  used_addresses = number_segments * 3 + 1;  // RGB for each segment + one channel for dimmer
+  uint8_t channels_per_seg = 3;
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBW
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+  else if (white_mode == 2) channels_per_seg = 5; // WHITE_TWO_CH
+#endif
+
+  used_addresses = number_segments * channels_per_seg + (dimmer_mode == 2 ? 0 : 1); // RGB_ONLY has no dimmer
   last_address = UNIVERSE_SIZE - used_addresses;
 }
 

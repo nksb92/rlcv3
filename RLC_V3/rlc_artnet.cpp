@@ -165,9 +165,17 @@ uint8_t* rlc_artnet::get_next_data() {
 
 /* SETTER FUNCTIONS */
 /* --------------------------------------------------------------- */
-void rlc_artnet::set_number_segments(uint16_t _segments) {
+void rlc_artnet::set_number_segments(uint16_t _segments, uint8_t dimmer_mode, uint8_t white_mode) {
   number_segments = _segments;
-  used_channel = number_segments * 3 + 1;  // RGB for each segment + one channel for dimmer
+  uint8_t channels_per_seg = 3;
+#if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBW
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+#elif LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
+  if (white_mode == 1) channels_per_seg = 4; // WHITE_ONE_CH
+  else if (white_mode == 2) channels_per_seg = 5; // WHITE_TWO_CH
+#endif
+
+  used_channel = number_segments * channels_per_seg + (dimmer_mode == 2 ? 0 : 1); // RGB_ONLY has no dimmer
   last_address = UNIVERSE_SIZE - used_channel;
   // update values
   add_channel(0);

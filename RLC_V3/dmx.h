@@ -113,7 +113,7 @@ class rgb_dmx {
    *
    * @param num_segs: The number of segments to configure.
    */
-  void set_number_segments(uint16_t num_segs);
+  void set_number_segments(uint16_t num_segs, uint8_t dimmer_mode, uint8_t white_mode);
 
   /**
    * Sets the universe data from a provided buffer.

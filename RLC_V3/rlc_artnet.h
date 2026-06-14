@@ -74,7 +74,7 @@ class rlc_artnet {
   uint8_t* get_next_data();
 
   /* SETTER FUNCTIONS */
-  void set_number_segments(uint16_t _segments);
+  void set_number_segments(uint16_t _segments, uint8_t dimmer_mode, uint8_t white_mode);
   void set_current_universe(uint8_t* data);
   void set_next_universe(uint8_t* data);
   void set_current_fsm(uint8_t val);
