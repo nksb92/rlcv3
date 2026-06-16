@@ -1,3 +1,8 @@
+/**
+ * @file fan_control.cpp
+ * @brief Implementation of cooling fan control.
+ */
+
 #include "fan_control.h"
 #include "segments.h"
 

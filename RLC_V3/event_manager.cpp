@@ -1,3 +1,8 @@
+/**
+ * @file event_manager.cpp
+ * @brief Implementation of the cooperative multitasking event manager.
+ */
+
 #include "event_manager.h"
 
 #include "common.h"

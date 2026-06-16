@@ -1,3 +1,8 @@
+/**
+ * @file display.cpp
+ * @brief Implementation of OLED display rendering functions.
+ */
+
 #include "display.h"
 
 #include <stdint.h>
@@ -189,10 +194,10 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
     case DIMMER_OPTION:
       dp.setCursor(5, 15);
       dp.print("DIMMER");
-      dp.setFont();
-      dp.setCursor(82, 6);
-      if (seg.get_dimmer_mode() == DIMMER_RGB) dp.print("D+RGB");
-      else if (seg.get_dimmer_mode() == RGB_DIMMER) dp.print("RGB+D");
+      dp.setFont(&FreeSans7pt7b);
+      dp.setCursor(82, 15);
+      if (seg.get_dimmer_mode() == DIMMER_RGB) dp.print("D-RGB");
+      else if (seg.get_dimmer_mode() == RGB_DIMMER) dp.print("RGB-D");
       else dp.print("RGB");
       dp.setFont(&FreeMonoBold9pt7b);
       break;
@@ -204,10 +209,12 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
                     W_H_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][WIDTH],
                     W_H_MATRIX_SETTINGS[NMBR_WHITEMODE_OPTION][HEIGHT],
                     1);
+      dp.setFont(&FreeSans7pt7b);
       dp.setCursor(82, 15);
       if (seg.get_white_mode() == WHITE_DISABLE) dp.print("OFF");
       else if (seg.get_white_mode() == WHITE_ONE_CH) dp.print("1CH");
       else dp.print("2CH");
+      dp.setFont(&FreeMonoBold9pt7b);
       break;
 
     case VALUE_MODE_OPTION:
@@ -217,8 +224,8 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
                     W_H_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][WIDTH],
                     W_H_MATRIX_SETTINGS[NMBR_VALUE_MODE_OPTION][HEIGHT],
                     1);
-      dp.setFont();
-      dp.setCursor(82, 6);
+      dp.setFont(&FreeSans7pt7b);
+      dp.setCursor(82, 15);
       if (seg.get_value_mode() == VALUE_PERCENTAGE) dp.print("PCRT");
       else dp.print("8-Bit");
       dp.setFont(&FreeMonoBold9pt7b);
@@ -304,6 +311,11 @@ void grad_display_update(Adafruit_SSD1306& dp, C_GRAD grad_val) {
       dp.print("VAL2");
       dp.setCursor(82, 15);
       dp.print(grad_val.get_end_val());
+      break;
+    case GRAD_DIMMER:
+      dp.print("DIMM");
+      dp.setCursor(82, 15);
+      dp.print(grad_val.get_dimmer());
       break;
   }
 

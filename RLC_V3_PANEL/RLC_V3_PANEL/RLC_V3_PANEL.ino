@@ -1,12 +1,17 @@
+/**
+ * @file RLC_V3_PANEL.ino
+ * @brief Firmware for the ATtiny402-based panel slave segment controller.
+ * 
+ * Listens on I2C for RGB color values and outputs WS2812/WS2815 NeoPixel signals.
+ * Since RAM is very limited, it is optimized to output a single uniform color across
+ * all pixels in the segment.
+ */
+
 #include "tinyNeoPixelModded.h"
 #include <Wire.h>
-// I2C for Attiny
-// Changed buffer size to 16 Byte, otherwise the 402 Controller runs out of RAM
-// https://github.com/SpenceKonde/megaTinyCore/tree/master/megaavr/libraries/Wire
 
-// NeoPixel for Attiny
-// Modified code to output one Color for all Pixel to save up RAM
-// Only works with 16 Mhz clock speed
+// Note: Change buffer size to 16 Byte in megaTinyCore Wire library config if needed
+// to prevent ATtiny402 from running out of RAM.
 
 //    Pinout AtTiny402
 //          ____
@@ -15,13 +20,13 @@
 // 3 PA7  -|    |-  6 PA0 (UPDI)
 // 4 PA1  -|____|-  5 PA2
 
-#define DATA_OUT PIN_PA7
+#define DATA_OUT PIN_PA7        /**< NeoPixel data output pin. */
 #define LED_PIN PIN_PA6
-#define SDA_PIN PIN_PA1
-#define SCL_PIN PIN_PA2
-#define NUM_PIXEL 75
+#define SDA_PIN PIN_PA1         /**< I2C SDA pin. */
+#define SCL_PIN PIN_PA2         /**< I2C SCL pin. */
+#define NUM_PIXEL 75            /**< Length of the LED segment. */
 
-// Select Slave Adress
+// Select Slave Address
 // #define HW_INDEX_0 0
 #define HW_INDEX_1 1
 // #define HW_INDEX_2 2
@@ -48,17 +53,24 @@
 #define ADDRESS 0x0C
 #endif
 
-// struct for storing incoming data
+/**
+ * @struct rgb_data
+ * @brief Simple storage structure for receiving 8-bit RGB color packets.
+ */
 struct rgb_data {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
+  uint8_t red;   /**< Red intensity. */
+  uint8_t green; /**< Green intensity. */
+  uint8_t blue;  /**< Blue intensity. */
 };
 
-// For WS2815 no dedicated Chipset in library, therefore the standart is used
 tinyNeoPixelModded leds = tinyNeoPixelModded(1, PIN_PA7);
 rgb_data data;
 
+/**
+ * @brief I2C receive event callback.
+ * Reads 3 bytes of RGB data, updates the local color state, and triggers NeoPixel show.
+ * @param[in] len The number of bytes received.
+ */
 void onReceive(int len) {
   data.red = Wire.read();
   data.green = Wire.read();
@@ -67,16 +79,22 @@ void onReceive(int len) {
   leds.show(NUM_PIXEL);
 }
 
+/**
+ * @brief Initializes I2C slave mode, sets callbacks, and readies NeoPixel output.
+ */
 void setup() {
   // sanity delay
   delay(2000);
-  // begin with standart pins
-  // PA1 (4) and PA2 (5)
+  
+  // begin with standard pins: PA1 and PA2
   Wire.onReceive(onReceive);
   Wire.begin((uint8_t)ADDRESS);
 
   leds.begin();
 }
 
+/**
+ * @brief Idle loop. All processing is event-driven via I2C callbacks.
+ */
 void loop() {
 }

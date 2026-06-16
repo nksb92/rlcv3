@@ -1,124 +1,128 @@
+/**
+ * @file c_hsv.h
+ * @brief Header file for the HSV (Hue, Saturation, Value) color space control class.
+ */
+
 #if !defined(C_HSV_H)
 #define C_HSV_H
 
 #include <Arduino.h>
 
-
-
-
 /**
- * An enum to define the possible hsv modes.
+ * @brief Enum defining active parameter modes for HSV.
  */
 enum {
-  HUE,
-  SAT,
-  VAL,
-  HSV_LAST
+  HUE,      /**< Hue adjustment mode. */
+  SAT,      /**< Saturation adjustment mode. */
+  VAL,      /**< Value/brightness adjustment mode. */
+  HSV_LAST  /**< Sentinel for boundaries. */
 };
 
+/**
+ * @class C_HSV
+ * @brief Manages lighting parameters in the HSV color space.
+ */
 class C_HSV {
-  uint8_t hue;  // The hue value between 0 and 255 (in 360/255 steps).
-  uint8_t sat;  // The saturation value between 0 and MAX_VALUE_SAT_VAL (as a percentage or full range).
-  uint8_t val;  // The value/brightness value between 0 and MAX_VALUE_SAT_VAL (as a percentage or full range).
+  uint8_t hue;  /**< The hue value between 0 and 255 (in 360/255 steps). */
+  uint8_t sat;  /**< The saturation value between 0 and MAX_VALUE_SAT_VAL. */
+  uint8_t val;  /**< The value/brightness value between 0 and MAX_VALUE_SAT_VAL. */
 
-  uint8_t current = HUE;  // The current mode, initialized to HUE.
+  uint8_t current = HUE;  /**< The current mode, initialized to HUE. */
 
  public:
   /**
-   * Constructor that takes the hue, saturation, and value as arguments.
-   * @param _hue: The hue value between 0 and 255 (in 360/255 steps).
-   * @param _sat: The saturation value between 0 and MAX_VALUE_SAT_VAL (as a percentage or full range).
-   * @param _val: The value/brightness value between 0 and MAX_VALUE_SAT_VAL (as a percentage or full range).
+   * @brief Constructor that takes the hue, saturation, and value as arguments.
+   * @param[in] _hue The hue value between 0 and 255 (in 360/255 steps).
+   * @param[in] _sat The saturation value between 0 and MAX_VALUE_SAT_VAL.
+   * @param[in] _val The value/brightness value between 0 and MAX_VALUE_SAT_VAL.
    */
   C_HSV(uint8_t _hue, uint8_t _sat, uint8_t _val);
 
   /**
-   * Adds an amount to the current hue value.
-   * @param amount: The amount to add.
+   * @brief Adds an amount to the current hue value.
+   * @param[in] amount The amount to add.
    */
   void add_hue(int amount);
 
   /**
-   * Adds an amount to the current saturation value.
-   * If the result is greater than 100 or less than 0, it is clamped to the maximum or minimum value, respectively.
-   * @param amount: The amount to add.
+   * @brief Adds an amount to the current saturation value.
+   * Clamps the result between 0 and MAX_VALUE_SAT_VAL.
+   * @param[in] amount The amount to add.
    */
   void add_sat(int amount);
 
   /**
-   * Adds an amount to the current value/brightness value.
-   * If the result is greater than 100 or less than 0, it is clamped to the maximum or minimum value, respectively.
-   * @param amount: The amount to add.
+   * @brief Adds an amount to the current value/brightness value.
+   * Clamps the result between 0 and MAX_VALUE_SAT_VAL.
+   * @param[in] amount The amount to add.
    */
   void add_val(int amount);
 
   /**
-   * Returns the current hue value.
-   * @return The hue value between 0 and 255 (in 360/255 steps).
+   * @brief Returns the current hue value.
+   * @return The hue value between 0 and 255.
    */
   uint8_t get_hue();
 
   /**
-   * Returns the current saturation value.
-   * @return The saturation value between 0 and 100 (as a percentage).
+   * @brief Returns the current saturation value.
+   * @return The saturation value.
    */
   uint8_t get_sat();
 
   /**
-   * Returns the current value/brightness value.
-   * @return The value/brightness value between 0 and 100 (as a percentage).
+   * @brief Returns the current value/brightness value.
+   * @return The value/brightness value.
    */
   uint8_t get_val();
 
   /**
-   * Sets the value/brightness value to the given value, clamping it to the maximum or minimum value if necessary.
-   * @param value: The value to set the value/brightness to.
+   * @brief Sets the value/brightness directly, clamping it within range.
+   * @param[in] value The brightness value.
    */
   void set_val(uint8_t value);
 
   /**
-   * Sets the value/brightness value to the given value, clamping it to the maximum or minimum value if necessary.
-   * @param value: The value to set the value/brightness to.
+   * @brief Sets the saturation directly, clamping it within range.
+   * @param[in] value The saturation value.
    */
   void set_sat(uint8_t value);
 
   /**
-   * Sets the hue to the given value in 360/255 steps.
-   * @param value: The hue value to set.
+   * @brief Sets the hue to the given value in 360/255 steps.
+   * @param[in] value The hue byte value to set.
    */
   void set_hue_byte(uint8_t value);
 
   /**
-   * Returns the current mode.
+   * @brief Returns the current mode index.
    * @return The current mode.
    */
   uint8_t get_current();
 
   /**
-   * Sets the current mode to the given mode. If the given mode is greater than or equal to the total number of modes,
-   * sets the mode to the last available mode.
-   * @param _current: The mode to set the current mode to.
+   * @brief Sets the current mode index.
+   * @param[in] _current The mode index to set.
    */
   void set_current(uint8_t _current);
 
   /**
-   * Sets the current mode to HUE.
+   * @brief Sets the current mode to HUE.
    */
   void set_hue();
 
   /**
-   * Sets the current mode to SAT.
+   * @brief Sets the current mode to SAT.
    */
   void set_sat();
 
   /**
-   * Sets the current mode to VAL.
+   * @brief Sets the current mode to VAL.
    */
   void set_val();
 
   /**
-   * Sets the current mode to the next mode in the enum.
-   * If the current mode is the last one, sets it to HUE.
+   * @brief Cycles to the next mode (HUE -> SAT -> VAL -> HUE).
    */
   void next();
 };

@@ -1,3 +1,8 @@
+/**
+ * @file std_defines.h
+ * @brief Standard macros, defaults, and definitions for the RLC_V3 firmware.
+ */
+
 #if !defined(STD_DEFINES_H)
 #define STD_DEFINES_H
 

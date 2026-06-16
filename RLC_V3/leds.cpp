@@ -1,3 +1,8 @@
+/**
+ * @file leds.cpp
+ * @brief Implementation of LED driver, mapping, and pattern generation.
+ */
+
 #include "leds.h"
 
 CRGB red_segment(255, 0, 0);
@@ -362,12 +367,14 @@ void grad_out(C_GRAD grad_val) {
   uint8_t eh = grad_val.get_end_hue();
   uint8_t es = grad_val.get_end_sat();
   uint8_t ev = grad_val.get_end_val();
+  uint8_t dimmer = grad_val.get_dimmer();
 
   if (seg.get_value_mode() == VALUE_PERCENTAGE) {
     ss = map(ss, 0, 100, 0, 255);
     sv = map(sv, 0, 100, 0, 255);
     es = map(es, 0, 100, 0, 255);
     ev = map(ev, 0, 100, 0, 255);
+    dimmer = map(dimmer, 0, 100, 0, 255);
   }
 
   // calculate distance always counting upwards
@@ -383,6 +390,7 @@ void grad_out(C_GRAD grad_val) {
     CHSV temp_hsv(curr_h, curr_s, curr_v);
     CRGB temp_rgb;
     hsv2rgb_rainbow(temp_hsv, temp_rgb);
+    temp_rgb.nscale8_video(dimmer);
 
 #ifdef LED_OUT_RGBIC
 #if LED_COLOR_TYPE == LED_COLOR_TYPE_RGBCCT
@@ -434,9 +442,9 @@ void cct_out(c_cct cct_val) {
   }
 
 #if LED_COLOR_TYPE == LED_COLOR_TYPE_RGB
-  uint8_t r = 255;
-  uint8_t g = (cw * 255 + ww * 197) / 255;
-  uint8_t b = (cw * 255 + ww * 143) / 255;
+  uint8_t r = (cw * RGB_CW_R + ww * RGB_WW_R) / 255;
+  uint8_t g = (cw * RGB_CW_G + ww * RGB_WW_G) / 255;
+  uint8_t b = (cw * RGB_CW_B + ww * RGB_WW_B) / 255;
   CRGB color(r, g, b);
   rgb_out(color, brightness);
 #endif

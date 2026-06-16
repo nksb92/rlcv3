@@ -1,3 +1,8 @@
+/**
+ * @file common.h
+ * @brief Common header file including all major configurations and dependencies.
+ */
+
 #ifndef COMMON_H
 #define COMMON_H
 

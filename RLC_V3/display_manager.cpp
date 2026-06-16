@@ -1,3 +1,8 @@
+/**
+ * @file display_manager.cpp
+ * @brief Implementation of display state and navigation manager.
+ */
+
 #include "display_manager.h"
 
 #include "common.h"

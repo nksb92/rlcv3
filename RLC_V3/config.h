@@ -1,3 +1,8 @@
+/**
+ * @file config.h
+ * @brief Central configuration file defining hardware profiles, firmware settings, and macro choices.
+ */
+
 #if !defined(RLCV3_CONFIG_H)
 #define RLCV3_CONFIG_H
 
@@ -69,6 +74,16 @@
 #define CCT_MIN_KELVIN 3000
 #define CCT_MAX_KELVIN 6500
 #define CCT_STEP_SIZE  50
+
+// RGB Emulation of White (used when LED_COLOR_TYPE is LED_COLOR_TYPE_RGB)
+// These define the raw RGB output values for the CCT_MIN_KELVIN and CCT_MAX_KELVIN points.
+// Adjust these to match the color characteristics of your specific LED hardware.
+#define RGB_WW_R 255
+#define RGB_WW_G 90
+#define RGB_WW_B 10
+#define RGB_CW_R 255
+#define RGB_CW_G 255
+#define RGB_CW_B 255
 
 #ifdef RGB_IC_TUBE
 #define NO_FAN

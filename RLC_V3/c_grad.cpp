@@ -1,3 +1,8 @@
+/**
+ * @file c_grad.cpp
+ * @brief Implementation of the gradient color control class.
+ */
+
 #include "c_grad.h"
 #include "segments.h"
 
@@ -11,6 +16,7 @@ C_GRAD::C_GRAD(uint8_t _sh, uint8_t _ss, uint8_t _sv, uint8_t _eh, uint8_t _es, 
   end_hue = _eh;
   end_sat = _es;
   end_val = _ev;
+  dimmer = MAX_VALUE_SAT_VAL;
   current_menu_item = GRAD_START_HUE;
   current_deepness = GRAD_ITEM_SELECTION;
 }
@@ -87,6 +93,13 @@ void C_GRAD::add_value(int amount) {
       end_val = temp;
       break;
     }
+    case GRAD_DIMMER: {
+      int temp = dimmer + amount;
+      if (temp > MAX_VALUE_SAT_VAL) temp = MAX_VALUE_SAT_VAL;
+      if (temp < 0) temp = 0;
+      dimmer = temp;
+      break;
+    }
   }
 }
 
@@ -96,6 +109,7 @@ uint8_t C_GRAD::get_start_val() { return start_val; }
 uint8_t C_GRAD::get_end_hue() { return end_hue; }
 uint8_t C_GRAD::get_end_sat() { return end_sat; }
 uint8_t C_GRAD::get_end_val() { return end_val; }
+uint8_t C_GRAD::get_dimmer() { return dimmer; }
 
 void C_GRAD::set_start_hue(uint8_t value) { start_hue = value; }
 void C_GRAD::set_start_sat(uint8_t value) { start_sat = value > MAX_VALUE_SAT_VAL ? MAX_VALUE_SAT_VAL : value; }
@@ -103,3 +117,4 @@ void C_GRAD::set_start_val(uint8_t value) { start_val = value > MAX_VALUE_SAT_VA
 void C_GRAD::set_end_hue(uint8_t value) { end_hue = value; }
 void C_GRAD::set_end_sat(uint8_t value) { end_sat = value > MAX_VALUE_SAT_VAL ? MAX_VALUE_SAT_VAL : value; }
 void C_GRAD::set_end_val(uint8_t value) { end_val = value > MAX_VALUE_SAT_VAL ? MAX_VALUE_SAT_VAL : value; }
+void C_GRAD::set_dimmer(uint8_t value) { dimmer = value > MAX_VALUE_SAT_VAL ? MAX_VALUE_SAT_VAL : value; }

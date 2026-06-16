@@ -1,3 +1,8 @@
+/**
+ * @file settings_menu.cpp
+ * @brief Implementation of settings sub-menu structure and interaction.
+ */
+
 #include "settings_menu.h"
 
 settings_menu::settings_menu() {

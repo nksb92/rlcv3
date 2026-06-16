@@ -1,3 +1,8 @@
+/**
+ * @file continuous_tasks.cpp
+ * @brief Implementation of continuous polling tasks.
+ */
+
 #include "continuous_tasks.h"
 
 #include "common.h"

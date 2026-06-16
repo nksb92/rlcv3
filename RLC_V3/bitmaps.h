@@ -1,3 +1,8 @@
+/**
+ * @file bitmaps.h
+ * @brief Auto-generated custom bitmaps for UI menu icons.
+ */
+
 #ifndef BITMAPS_H
 #define BITMAPS_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file event_handler.cpp
+ * @brief Implementation of the event-handling logic.
+ */
+
 #include "event_handler.h"
 
 #include "common.h"

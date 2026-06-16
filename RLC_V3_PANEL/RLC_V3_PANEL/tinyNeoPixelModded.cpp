@@ -1,3 +1,8 @@
+/**
+ * @file tinyNeoPixelModded.cpp
+ * @brief Implementation of modded tinyNeoPixelModded library.
+ */
+
 /*-------------------------------------------------------------------------
   Arduino library to control a wide variety of WS2811- and WS2812-based RGB
   LED devices such as Adafruit FLORA RGB Smart Pixels and NeoPixel strips.

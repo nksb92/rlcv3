@@ -1,3 +1,8 @@
+/**
+ * @file soft_timer_cfg.cpp
+ * @brief Implementation of software timer configurations.
+ */
+
 #include "soft_timer_cfg.h"
 
 // Timer Configuration Table

@@ -1,37 +1,27 @@
-/*
-
-  Project:          RLC_V3
-  Author:           Niko Kassubek
-  Microcontroller:  SeeedStudio XIAO ESP32-C3
-
-*/
-
-/*
-  Architecture Overview:
-  This project utilizes a hybrid Event-Driven architecture combined with a polling loop for real-time tasks.
-
-  1. Event System: User inputs (Rotary Encoder), Timers, and System changes generate events posted to a queue (EventManager).
-  2. Event Handler: The main loop processes these events to update the application state (Menu, LED values, Settings) and trigger UI updates.
-  3. Continuous Tasks: High-bandwidth tasks like DMX and ArtNet processing run continuously in the main loop to ensure low latency.
-  4. Modularity: Hardware abstraction layers exist for Display, LEDs, DMX, and NVM (EEPROM), keeping the main logic decoupled from hardware specifics.
-*/
-
-/* ************ LIBRARY DEPENDENCIES ************ **
-
-  Make sure, to have these library versions installed,
-  otherwise it may break this code!
-
-  esp core:             version 3.30.3
-
-  Adafruit GFX Library: version 1.12.1
-  Adafruit NeoPixel:    version 1.13.0
-  Adafruit SSD1306:     version 2.5.14
-  ArtnetWifi:           version 1.6.1
-  EncoderButton:        version 1.0.6
-  FastLED:              version 3.9.16
-  esp_dmx:              version 4.1.0 -> needs fix https://github.com/someweisguy/esp_dmx/issues/181#issuecomment-2619261884
-
-** ************ LIBRARY DEPENDENCIES ************ */
+/**
+ * @file RLC_V3.ino
+ * @brief Main entry point and initialization logic for the RLC_V3 hybrid LED controller.
+ * @author Niko Kassubek
+ * @date 2026
+ * 
+ * @section overview Architecture Overview
+ * This project utilizes a hybrid Event-Driven architecture combined with a polling loop for real-time tasks.
+ * 1. Event System: User inputs (Rotary Encoder), Timers, and System changes generate events posted to a queue (EventManager).
+ * 2. Event Handler: The main loop processes these events to update the application state (Menu, LED values, Settings) and trigger UI updates.
+ * 3. Continuous Tasks: High-bandwidth tasks like DMX and ArtNet processing run continuously in the main loop to ensure low latency.
+ * 4. Modularity: Hardware abstraction layers exist for Display, LEDs, DMX, and NVM (EEPROM), keeping the main logic decoupled from hardware specifics.
+ * 
+ * @section dependencies Library Dependencies
+ * Make sure to have these library versions installed, otherwise compilation or behavior may break:
+ * - ESP32 Core: version 3.30.3
+ * - Adafruit GFX Library: version 1.12.1
+ * - Adafruit NeoPixel: version 1.13.0
+ * - Adafruit SSD1306: version 2.5.14
+ * - ArtnetWifi: version 1.6.1
+ * - EncoderButton: version 1.0.6
+ * - FastLED: version 3.9.16
+ * - esp_dmx: version 4.1.0 (requires fix for ESP32-C3)
+ */
 
 #include "continuous_tasks.h"
 #include "display.h"
@@ -54,6 +44,7 @@
 #include "common.h"
 
 // --- Globals: State ---
+/** @brief Flag indicating if new ArtNet data has been received. */
 bool artnet_data = false;
 
 // --- Globals: Objects ---
@@ -74,6 +65,14 @@ fan_control fan;
 #endif
 
 void startup_wrapper();
+
+/**
+ * @brief Executes the startup animation and fade-in logic for LEDs and display.
+ * 
+ * Gradually fades in the LEDs depending on the active mode (HSV, RGB, CCT, Gradient)
+ * and displays the startup splash screen on the OLED. If ArtNet mode is configured,
+ * it kicks off the WiFi connection sequence.
+ */
 void startup_wrapper() {
   uint8_t current_deepness = main_sw.get_deepness();
   uint8_t main_state = main_sw.get_current();
@@ -120,6 +119,16 @@ void startup_wrapper() {
   }
 }
 
+/**
+ * @brief Callback function triggered when an ArtNet packet is received.
+ * 
+ * Maps received ArtNet universe data to the current or next segment configuration.
+ * 
+ * @param[in] universe The ArtNet universe number.
+ * @param[in] length The length of the DMX data.
+ * @param[in] sequence The sequence number of the ArtNet packet.
+ * @param[in] data Pointer to the DMX channel data buffer.
+ */
 void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
   uint16_t current_universe = artnet_var.get_start_universe();
   if (universe == current_universe) {
@@ -130,6 +139,13 @@ void on_artnet_frame(uint16_t universe, uint16_t length, uint8_t sequence, uint8
   artnet_data = true;
 }
 
+/**
+ * @brief Main Arduino initialization routine.
+ * 
+ * Configures system peripherals (Serial, I2C, SPI), initializes sub-systems (fan, event manager,
+ * timers, UI, EEPROM, display, LEDs, encoder, DMX, segments, ArtNet), loads saved state from EEPROM,
+ * and boots the display standby timers.
+ */
 void setup() {
 // init fan instantly
 #ifdef DEBUGGING_ENABLED
@@ -203,6 +219,12 @@ void setup() {
   DEBUG_PRINTLN("Startup complete.");
 }
 
+/**
+ * @brief Main Arduino program loop.
+ * 
+ * Periodically updates the rotary encoder state, checks and posts elapsed software timer events,
+ * dispatches and processes pending queue events, and executes continuous low-latency tasks (DMX, ArtNet).
+ */
 void loop() {
   enc_button.update();
 

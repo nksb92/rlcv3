@@ -1,3 +1,8 @@
+/**
+ * @file c_rgb.cpp
+ * @brief Implementation of the RGB color space control class.
+ */
+
 #include "c_rgb.h"
 
 C_RGB::C_RGB(uint8_t red, uint8_t green, uint8_t blue) {

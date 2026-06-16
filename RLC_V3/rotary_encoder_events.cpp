@@ -1,3 +1,8 @@
+/**
+ * @file rotary_encoder_events.cpp
+ * @brief Implementation of rotary encoder button and rotation event-handler.
+ */
+
 #include "rotary_encoder_events.h"
 
 #include "display_manager.h"

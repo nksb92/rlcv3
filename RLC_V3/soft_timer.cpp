@@ -1,3 +1,8 @@
+/**
+ * @file soft_timer.cpp
+ * @brief Implementation of the software timer manager system.
+ */
+
 #include "soft_timer.h"
 
 #include <Arduino.h>

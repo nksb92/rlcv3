@@ -1,3 +1,8 @@
+/**
+ * @file event_manager_cfg.cpp
+ * @brief Implementation and declaration of event manager configuration table.
+ */
+
 #include "event_manager_cfg.h"
 
 // Event Configuration Table

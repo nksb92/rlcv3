@@ -1,15 +1,20 @@
+/**
+ * @file dmx.cpp
+ * @brief Implementation of the DMX lighting control receiver class.
+ */
+
 #include "dmx.h"
 
 #include "hal/uart_ll.h"
 #include "soc/system_struct.h"
 #include "soc/uart_struct.h"
-/*
-Pins for the communication with the RS-485 IC
-@param TRANSMIT_PIN: pin for sending dmx_data
-@param RECEIVE_PIN: pin for receiving dmx_data
-@param ENABLE_PIN: pin to pull RS-485 IC high or low; high for sending dmx_data, low
-for receiving dmx_data
-*/
+
+/**
+ * Pins for the communication with the RS-485 IC:
+ * - TRANSMIT_PIN: Pin for sending DMX data.
+ * - RECEIVE_PIN: Pin for receiving DMX data.
+ * - ENABLE_PIN: Pin to control RS-485 driver enable; high for sending, low for receiving.
+ */
 #define TRANSMIT_PIN D6
 #define RECEIVE_PIN D7
 #define ENABLE_PIN D3

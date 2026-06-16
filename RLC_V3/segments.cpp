@@ -1,3 +1,8 @@
+/**
+ * @file segments.cpp
+ * @brief Implementation of LED segment layout and configuration options.
+ */
+
 #include "segments.h"
 
 segments::segments() {

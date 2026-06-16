@@ -1,6 +1,11 @@
+/**
+ * @file nvm.cpp
+ * @brief Implementation of Non-Volatile Memory (EEPROM) read/write operations.
+ */
+
 #include "nvm.h"
 
-#define COUNT_STORED_VALUES 25
+#define COUNT_STORED_VALUES 26
 #define POLYNOMIAL 0xD8
 #define WIDTH (8 * sizeof(uint8_t))
 #define TOPBIT (1 << (WIDTH - 1))
@@ -175,13 +180,14 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
   crc_index++;
 
   // get all variables from grad page
-  uint8_t g_sh = 0, g_ss = 100, g_sv = 100, g_eh = 160, g_es = 100, g_ev = 100;
+  uint8_t g_sh = 0, g_ss = 100, g_sv = 100, g_eh = 160, g_es = 100, g_ev = 100, g_dim = 100;
   EEPROM.get(eeprom_address, g_sh); eeprom_address += sizeof(g_sh); crc_values[crc_index++] = g_sh;
   EEPROM.get(eeprom_address, g_ss); eeprom_address += sizeof(g_ss); crc_values[crc_index++] = g_ss;
   EEPROM.get(eeprom_address, g_sv); eeprom_address += sizeof(g_sv); crc_values[crc_index++] = g_sv;
   EEPROM.get(eeprom_address, g_eh); eeprom_address += sizeof(g_eh); crc_values[crc_index++] = g_eh;
   EEPROM.get(eeprom_address, g_es); eeprom_address += sizeof(g_es); crc_values[crc_index++] = g_es;
-  EEPROM.get(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index] = g_ev;
+  EEPROM.get(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index++] = g_ev;
+  EEPROM.get(eeprom_address, g_dim); eeprom_address += sizeof(g_dim); crc_values[crc_index] = g_dim;
 
   uint8_t crc = 0;
   EEPROM.get(eeprom_address, crc);
@@ -222,8 +228,8 @@ void read_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_va
     grad_val.set_start_sat(g_ss);
     grad_val.set_start_val(g_sv);
     grad_val.set_end_hue(g_eh);
-    grad_val.set_end_sat(g_es);
     grad_val.set_end_val(g_ev);
+    grad_val.set_dimmer(g_dim);
   }
 }
 
@@ -359,7 +365,9 @@ void write_eeprom(C_HSV& hsv_val, C_RGB& rgb_val, c_cct& cct_val, rgb_dmx& dmx_v
   uint8_t g_es = grad_val.get_end_sat();
   EEPROM.put(eeprom_address, g_es); eeprom_address += sizeof(g_es); crc_values[crc_index++] = g_es;
   uint8_t g_ev = grad_val.get_end_val();
-  EEPROM.put(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index] = g_ev;
+  EEPROM.put(eeprom_address, g_ev); eeprom_address += sizeof(g_ev); crc_values[crc_index++] = g_ev;
+  uint8_t g_dim = grad_val.get_dimmer();
+  EEPROM.put(eeprom_address, g_dim); eeprom_address += sizeof(g_dim); crc_values[crc_index] = g_dim;
 
   // calculate the crc and saving it in the eeprom
   EEPROM.put(eeprom_address, crcFast(crc_values));

@@ -1,3 +1,8 @@
+/**
+ * @file rlc_artnet.cpp
+ * @brief Implementation of ArtNet over WiFi control receiver.
+ */
+
 #include "rlc_artnet.h"
 
 #include "WiFiType.h"

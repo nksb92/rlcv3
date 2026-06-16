@@ -1,3 +1,8 @@
+/**
+ * @file c_cct.cpp
+ * @brief Implementation of the Correlated Color Temperature (CCT) control class.
+ */
+
 #include "c_cct.h"
 #include "segments.h"
 

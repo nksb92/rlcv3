@@ -1,3 +1,8 @@
+/**
+ * @file tinyNeoPixelModded.h
+ * @brief Modded version of Adafruit_NeoPixel library tailored for ATtiny402 megatinycore.
+ */
+
 /*--------------------------------------------------------------------
   This file is part of the tinyNeoPixelModded library, derived from
   Adafruit_NeoPixel.
