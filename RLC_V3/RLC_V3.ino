@@ -209,6 +209,20 @@ void setup() {
   // read non volatile memory and set variables accordingly
   read_eeprom(hsv_val, rgb_val, cct_val, dmx_val, main_sw, artnet_var, seg, grad_val);
 
+  extern uint32_t dmx_error_reboot_flag;
+  extern uint16_t rtc_saved_dmx_address;
+  extern uint8_t rtc_consecutive_reboots;
+  
+  if (dmx_error_reboot_flag == 0x12345678) {
+    dmx_error_reboot_flag = 0; // Clear the flag
+    dmx_val.set_start_address(rtc_saved_dmx_address); // Restore the actively set (unsaved) address
+    main_sw.set_current(DMX_PAGE); // Force the DMX page
+    main_sw.set_deepness(SUB_MENU); // Enter the menu so it's active
+  } else {
+    // Normal cold boot or user reboot, reset the fail counter
+    rtc_consecutive_reboots = 0;
+  }
+
   startup_wrapper();
 
   // wake up display and Start display standby timer

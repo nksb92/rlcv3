@@ -92,8 +92,16 @@ void rgb_dmx::set_start_address(int start) {
   add_to_adress(start - 1);
 }
 
+#include <esp_attr.h>
+RTC_NOINIT_ATTR uint32_t dmx_error_reboot_flag;
+RTC_NOINIT_ATTR uint16_t rtc_saved_dmx_address;
+RTC_NOINIT_ATTR uint8_t rtc_consecutive_reboots;
+#define DMX_REBOOT_MAGIC 0x12345678
+
 void rgb_dmx::handle_dmx() {
   dmx_packet_t packet;
+  static uint32_t consecutive_errors = 0;
+
   if (dmx_receive(dmxPort, &packet, 5)) {
     if (!packet.err) {
       if (packet.size > 0) {
@@ -101,6 +109,8 @@ void rgb_dmx::handle_dmx() {
         dmx_read(dmxPort, _data, packet.size);
         set_universe(_data);
         data_received = true;
+        consecutive_errors = 0; // reset counter on valid packet
+        rtc_consecutive_reboots = 0; // reset the reboot counter on successful frame
       } else {
         data_received = false;
       }
@@ -109,13 +119,36 @@ void rgb_dmx::handle_dmx() {
       switch (packet.err) {
         case DMX_ERR_UART_OVERFLOW:
           reset();  // Overflow needs a reset to clear buffer
+          consecutive_errors = 0;
           break;
 
         case DMX_ERR_IMPROPER_SLOT:
           // Do nothing! Let the driver re-sync on the next frame.
+          consecutive_errors = 0; // Not a critical error
+          break;
+
+        case DMX_ERR_TIMEOUT:
+          // Signal lost or stopped mid-frame (e.g. cable unplugged).
+          // This is completely normal and should not cause a reboot.
+          consecutive_errors = 0;
           break;
 
         default:
+          consecutive_errors++;
+          if (consecutive_errors > 100) {
+            if (rtc_consecutive_reboots < 3) {
+              // If we are flooded with noise/errors, force a full reboot
+              rtc_consecutive_reboots++;
+              dmx_error_reboot_flag = DMX_REBOOT_MAGIC;
+              rtc_saved_dmx_address = start_address; // Backup active unsaved address
+              ESP.restart(); 
+            } else {
+              // We've rebooted 3 times and are STILL getting flooded.
+              // This is a permanent hardware failure or floating line.
+              // Disable the DMX driver completely to prevent an infinite boot loop.
+              disable();
+            }
+          }
           break;
       }
     }
