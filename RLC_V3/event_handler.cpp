@@ -132,7 +132,7 @@ void process_event(const event_t* event) {
             case CCT_PAGE:
               cct_out(cct_val);
 #ifdef FAN_USAGE
-              fan.calc_hsv_speed(hsv_val); // Fallback to HSV speed logic for fan when in CCT, or omit if not desired
+              fan.calc_cct_speed(cct_val);
 #endif
               break;
             case DMX_PAGE:
@@ -171,7 +171,7 @@ void process_event(const event_t* event) {
       DEBUG_PRINTLN("DOUBLE PRESS");
       TimerManager.restart(TIMER_DISPLAY_STANDBY);
 
-      if (current_deepness == SUB_MENU && main_state != SETTINGS_PAGE) {
+      if (current_deepness == SUB_MENU) {
         event_manager.post(EVT_SAVE_TO_NVM);
       }
       break;
@@ -237,7 +237,7 @@ void process_event(const event_t* event) {
               }
               cct_out(cct_val);
 #ifdef FAN_USAGE
-              fan.calc_hsv_speed(hsv_val);
+              fan.calc_cct_speed(cct_val);
 #endif
               break;
 

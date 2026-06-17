@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+class c_cct;
+
 /**
  * @class fan_control
  * @brief Regulates cooling fan speed based on active LED thermal/power load.
@@ -61,6 +63,12 @@ class fan_control {
    * @param[in] color RGB color value.
    */
   void calc_rgb_speed(CRGB color);
+
+  /**
+   * @brief Calculates target fan speed based on a CCT value.
+   * @param[in] color CCT value.
+   */
+  void calc_cct_speed(c_cct color);
 
   /**
    * @brief Evaluates the total sum of LED channel loads to determine cooling needs.

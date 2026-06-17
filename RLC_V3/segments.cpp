@@ -36,6 +36,9 @@ uint8_t segments::get_current_seg() {
 }
 
 void segments::set_current_segment(uint8_t _current) {
+  if (_current >= last_segment) {
+    _current = 0;
+  }
   current_segment = _current;
   add_seg(0);
 }

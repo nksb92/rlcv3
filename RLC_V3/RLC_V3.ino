@@ -103,6 +103,16 @@ void startup_wrapper() {
         temp_grad.set_start_val(s_v);
         temp_grad.set_end_val(e_v);
         grad_out(temp_grad);
+      } else if (SETTINGS_PAGE == main_state) {
+        if (i == steps) {
+          if (option_menu.get_item() == SEGMENTS) {
+            show_segments(seg.get_num_seg());
+          } else if (option_menu.get_item() == FIRMWARE) {
+            TimerManager.start(TIMER_RAINBOW_ANIM);
+          } else {
+            rgb_out(rgb_val.get_rgb(), 0);
+          }
+        }
       }
       delay(FRAME_DELAY);
     }
@@ -212,6 +222,8 @@ void setup() {
       fan.calc_hsv_speed(hsv_val);
     } else if (main_sw.get_current() == RGB_PAGE) {
       fan.calc_rgb_speed(rgb_val.get_rgb());
+    } else if (main_sw.get_current() == CCT_PAGE) {
+      fan.calc_cct_speed(cct_val);
     }
   }
 #endif

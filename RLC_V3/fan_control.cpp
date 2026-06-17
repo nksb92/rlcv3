@@ -5,6 +5,7 @@
 
 #include "fan_control.h"
 #include "segments.h"
+#include "c_cct.h"
 
 #define STEP_UP 5    // Ramp Up Time:   255 * 150 ms / 5 = 7,65 s
 #define STEP_DOWN 1  // Ramp Down Time: 255 * 150 ms / 1 = 38,25 s
@@ -87,6 +88,19 @@ void fan_control::calc_rgb_speed(CRGB color) {
   uint16_t sum = 0;
   sum += color.r + color.g + color.b;
 
+  evaluate_sum(sum);
+}
+
+void fan_control::calc_cct_speed(c_cct color) {
+  uint8_t brightness = color.get_brightness();
+  if (seg.get_value_mode() == VALUE_PERCENTAGE) {
+    brightness = map(brightness, 0, 100, 0, 255);
+  }
+  
+  // Scale to 0-765 range to match RGB scaling
+  // Since CCT mode only drives white LEDs (equivalent to 1 or 2 channels),
+  // we scale by 3 to represent full thermal load at 100% brightness.
+  uint16_t sum = (uint16_t)brightness * 3;
   evaluate_sum(sum);
 }
 

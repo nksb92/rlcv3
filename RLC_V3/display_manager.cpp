@@ -68,10 +68,12 @@ void display_enter_standby() {
   display_is_standby = true;
   display.clearDisplay();
   display.display();
+  display.ssd1306_command(SSD1306_DISPLAYOFF);
 }
 
 void display_leave_standby() {
   display_is_standby = false;
+  display.ssd1306_command(SSD1306_DISPLAYON);
   display_show_menu();
   display_show_submenu();
 }
