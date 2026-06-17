@@ -188,8 +188,10 @@ void settings_display_update(Adafruit_SSD1306& dp, segments seg, uint8_t setting
                     W_H_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][WIDTH],
                     W_H_MATRIX_SETTINGS[NMBR_FIRMWARE_OPTION][HEIGHT],
                     1);
+      dp.setFont(&FreeSans7pt7b);
       dp.setCursor(82, 15);
       dp.print(RLCV3_FIRMWARE_VERSION);
+      dp.setFont(&FreeMonoBold9pt7b);
       break;
     case DIMMER_OPTION:
       dp.setCursor(5, 15);

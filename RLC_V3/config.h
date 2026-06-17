@@ -67,7 +67,23 @@
 #define LED_COLOR_TYPE_RGBW 1
 #define LED_COLOR_TYPE_RGBCCT 2
 
-// set default to RGBCCT
+// ----------------------------------------------------------------------------------------------------------------------------------------
+#ifdef RGB_IC_TUBE
+#define NO_FAN
+#define LED_OUT_RGBIC
+#define NUM_PIXEL 24
+
+// LED strip configuration
+#define COLOR_ORDER_WS2815 NEO_GRB
+#define COLOR_ORDER_WS2811 NEO_RGB
+#define COLOR_ORDER_COB_RGBIC NEO_RGB
+// #define COLOR_ORDER COLOR_ORDER_WS2815
+// #define COLOR_ORDER COLOR_ORDER_WS2811
+#define COLOR_ORDER COLOR_ORDER_COB_RGBIC
+
+// Note: To change the chipset type or LED class (e.g. NeoPixelBus features/methods),
+// refer to the instantiation in leds.cpp.
+
 #define LED_COLOR_TYPE LED_COLOR_TYPE_RGBCCT
 
 // CCT Settings (used when LED_COLOR_TYPE is LED_COLOR_TYPE_RGBCCT)
@@ -76,21 +92,15 @@
 #define CCT_STEP_SIZE  50
 
 // RGB Emulation of White (used when LED_COLOR_TYPE is LED_COLOR_TYPE_RGB)
-// These define the raw RGB output values for the CCT_MIN_KELVIN and CCT_MAX_KELVIN points.
-// Adjust these to match the color characteristics of your specific LED hardware.
 #define RGB_WW_R 255
 #define RGB_WW_G 90
 #define RGB_WW_B 10
 #define RGB_CW_R 255
 #define RGB_CW_G 255
 #define RGB_CW_B 255
-
-#ifdef RGB_IC_TUBE
-#define NO_FAN
-#define LED_OUT_RGBIC
-#define NUM_PIXEL 24
 #endif
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
 #ifdef RGB_TUBE
 #define NO_FAN
 #define LED_OUT_MOSFET
@@ -98,8 +108,24 @@
 #define GREEN_PIN D9
 #define BLUE_PIN D8
 #define NUM_PIXEL 1
+
+#define LED_COLOR_TYPE LED_COLOR_TYPE_RGB
+
+// CCT Settings
+#define CCT_MIN_KELVIN 3000
+#define CCT_MAX_KELVIN 6500
+#define CCT_STEP_SIZE  50
+
+// RGB Emulation of White
+#define RGB_WW_R 255
+#define RGB_WW_G 90
+#define RGB_WW_B 10
+#define RGB_CW_R 255
+#define RGB_CW_G 255
+#define RGB_CW_B 255
 #endif
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
 #ifdef PANEL
 #define LED_OUT_I2C
 
@@ -110,8 +136,24 @@
 #define FAN_ZERO_RPM false
 
 #define NUM_PIXEL 5
+
+#define LED_COLOR_TYPE LED_COLOR_TYPE_RGB
+
+// CCT Settings
+#define CCT_MIN_KELVIN 3000
+#define CCT_MAX_KELVIN 6500
+#define CCT_STEP_SIZE  50
+
+// RGB Emulation of White
+#define RGB_WW_R 255
+#define RGB_WW_G 90
+#define RGB_WW_B 10
+#define RGB_CW_R 255
+#define RGB_CW_G 255
+#define RGB_CW_B 255
 #endif
 
+// ----------------------------------------------------------------------------------------------------------------------------------------
 #ifdef SPOT
 #define LED_OUT_MOSFET
 #define RED_PIN D10
@@ -125,7 +167,24 @@
 #define FAN_ZERO_RPM true
 
 #define NUM_PIXEL 1
+
+#define LED_COLOR_TYPE LED_COLOR_TYPE_RGB
+
+// CCT Settings
+#define CCT_MIN_KELVIN 3000
+#define CCT_MAX_KELVIN 6500
+#define CCT_STEP_SIZE  50
+
+// RGB Emulation of White
+#define RGB_WW_R 255
+#define RGB_WW_G 90
+#define RGB_WW_B 10
+#define RGB_CW_R 255
+#define RGB_CW_G 255
+#define RGB_CW_B 255
 #endif
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
 
 #ifdef NO_FAN
 #define PWM_PIN NOT_A_PIN
